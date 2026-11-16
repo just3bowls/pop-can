@@ -31,7 +31,7 @@
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.2.1",
     "@scala-js/vite-plugin-scalajs": "^1.1.0",
-    "typescript": "^5.8.3",
+    "typescript": "^7.0.2",
     "vite": "^7.3.8"
   },
   "author": "just3bowls",
