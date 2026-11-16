@@ -177,25 +177,13 @@ final private[ui] class SessionFolderPanel(
         padding                          := "4px 0",
         children <-- Signal
           .combine(
-            folders.signal,
-            currentFolder,
-            sessions.signal,
-            creating.signal,
-            editing.signal,
-            creatingParentId,
-            collapsed.signal,
-            selected.signal
+            Signal.combine(folders.signal, currentFolder, sessions.signal, creating.signal),
+            Signal.combine(editing.signal, creatingParentId, collapsed.signal, selected.signal, confirmDelete.signal)
           )
           .map {
             case (
-                  allFolders,
-                  folderId,
-                  allSessions,
-                  isCreating,
-                  editId,
-                  createParentId,
-                  collapsedIds,
-                  selectedRow
+                  (allFolders, folderId, allSessions, isCreating),
+                  (editId, createParentId, collapsedIds, selectedRow, confirmingDelete)
                 ) =>
               val rows           = tree(allFolders, allSessions, collapsedIds).flatMap {
                 case row: FolderTreeRow  =>
@@ -209,7 +197,8 @@ final private[ui] class SessionFolderPanel(
                     rowSelected = selectedRow == FolderSelection(row.folder.id),
                     expanded = !collapsedIds.contains(row.folder.id),
                     canDelete = canDelete(allFolders, allSessions, row.folder.id),
-                    isEditing = editId == row.folder.id
+                    isEditing = editId == row.folder.id,
+                    isConfirming = confirmingDelete.contains(FolderSelection(row.folder.id))
                   )
                   val editor  =
                     if (isCreating && createParentId == row.folder.id)
@@ -234,7 +223,8 @@ final private[ui] class SessionFolderPanel(
                       level = row.level,
                       isLast = row.isLast,
                       ancestorContinues = row.ancestorContinues,
-                      rowSelected = selectedRow == SessionSelection(row.session.id)
+                      rowSelected = selectedRow == SessionSelection(row.session.id),
+                      isConfirming = confirmingDelete.contains(SessionSelection(row.session.id))
                     )
                   )
               }
@@ -692,11 +682,11 @@ final private[ui] class SessionFolderPanel(
       rowSelected: Boolean,
       expanded: Boolean,
       canDelete: Boolean,
-      isEditing: Boolean
+      isEditing: Boolean,
+      isConfirming: Boolean
   ): HtmlElement = {
     val hovered          = Var(false)
     val isDropTarget     = dragTarget.signal.map(_ == FolderDropTarget(id))
-    val confirming       = confirmDelete.signal.map(_ == FolderSelection(id))
     val isMoveTarget     = Signal.combine(moving.signal, moveTarget.signal).map {
       case (Some(_), target) => target == id
       case _                 => false
@@ -771,25 +761,18 @@ final private[ui] class SessionFolderPanel(
           alignItems.center,
           gap        := "1px",
           flexShrink := "0",
-          opacity <-- Signal
-            .combine(hovered.signal, confirming)
-            .map { case (isHovered, isConfirming) => if (isHovered || isConfirming) "1" else "0" },
-          pointerEvents <-- Signal
-            .combine(hovered.signal, confirming)
-            .map { case (isHovered, isConfirming) => if (isHovered || isConfirming) "auto" else "none" },
-          child <-- confirming.map {
-            case true  =>
-              InlineDeleteConfirmation.render(
-                onConfirm = () => deleteFolder(id, s"Deleted folder: $name"),
-                onCancel = () =>
-                  if (confirmDelete.now().contains(FolderSelection(id))) confirmDelete.set(None),
-                busySignal = busy.signal
-              )
-            case false =>
-              if (canDelete)
-                actionIcon("×", s"Delete empty folder $name", () => confirmDelete.set(Some(FolderSelection(id))))
-              else span("")
-          }
+          opacity <-- hovered.signal.map(value => if (value || isConfirming) "1" else "0"),
+          pointerEvents <-- hovered.signal.map(value => if (value || isConfirming) "auto" else "none"),
+          if (isConfirming)
+            InlineDeleteConfirmation.render(
+              onConfirm = () => deleteFolder(id, s"Deleted folder: $name"),
+              onCancel = () =>
+                if (confirmDelete.now().contains(FolderSelection(id))) confirmDelete.set(None),
+              busySignal = busy.signal
+            )
+          else if (canDelete)
+            actionIcon("×", s"Delete empty folder $name", () => confirmDelete.set(Some(FolderSelection(id))))
+          else span("")
         )
       else emptyNode
     )
@@ -799,12 +782,12 @@ final private[ui] class SessionFolderPanel(
       level: Int,
       isLast: Boolean,
       ancestorContinues: List[Boolean],
-      rowSelected: Boolean
+      rowSelected: Boolean,
+      isConfirming: Boolean
   ): HtmlElement = {
     val hovered          = Var(false)
     val isCurrent        = currentSessionId.signal.map(_ == session.id)
     val isEditing        = editingSessionId.signal.map(_ == session.id)
-    val confirming       = confirmDelete.signal.map(_ == SessionSelection(session.id))
     val displayTitle     = Option(session.title).map(_.trim).filter(_.nonEmpty).getOrElse(ChatStore.NewSessionTitle)
     val displayPath      = s"${SessionFolderPanel.pathPrefix(path(folders.now(), session.folderId))}$displayTitle"
     val isDropTarget     = dragTarget.signal.map(_ == SessionDropTarget(session.id))
@@ -930,27 +913,21 @@ final private[ui] class SessionFolderPanel(
               display.flex,
               alignItems.center,
               flexShrink      := "0",
-              opacity <-- Signal
-                .combine(hovered.signal, confirming)
-                .map { case (isHovered, isConfirming) => if (isHovered || isConfirming) "1" else "0" },
-              pointerEvents <-- Signal
-                .combine(hovered.signal, confirming)
-                .map { case (isHovered, isConfirming) => if (isHovered || isConfirming) "auto" else "none" },
-              child <-- confirming.map {
-                case true  =>
-                  InlineDeleteConfirmation.render(
-                    onConfirm = () => deleteSession(session.id, displayTitle),
-                    onCancel = () =>
-                      if (confirmDelete.now().contains(SessionSelection(session.id))) confirmDelete.set(None),
-                    busySignal = busy.signal
-                  )
-                case false =>
-                  actionIcon(
-                    "×",
-                    s"Delete session $displayTitle",
-                    () => confirmDelete.set(Some(SessionSelection(session.id)))
-                  )
-              }
+              opacity <-- hovered.signal.map(value => if (value || isConfirming) "1" else "0"),
+              pointerEvents <-- hovered.signal.map(value => if (value || isConfirming) "auto" else "none"),
+              if (isConfirming)
+                InlineDeleteConfirmation.render(
+                  onConfirm = () => deleteSession(session.id, displayTitle),
+                  onCancel = () =>
+                    if (confirmDelete.now().contains(SessionSelection(session.id))) confirmDelete.set(None),
+                  busySignal = busy.signal
+                )
+              else
+                actionIcon(
+                  "×",
+                  s"Delete session $displayTitle",
+                  () => confirmDelete.set(Some(SessionSelection(session.id)))
+                )
             )
           )
       }
