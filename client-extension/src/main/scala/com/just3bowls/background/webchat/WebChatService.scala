@@ -17,7 +17,8 @@ import com.just3bowls.model.chat.ChatMessage
 import com.just3bowls.model.chat.ChatStore
 import com.just3bowls.model.provider.ParserProviderInfo
 import com.just3bowls.model.localapi.ApiKeyStore
-import com.just3bowls.model.chat.SessionSettingsStore
+import com.just3bowls.model.chat.{LocalAgentModel, SessionSettingsStore}
+import com.just3bowls.api.marker.{DeclaredToolPolicy, ProtocolRepair}
 import com.just3bowls.model.chat.FinalSseProducer
 import com.just3bowls.model.provider.ProviderRequestRule
 import com.just3bowls.model.chat.RawChunkStreamDecoder
@@ -988,6 +989,7 @@ private[background] object WebChatService {
     else {
       val provider = runtime.assoc.map(_.provider).getOrElse("")
       runtime.turnAssoc = runtime.assoc
+      runtime.turnAllowedTools = Set.empty
       runtime.content.clear()
       // 新的一轮开始：清掉上一轮的错误，免得胶囊一直挂着旧报错。
       clearError(runtime)
@@ -1172,6 +1174,11 @@ private[background] object WebChatService {
                 new FinalSseProducer(runtime.turnGen, runtime.assoc.map(_.provider).getOrElse(""))
                   .parseMarkersText(normalized)
                   .toOption
+                  .filter(result =>
+                    DeclaredToolPolicy
+                      .validate(result.content, result.toolCalls, runtime.turnAllowedTools)
+                      .isEmpty
+                  )
                   .map(result => AgentRound(result.content, result.thinking, result.toolCalls))
                   .filter(_.toolCalls.nonEmpty)
               } catch { case _: Throwable => None }
@@ -1393,9 +1400,15 @@ private[background] object WebChatService {
       forceRaw: Boolean = false
   ): Future[Unit] = {
     val provider                               = host.provider
-    val parsed                                 =
+    val structurallyParsed                     =
       try new FinalSseProducer(runtime.turnGen, provider).parseMarkersText(normalized)
       catch { case _: Throwable => Left("marker parse threw") }
+    val parsed                                 =
+      structurallyParsed.flatMap { result =>
+        val violations = DeclaredToolPolicy.validate(result.content, result.toolCalls, runtime.turnAllowedTools)
+        if (violations.isEmpty) Right(result)
+        else Left(DeclaredToolPolicy.messages(violations).mkString(" | "))
+      }
     // marker 里的 reason 也要落库：网页原生这条链路没有 steps，插件页靠 `thinking` 渲染折叠的 "Thinking"。
     val (assistantText, assistantThinking, ok) = parsed match {
       case Right(result) if !forceRaw => (result.content, capWebTurnThinking(result.thinking), true)
@@ -1411,6 +1424,10 @@ private[background] object WebChatService {
       case Left(error) => error
       case Right(_)    => ""
     }
+    val protocolRepair                         =
+      Option(markerReason).filter(_.nonEmpty).map(reason =>
+        ProtocolRepair.directive(List(reason), runtime.turnAllowedTools)
+      )
     val regenerate                             = isRegenerate(userText, host)
     val origin                                 = s"web:${host.convKey}"
     ChatStore
@@ -1456,7 +1473,8 @@ private[background] object WebChatService {
       .flatMap(_ => pushState(runtime.tabId))
       // marker 类失败：把这一轮交回插件页自动重试（换新对话 + 完整模版；预算在页面侧）。
       .flatMap(_ =>
-        if (markerReason.nonEmpty) requestNativeRetryForTurn(runtime, host, markerReason) else Future.successful(())
+        if (markerReason.nonEmpty) requestNativeRetryForTurn(runtime, host, markerReason, protocolRepair)
+        else Future.successful(())
       )
       .recover { case e =>
         PopCanLog.warn("webchat", s"record turn failed: ${e.getMessage}")
@@ -1489,14 +1507,27 @@ private[background] object WebChatService {
     }
 
   /** 原生首轮 marker 解析失败：拿这条会话的 tip（刚写下的 error assistant）去请插件页自动重试。 */
-  private def requestNativeRetryForTurn(runtime: Runtime, host: WebChatHost, reason: String): Future[Unit] =
+  private def requestNativeRetryForTurn(
+      runtime: Runtime,
+      host: WebChatHost,
+      reason: String,
+      protocolRepair: Option[String]
+  ): Future[Unit] =
     ChatStore
       .tipMessageId(host.sessionId)
       .flatMap { tip =>
         val assistantId = tip.getOrElse("")
         if (assistantId.isEmpty) Future.successful(())
         else
-          requestNativeRetry(host.sessionId, host.provider, host.convKey, runtime.tabId, assistantId, reason).map { _ =>
+          requestNativeRetry(
+            host.sessionId,
+            host.provider,
+            host.convKey,
+            runtime.tabId,
+            assistantId,
+            reason,
+            protocolRepair
+          ).map { _ =>
             TraceStore.noteEvidence(
               runtime.turnGen,
               s"marker parse failed -> plugin page auto-retry requested (assistant=$assistantId)"
@@ -1519,19 +1550,21 @@ private[background] object WebChatService {
       convKey: String,
       tabId: Int,
       assistantId: String,
-      reason: String
+      reason: String,
+      protocolRepair: Option[String] = None
   ): Future[Unit] =
     if (sessionId.isEmpty || assistantId.isEmpty) Future.successful(())
     else
       ServerTabManager.ensurePluginPageTab().flatMap { pageTabId =>
         val payload = JsBridge.obj(
-          "type"        -> ("NATIVE_RETRY_TURN"),
-          "sessionId"   -> (sessionId),
-          "provider"    -> (provider),
-          "convKey"     -> (convKey),
-          "tabId"       -> (tabId),
-          "assistantId" -> (assistantId),
-          "reason"      -> (reason)
+          "type"           -> ("NATIVE_RETRY_TURN"),
+          "sessionId"      -> (sessionId),
+          "provider"       -> (provider),
+          "convKey"        -> (convKey),
+          "tabId"          -> (tabId),
+          "assistantId"    -> (assistantId),
+          "reason"         -> (reason),
+          "protocolRepair" -> protocolRepair.getOrElse("")
         )
         sendToPageWithRetry(pageTabId, payload, attempts = 40).map { _ =>
           PopCanLog.info(
@@ -1747,6 +1780,9 @@ private[background] object WebChatService {
             .load(sessionId)
             .recover { case _ => com.just3bowls.model.chat.SessionSettings.Default }
             .flatMap { settings =>
+              runtime.turnAllowedTools =
+                if (settings.browserTools) LocalAgentModel.defaultTools.map(_.name).toSet
+                else Set.empty
               MemoryRecallBridge
                 .recall(
                   MemoryQuery(

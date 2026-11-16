@@ -106,9 +106,13 @@ object LocalAgentRunner {
       /** ReAct / Plan. Browser tools are an execution capability, not a separate mode. */
       mode: String = AgentModePolicy.React,
       /** Only Auto may escalate while running; explicit / pinned modes stay locked. */
-      allowHandoff: Boolean = false
+      allowHandoff: Boolean = false,
+      /** Transient repair directive used by the first provider call of a native auto-retry. */
+      initialProtocolRepair: Option[String] = None
   ): Future[LocalAgentOutcome] = {
     val requestedMode                                                    = AgentModePolicy.normalize(mode)
+    val repairState                                                      =
+      initialProtocolRepair.map(value => new LocalAgentModel.RepairState(Some(value)))
     def runPlanMode(): Future[LocalAgentOutcome]                         =
       runPlanExecute(
         provider,
@@ -124,7 +128,8 @@ object LocalAgentRunner {
         hostTabId,
         bindConversation,
         tabRefs,
-        memoryContext
+        memoryContext,
+        repairState
       )
     def runReactMode(handoffEnabled: Boolean): Future[LocalAgentOutcome] =
       runReact(
@@ -144,7 +149,8 @@ object LocalAgentRunner {
         bindConversation,
         tabRefs,
         memoryContext,
-        handoffEnabled
+        handoffEnabled,
+        repairState
       )
     if (requestedMode == AgentModePolicy.Plan)
       runPlanMode()
@@ -171,7 +177,8 @@ object LocalAgentRunner {
       hostTabId: Int,
       bindConversation: Boolean,
       tabRefs: List[BrowserTabRef],
-      memoryContext: String
+      memoryContext: String,
+      repair: Option[LocalAgentModel.RepairState]
   ): Future[LocalAgentOutcome] = {
     val messageReducer: js.Function2[js.Array[js.Any], js.Array[js.Any], js.Array[js.Any]] =
       (left, right) => left.concat(right)
@@ -220,7 +227,8 @@ object LocalAgentRunner {
           conversation = conversation,
           promptMode = promptMode,
           hostTabId = hostTabId,
-          bindConversation = bindConversation
+          bindConversation = bindConversation,
+          repair = repair
         )
         .asInstanceOf[LangChainRunnable]
       StructuredAgentRunner
@@ -299,7 +307,8 @@ object LocalAgentRunner {
           bindConversation,
           tabRefs,
           memoryContext,
-          allowHandoff = false
+          allowHandoff = false,
+          repair
         ).map { outcome =>
           val result = JsBridge.obj(
             "content"   -> (outcome.content),
@@ -421,7 +430,8 @@ object LocalAgentRunner {
       bindConversation: Boolean,
       tabRefs: List[BrowserTabRef],
       memoryContext: String,
-      allowHandoff: Boolean
+      allowHandoff: Boolean,
+      repair: Option[LocalAgentModel.RepairState]
   ): Future[LocalAgentOutcome] = {
     val evidence     = mutable.ArrayBuffer.empty[ToolEvidence]
     val seed         = firstRound.map(round => new LocalAgentModel.SeedState(Some(round)))
@@ -476,7 +486,8 @@ object LocalAgentRunner {
       promptMode = promptMode,
       hostTabId = hostTabId,
       bindConversation = bindConversation,
-      seed = seed
+      seed = seed,
+      repair = repair
     )
     val app          = AgentHarness.create(model, toolObjects, Nil)
     val config       = JsBridge.obj("recursionLimit" -> (AgentStepPolicy.reactRecursionLimit(maxSteps)))
@@ -497,7 +508,8 @@ object LocalAgentRunner {
             hostTabId,
             bindConversation,
             tabRefs,
-            memoryContext
+            memoryContext,
+            repair
           ).map(_.copy(handoffs = List(request)))
         case _                    =>
           Future.successful(LocalAgentOutcome(content = "", thinking = "", toolCalls = Nil, handoffs = List(request)))

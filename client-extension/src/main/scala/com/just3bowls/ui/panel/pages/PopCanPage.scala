@@ -1182,7 +1182,12 @@ object PopCanPage {
      *
      * 一律以 `message.sessionId` 为准（后台会话也能重试），user 从存储里回溯（不依赖页面当前显示的是哪条会话）。
      */
-    def retryTurn(message: ChatMessage, reason: String, auto: Boolean): Unit                                 =
+    def retryTurn(
+        message: ChatMessage,
+        reason: String,
+        auto: Boolean,
+        protocolRepair: Option[String] = None
+    ): Unit =
       if (chatRunningVar.now() || message.role != "assistant" || message.sessionId.isEmpty) ()
       else
         ChatStore
@@ -1190,12 +1195,18 @@ object PopCanPage {
           .flatMap { path =>
             path.reverse.find(_.role == "user") match {
               case None       => Future.successful(())
-              case Some(user) => startRetryTurn(message, user, reason, auto)
+              case Some(user) => startRetryTurn(message, user, reason, auto, protocolRepair)
             }
           }
           .recover { case e => PopCanLog.warn("agent", s"retry turn failed: ${Option(e.getMessage).getOrElse("")}") }
           .foreach(_ => ())
-    def startRetryTurn(message: ChatMessage, user: ChatMessage, reason: String, auto: Boolean): Future[Unit] = {
+    def startRetryTurn(
+        message: ChatMessage,
+        user: ChatMessage,
+        reason: String,
+        auto: Boolean,
+        protocolRepair: Option[String]
+    ): Future[Unit] = {
       val sessionId = message.sessionId
       val base      = ChatMessage.withAttempts(message)
       val previous  = base.attempts.find(_.id == base.activeAttemptIdOrLegacy).getOrElse(ChatAttempt.fromMessage(base))
@@ -1277,7 +1288,8 @@ object PopCanPage {
                   Option(message.effectiveMode).filter(_.nonEmpty).getOrElse(AgentModePolicy.React),
                 requestedMode =
                   Option(message.requestedMode).filter(_.nonEmpty).getOrElse(AgentModePolicy.React),
-                modeReason = reason
+                modeReason = reason,
+                initialProtocolRepair = protocolRepair
               )
               .map { assistant =>
                 abortCurrentChat = None
@@ -1335,11 +1347,12 @@ object PopCanPage {
           )
     // SW 在原生轮 marker 解析失败后把这一轮交过来：按预算自动重试（后台会话也能跑，一切都以 message.sessionId 为准）。
     onNativeRetryTurn = (payload: NativeRetryTurnMessage) => {
-      val sessionId   = payload.sessionId.getOrElse("")
-      val assistantId = payload.assistantId.getOrElse("")
-      val reason      = payload.reason.filter(_.nonEmpty).getOrElse(
+      val sessionId      = payload.sessionId.getOrElse("")
+      val assistantId    = payload.assistantId.getOrElse("")
+      val reason         = payload.reason.filter(_.nonEmpty).getOrElse(
         "marker parse failed"
       )
+      val protocolRepair = payload.protocolRepair.toOption.map(_.trim).filter(_.nonEmpty)
       if (sessionId.nonEmpty && assistantId.nonEmpty)
         ChatStore
           .listMessages(sessionId)
@@ -1347,7 +1360,7 @@ object PopCanPage {
           .foreach {
             case Some(assistant) if assistant.role == "assistant" && assistant.retries < 2 =>
               PopCanLog.info("agent", s"native turn marker failure -> auto retry: $reason")
-              retryTurn(assistant, reason, auto = true)
+              retryTurn(assistant, reason, auto = true, protocolRepair = protocolRepair)
             case _                                                                         => ()
           }
     }

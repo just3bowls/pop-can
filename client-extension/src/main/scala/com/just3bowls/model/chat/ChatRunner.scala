@@ -42,7 +42,8 @@ object ChatRunner {
       retries: Int = 0,
       agentMode: String = AgentModePolicy.React,
       requestedMode: String = AgentModePolicy.React,
-      modeReason: String = "retry"
+      modeReason: String = "retry",
+      initialProtocolRepair: Option[String] = None
   ): Future[ChatMessage] =
     ChatStore.getMessagePath(user.id).flatMap { context =>
       val cancellation = new AgentCancellation(() => TabAiExecutor.cancelRunning(provider))
@@ -70,7 +71,8 @@ object ChatRunner {
             tabRefs = user.tabRefs,
             mode = AgentModePolicy.normalize(agentMode),
             // Retry/Regenerate re-runs the mode already recorded on this turn.
-            allowHandoff = false
+            allowHandoff = false,
+            initialProtocolRepair = initialProtocolRepair
           )
           .flatMap { outcome =>
             val assistant = ChatMessage(

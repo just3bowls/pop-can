@@ -196,11 +196,12 @@ trait LocationMarkersReadyMessage extends RuntimeMessage:
 
 @js.native
 trait NativeRetryTurnMessage extends WebChatSessionMessage:
-  def provider: js.UndefOr[String]    = js.native
-  def convKey: js.UndefOr[String]     = js.native
-  def tabId: js.UndefOr[Int]          = js.native
-  def assistantId: js.UndefOr[String] = js.native
-  def reason: js.UndefOr[String]      = js.native
+  def provider: js.UndefOr[String]       = js.native
+  def convKey: js.UndefOr[String]        = js.native
+  def tabId: js.UndefOr[Int]             = js.native
+  def assistantId: js.UndefOr[String]    = js.native
+  def reason: js.UndefOr[String]         = js.native
+  def protocolRepair: js.UndefOr[String] = js.native
 
 @js.native
 trait BrowserTabRefMessage extends js.Object:

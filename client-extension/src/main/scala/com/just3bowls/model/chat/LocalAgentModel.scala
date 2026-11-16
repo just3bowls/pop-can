@@ -31,6 +31,15 @@ object LocalAgentModel {
       current
     }
   }
+
+  /** One transient protocol-repair instruction, consumed by the first provider call in a retry run. */
+  final class RepairState(private var pending: Option[String]) {
+    def take(): Option[String] = {
+      val current = pending
+      pending = None
+      current
+    }
+  }
   def createLangChainTool(
       toolDef: AgentToolSpec,
       callTool: (String, String) => Future[js.Any],
@@ -133,7 +142,8 @@ object LocalAgentModel {
       hostTabId: Int = 0,
       /** 这一轮用过的对话要不要绑给会话：插件页 Chat / Retry 为 true；网页原生 host 轮为 false。 */
       bindConversation: Boolean = false,
-      seed: Option[SeedState] = None
+      seed: Option[SeedState] = None,
+      repair: Option[RepairState] = None
   ): js.Object = {
     val invokeFn: js.Function2[js.Any, js.UndefOr[js.Any], js.Promise[js.Any]] =
       (messages: js.Any, _) =>
@@ -151,7 +161,8 @@ object LocalAgentModel {
           promptMode,
           hostTabId,
           bindConversation,
-          seed
+          seed,
+          repair
         ).toJSPromise
     val bindFn: js.Function1[js.Any, js.Object]                                =
       (tools: js.Any) =>
@@ -169,7 +180,8 @@ object LocalAgentModel {
           promptMode,
           hostTabId,
           bindConversation,
-          seed
+          seed,
+          repair
         )
     val runnable                                                               = JsBridge.asObject(RunnableLambda.from(
       invokeFn.asInstanceOf[js.Function1[js.Any, js.Any]]
@@ -194,12 +206,15 @@ object LocalAgentModel {
       promptMode: String,
       hostTabId: Int,
       bindConversation: Boolean,
-      seed: Option[SeedState]
+      seed: Option[SeedState],
+      repair: Option[RepairState]
   ): Future[AIMessage] = {
     cancellation.check()
     seed.flatMap(_.take()) match {
       case Some(round) => Future.successful(seededAIMessage(round, onEvent))
-      case None        => invokeProvider(
+      case None        =>
+        val initialRepair = repair.flatMap(_.take())
+        invokeProvider(
           provider,
           toolDefs,
           onEvent,
@@ -212,7 +227,8 @@ object LocalAgentModel {
           conversation,
           promptMode,
           hostTabId,
-          bindConversation
+          bindConversation,
+          initialRepair
         )
     }
   }
@@ -229,7 +245,8 @@ object LocalAgentModel {
       conversation: String,
       promptMode: String,
       hostTabId: Int,
-      bindConversation: Boolean
+      bindConversation: Boolean,
+      initialProtocolRepair: Option[String]
   ): Future[AIMessage] = {
     val messageJson = messagesAsOpenAi(messages)
     val toolsJson   = AgentBody.toolsJson(toolDefs)
@@ -250,7 +267,9 @@ object LocalAgentModel {
           bindConversation = bindConversation
         ),
         onEvent,
-        cancellation
+        cancellation,
+        initialProtocolRepair = initialProtocolRepair,
+        initialRepairCount = if (initialProtocolRepair.nonEmpty) 1 else 0
       )
       .map { result =>
         if (!result.ok) {
