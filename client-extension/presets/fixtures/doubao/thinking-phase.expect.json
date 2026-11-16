@@ -1,0 +1,19 @@
+{
+  "provider": "doubao",
+  "dialect": "thinking-phase",
+  "comment": "深度思考档：10040 思考块下的 10000 文本块 + CHUNK_DELTA 是页面思考，必须不进正文；答案在“无 parent_id 的 10000 块”之后。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "thinkingStart",
+      "answerStartInThinking",
+      "answerPatchDelta",
+      "chunkDelta"
+    ],
+    "mustNotContain": [
+      "我需按指定格式回复",
+      "无需填写"
+    ],
+    "finishReason": "stop"
+  }
+}

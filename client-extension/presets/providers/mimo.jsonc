@@ -1,0 +1,245 @@
+{
+  // MiMo React chat SSE：event:message 携带 reasoningContent 与 content 两类增量，event:finish 结束本轮；页面思考不进入正文。
+  "schemaVersion": 2,
+  "name": "mimo",
+  "page": {
+    // MiMo 使用页面编辑器与 React 路由，输入框和 New Chat 通过指纹与结构特征定位，避免哈希路由变化影响 selector。
+    "url": "https://aistudio.xiaomimimo.com/#/c",
+    "selectors": {
+      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='textarea'][1]",
+      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][4]/*[local-name()='button'][1]"
+    },
+    "fingerprints": {
+      "input": {
+        "ancestorClasses": [
+          "flex",
+          "gap-2",
+          "items-end",
+          "p-4",
+          "py-2.5",
+          "px-3",
+          "md:p-4",
+          "md:pb-2.5",
+          "relative",
+          "rounded-2xl",
+          "border",
+          "border-sem-border-default",
+          "shadow-[0_0.375rem_0.75rem_rgba(0,0,0,0.05)]",
+          "transition-none",
+          "bg-mimo-bg-outlined"
+        ],
+        "ancestorTexts": [
+          "翻译解题答疑智拍问答",
+          "翻译解题答疑智拍问答"
+        ],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1790590117672,
+        "classes": [
+          "relative",
+          "mb-1",
+          "max-h-[160px]",
+          "min-h-[32px]",
+          "w-full",
+          "resize-none",
+          "overflow-y-auto",
+          "bg-transparent",
+          "text-base",
+          "leading-6",
+          "text-gray-900",
+          "placeholder-gray-400",
+          "placeholder:font-light",
+          "focus:outline-none",
+          "disabled:cursor-not-allowed",
+          "disabled:opacity-50",
+          "dark:text-gray-50",
+          "dark:placeholder-gray-500",
+          "retina:placeholder:font-normal",
+          "md:text-sm"
+        ],
+        "clickable": false,
+        "dataTestId": "",
+        "docX": 776.8000183105469,
+        "docY": 610.4000244140625,
+        "editable": true,
+        "height": 32,
+        "id": "",
+        "innerHeight": 711,
+        "innerWidth": 1298,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "",
+        "parentClasses": [
+          "flex",
+          "gap-2",
+          "items-end"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "有问题，尽管问，Shift + Enter 换行",
+        "role": "input",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [],
+        "tag": "textarea",
+        "text": "",
+        "width": 766.4000244140625,
+        "x": 776.8000183105469,
+        "y": 610.4000244140625
+      },
+      "new-chat": {
+        "ancestorClasses": [
+          "flex",
+          "h-9",
+          "shrink-0",
+          "select-none",
+          "items-center",
+          "justify-between",
+          "rounded-md",
+          "px-2",
+          "cursor-pointer",
+          "sticky",
+          "shadow-[0_-1px_0_0_var(--mimo-bg-body)]",
+          "bg-mimo-fill-neutral-active",
+          "flex",
+          "flex-col",
+          "hover-scrollbar",
+          "flex",
+          "min-h-0",
+          "flex-1",
+          "flex-col",
+          "overflow-y-auto",
+          "px-2",
+          "scrollbar-visible"
+        ],
+        "ancestorTexts": [
+          "MiMo Chat",
+          "UltraSpeedNewZIO函数式异步编程库介绍MiMo ClawMiMo V2.6MiMo ChatZIO框架趋势与热度分析",
+          "UltraSpeedNewZIO函数式异步编程库介绍MiMo ClawMiMo V2.6MiMo ChatZIO框架趋势与热度分析"
+        ],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "新对话",
+        "capturedAt": 1790590113506,
+        "classes": [
+          "ml-auto",
+          "flex",
+          "h-5",
+          "w-5",
+          "shrink-0",
+          "items-center",
+          "justify-center",
+          "rounded",
+          "text-mimo-icon-n3",
+          "hover:bg-mimo-fill-neutral-hover",
+          "hover:text-mimo-icon-n1"
+        ],
+        "clickable": true,
+        "dataTestId": "",
+        "docX": 231.1999969482422,
+        "docY": 156,
+        "editable": false,
+        "height": 20,
+        "id": "",
+        "innerHeight": 767,
+        "innerWidth": 1298,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "MiMo Chat",
+        "parentClasses": [
+          "flex",
+          "h-9",
+          "shrink-0",
+          "select-none",
+          "items-center",
+          "justify-between",
+          "rounded-md",
+          "px-2",
+          "cursor-pointer",
+          "sticky",
+          "shadow-[0_-1px_0_0_var(--mimo-bg-body)]",
+          "bg-mimo-fill-neutral-active"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "",
+        "role": "new-chat",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [
+          "MiMo Chat"
+        ],
+        "tag": "button",
+        "text": "",
+        "width": 20,
+        "x": 231.1999969482422,
+        "y": 156
+      }
+    }
+  },
+  "network": {
+    // 监听 /open-apis/react/chat；正文与页面 reasoning 在同一个数据对象的不同字段中。
+    "apiPatterns": [
+      "https://aistudio.xiaomimimo.com/open-apis/react/chat"
+    ],
+    "followUpPatterns": [],
+    "followUpIdentityPath": ""
+  },
+  "attachment": {
+    // file 模式使用页面 text-like file input；selector 留空时由引擎自动选择，兼容页面动态生成上传控件。
+    "strategy": "input",
+    "selector": ""
+  },
+  "parserRule": {
+    // MiMo React chat SSE with named events (`event:message` / `event:finish`). Page reasoning and answer text arrive in separate JSON fields.
+    "schemaVersion": 2,
+    "confidence": "high",
+    "missingInfo": [],
+    "contentTransforms": [],
+    "memory": {},
+    "handlers": [
+      {
+        // React chat assistant deltas. reasoningContent is page-side thinking and is ignored because content is absent on those frames.
+        "id": "answerDelta",
+        "match": {
+          // 匹配 messageType=assistant 的正文事件；reasoningContent 帧因没有 content 自然不会产生正文增量。
+          "rawRegex": "event:message\\ndata:\\s*(.+)\\n",
+          "jsonGroup": 1,
+          "path": "$.messageType",
+          "regex": "^assistant$"
+        },
+        "actions": [
+          {
+            // Append answer content; missing content on reasoning frames produces no delta.
+            "op": "appendContent",
+            "path": "$.content"
+          }
+        ]
+      },
+      {
+        // content=[DONE] marks the end of the answer.
+        "id": "finish",
+        "match": {
+          // 匹配 event:finish 且 content=[DONE] 的结束帧。
+          "rawRegex": "event:finish\\ndata:\\s*(.+)\\n",
+          "jsonGroup": 1,
+          "path": "$.content",
+          "regex": "^\\[DONE\\]$"
+        },
+        "actions": [
+          {
+            // 将本轮标记为正常结束。
+            "op": "setFinishReason",
+            "value": "stop"
+          }
+        ]
+      }
+    ],
+    "final": [],
+    "request": {
+      // inline 模式改写请求体 $.query；该字段承载当前用户问题。
+      "userText": "$.query"
+    }
+  }
+}

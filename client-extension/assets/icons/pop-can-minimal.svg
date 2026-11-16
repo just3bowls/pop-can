@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Minimal Pop Can">
+  <defs>
+    <clipPath id="minimal-body">
+      <path d="M181 144C178 119 212 105 256 105s79 14 75 39l-8 139 12 32-11 26 10 25-13 47c-5 18-29 30-65 30s-60-12-65-30l-13-47 10-25-11-26 12-32z"/>
+    </clipPath>
+  </defs>
+
+  <circle cx="256" cy="256" r="235" fill="#f3ead8"/>
+  <circle cx="256" cy="256" r="218" fill="none" stroke="#111217" stroke-width="5"/>
+
+  <g transform="rotate(-7 256 270)">
+    <path
+      d="M181 144C178 119 212 105 256 105s79 14 75 39l-8 139 12 32-11 26 10 25-13 47c-5 18-29 30-65 30s-60-12-65-30l-13-47 10-25-11-26 12-32z"
+      fill="#111217"/>
+
+    <g clip-path="url(#minimal-body)">
+      <path
+        d="M156 252c42-34 102-22 139-51 29-23 47-15 65-3v73c-31-9-53 9-79 28-35 25-79 23-125 4z"
+        fill="#f3ead8"/>
+      <path d="M196 174c-9 53-8 106 2 158" fill="none" stroke="#f3ead8" stroke-width="8" opacity=".28"/>
+      <path d="M302 156c10 62 7 126-5 190" fill="none" stroke="#f3ead8" stroke-width="5" opacity=".2"/>
+    </g>
+
+    <ellipse cx="256" cy="132" rx="75" ry="23" fill="#f3ead8" stroke="#111217" stroke-width="9"/>
+    <ellipse cx="256" cy="129" rx="52" ry="14" fill="#111217"/>
+    <path
+      d="M232 118c0-9 13-15 27-11 10 3 19 10 19 17 0 9-13 15-27 11-11-3-19-10-19-17z"
+      fill="#e64b3c"/>
+    <ellipse cx="255" cy="123" rx="7" ry="3.5" fill="#f3ead8"/>
+  </g>
+
+  <circle cx="394" cy="155" r="9" fill="#e64b3c"/>
+  <circle cx="414" cy="184" r="4.5" fill="#111217"/>
+  <circle cx="112" cy="326" r="5.5" fill="#111217"/>
+</svg>

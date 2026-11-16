@@ -1,0 +1,62 @@
+data: {"type":"text"}
+
+event: speech_type
+data: status
+
+event: speech_type
+data: deep_search_agent
+
+data: {"type":"agentCapabilities","capabilities":{"interruptHint":{"supported":false,"agentTaskId":"task-46d95c9ef40b68b84ef63b24a6b4a96a","icon":null}}}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"@@","status":0,"title":"正在处理"}],"expConfig":{"schemaVersion":"1"}}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"BEG:","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"response@@\n","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"@@B","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"EG:reason","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"ing_content@@","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"\nSimple arithmetic","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":": 1","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"+3 =","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":" 4","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":".\n@@END","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":":reason","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"ing_content@@","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"\n@@B","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"EG:content","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"@@\n4","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"\n@@END","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":":content@@","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":"\n@@END","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"text","text":":response@@","status":0,"title":"正在处理"}]}
+
+data: {"type":"tips","status":0,"internetFlag":0,"targetFunctionId":"autoInternetSearch"}
+
+data: [plugin: ]
+
+data: [MSGINDEX:6]
+
+data: {"type":"meta","messageId":"fixture-messageid","index":6,"replyId":"fixture-replyid","replyIndex":5,"traceId":"0123456789abcdef0123456789abcdef","guideId":0,"ic":0,"unSupportRepeat":false,"pluginID":"OneAgent","stopReason":"stop","endConv":false,"requireLogin":false,"requireLoginType":0,"loginTips":"","tipsType":0,"modelErrorCode":0,"modelErrorMsg":"","speechIndex":1,"tokenUsageInfo":{"promptTokens":8165,"completionTokens":56,"totalTokens":8221},"userId":"fixture-user","outputCheck":false,"chainID":"WorkingAgentDirect","sensitiveType":0,"aiSearchSource":"","performance":{"dataIndex":{"SearchStart":-1,"SearchEnd":-1,"ThinkingStart":3,"ThinkingEnd":3,"FirstWord":4},"timePoint":{"TpSearchStart":0,"TpSearchEnd":0,"TpThinkingStart":529,"TpThinkingEnd":529,"TpFirstWord":848}},"oneAgentId":"main_agent_with_agent_mode","deepOpsErrorInfo":"{\"code\":0}","isCharacter":false}
+
+data: [TRACEID:0123456789abcdef0123456789abcdef]
+
+data: [DONE]
+

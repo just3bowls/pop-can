@@ -1,0 +1,12 @@
+{
+  "provider": "yuanbao",
+  "dialect": "hy4-agent",
+  "comment": "Hy4 preview（无思考）：speech_type=deep_search_agent，答案在 contents[].type=text（mode=deep_search_agent）。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "agentContent"
+    ],
+    "finishReason": "stop"
+  }
+}

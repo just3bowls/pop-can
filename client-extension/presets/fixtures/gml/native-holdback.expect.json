@@ -1,0 +1,12 @@
+{
+  "provider": "gml",
+  "dialect": "native-holdback",
+  "comment": "原生轮：增量 + status=finish 全量快照；这轮暴露过“终态空分片不 finish 就丢 32 字尾巴”。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "gmlTextChunk",
+      "gmlFinishSnapshot"
+    ]
+  }
+}

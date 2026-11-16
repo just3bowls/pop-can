@@ -1,0 +1,389 @@
+{
+  // Doubao 网页 SSE：答案位于 block_type=10000 文本块，深度思考档会先出现 10040 思考块；规则通过 thinkStart/answerStart 阶段门把页面思考与最终答案分开。
+  "schemaVersion": 2,
+  "name": "doubao",
+  "page": {
+    // Doubao 使用 Tiptap/ProseMirror contenteditable 作为输入框，New Chat 在左侧导航；fingerprints 优先匹配编辑器角色、classes 与容器层级。
+    "url": "https://www.doubao.com/chat",
+    "selectors": {
+      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='main'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]",
+      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='nav'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][1]"
+    },
+    "fingerprints": {
+      "input": {
+        "ancestorClasses": [
+          "w-full",
+          "text-16",
+          "flex",
+          "min-h-24",
+          "w-full",
+          "items-stretch",
+          "flex-1",
+          "w-0",
+          "min-w-0",
+          "!border-none",
+          "!bg-transparent",
+          "max-h-[calc(var(--input-guidance-input-container-max-height)-var(--custom-area-height,0px)-36px-16px-14px-10px)]",
+          "container-ObLj2X",
+          "w-full"
+        ],
+        "ancestorTexts": [],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1790673710133,
+        "classes": [
+          "tiptap",
+          "ProseMirror",
+          "ProseMirror-focused"
+        ],
+        "clickable": false,
+        "dataTestId": "",
+        "docX": 788.8000183105469,
+        "docY": 623.2000122070312,
+        "editable": true,
+        "height": 24,
+        "id": "",
+        "innerHeight": 711,
+        "innerWidth": 1298,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "",
+        "parentClasses": [
+          "w-full",
+          "text-16"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "",
+        "role": "input",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [],
+        "tag": "div",
+        "text": "",
+        "width": 945.6000366210938,
+        "x": 788.8000183105469,
+        "y": 623.2000122070312
+      },
+      "new-chat": {
+        "ancestorClasses": [
+          "select-none",
+          "contents",
+          "relative",
+          "p-12",
+          "sm:fixed",
+          "overflow-hidden",
+          "pointer-events-auto",
+          "w-sidebar-width",
+          "flex",
+          "shrink-0",
+          "flex-col",
+          "bg-dbx-bg-base-web",
+          "border-r",
+          "border-[0.5px]",
+          "border-s-color-border-tertiary/80",
+          "transition-[transform]",
+          "duration-[var(--transition-duration-slow)]",
+          "ease-[var(--ease-in-out)]",
+          "transform",
+          "transform",
+          "[&_:is(a,button,[role=button]):focus-visible]:![outline:2px_solid_var(--dbx-fill-highlight)]",
+          "[&_:is(a,button,[role=button]):focus-visible]:!outline-offset-[-2px]",
+          "pt-g-sidebar-wrapper-padding-top",
+          "pl-g-sidebar-wrapper-padding-left",
+          "pr-g-sidebar-wrapper-padding-right",
+          "h-full"
+        ],
+        "ancestorTexts": [
+          "新对话Ctrl Shift K",
+          "豆包新工作任务Ctrl J新对话Ctrl Shift K",
+          "豆包新工作任务Ctrl J新对话Ctrl Shift K定时任务Ctrl Shift T插件 · 技能 · 伙伴Ctrl Shift S云盘Ctrl Shift DAPI 服务更多 To pick up a draggable item, "
+        ],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1790673707630,
+        "classes": [
+          "group/sidebar_nav_item",
+          "cursor-pointer",
+          "flex",
+          "items-center",
+          "px-8",
+          "rounded-dbx-lg",
+          "h-32",
+          "!text-dbx-text-primary",
+          "hover:bg-dbx-fill-trans-10-hover",
+          "nav-link-IkIer0",
+          "mb-2"
+        ],
+        "clickable": true,
+        "dataTestId": "",
+        "docX": 140.00000476837158,
+        "docY": 104.80000305175781,
+        "editable": false,
+        "height": 32,
+        "id": "",
+        "innerHeight": 767,
+        "innerWidth": 1298,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "",
+        "parentClasses": [],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "",
+        "role": "new-chat",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [],
+        "tag": "div",
+        "text": "新对话Ctrl Shift K",
+        "width": 254.40000915527344,
+        "x": 140.00000476837158,
+        "y": 104.80000305175781
+      }
+    }
+  },
+  "network": {
+    // 监听 /chat/completion SSE；正文可能分散在 STREAM_CHUNK 的 patch_op 或 STREAM_MSG_NOTIFY 的 content_block 中，规则同时覆盖两种信封。
+    "apiPatterns": [
+      "https://www.doubao.com/chat/completion"
+    ],
+    "followUpPatterns": [],
+    "followUpIdentityPath": ""
+  },
+  "attachment": {
+    // file 模式向编辑器附近的隐藏 file input 注入 .txt；selector 留空时自动选择 text-like 输入，页面支持多文件但本流程只上传本轮 request body。
+    "strategy": "input",
+    "selector": ""
+  },
+  "parserRule": {
+    // doubao SSE. 答案永远在 `block_type=10000` 的文本块里；但深度思考档会先来一个 10040 思考块，思考文字被包成一个 `10000` 文本块（`parent_id` 指向思考块），它的 `CHUNK_DELTA` 增量与答案的**形状完全一致**。所以规则先用 `thinkStart` 记住“进过思考块”，再用 `answerStart` 记住“答案块开始”（帧内断言：`block_id` 后面直接是 `content`，即没有 `parent_id`；另有 `answer_first_token` 作为备份触发），delta handler 的门是 `answerStart 非空` 或 `thinkStart 为空` —— 思考阶段被挡、普通档不受影响。
+    "schemaVersion": 2,
+    "confidence": "high",
+    "missingInfo": [],
+    "memory": {},
+    "handlers": [
+      {
+        // 思考块出现（block_type=10040）→ 记下 `thinkStart`，后面的增量就知道自己在思考阶段。
+        "id": "thinkingStart",
+        "match": {
+          // Fan out all content blocks and select the thinking block by block_type, never by array position.
+          "rawRegex": "(?m)^event:\\s*STREAM_MSG_NOTIFY\\s*\\ndata:\\s*(\\{.*\"block_type\"\\s*:\\s*10040.*\\})\\s*$",
+          "jsonGroup": 1,
+          "eventsPath": "$.content.content_block[*]",
+          "path": "$.block_id",
+          "allOf": [
+            {
+              // 10040 是豆包的 thinking 块；命中它才把 thinkStart 置位，后续用阶段门隔离页面思考。
+              "path": "$.block_type",
+              "regex": "^10040$"
+            }
+          ]
+        },
+        "actions": [
+          {
+            // 记住思考块的 block_id，打开 thinkStart 阶段标记。
+            "op": "setMemory",
+            "key": "thinkStart",
+            "path": "$.block_id"
+          }
+        ]
+      },
+      {
+        // 答案块开始（10000 且 block_id 后面直接是 content，即没有 parent_id）**且这一轮有思考块**：开 `answerStart` 并把这帧自带的答案首段写上（同帧里别的 delta handler 用旧快照判定，因此不会重复写）。
+        "id": "answerStartInThinking",
+        "match": {
+          // Fan out patch_op entries, then select the answer block by block_type. Doubao may put answer text after loading/status patches.
+          "rawRegex": "(?m)^event:\\s*STREAM_CHUNK\\s*\\ndata:\\s*(\\{.*\"block_type\"\\s*:\\s*10000\\s*,\\s*\"block_id\"\\s*:\\s*\"[^\"]*\"\\s*,\\s*\"content\".*\\})\\s*$",
+          "jsonGroup": 1,
+          "eventsPath": "$.patch_op[*]",
+          "path": "$.patch_value.content_block[?(@.block_type=='10000')][0].content.text_block.text",
+          "memoryKey": "answerStart",
+          "memoryEquals": "",
+          "anyOf": [
+            {
+              // thinkStart 非空，说明本轮已经进入过思考块，当前帧才有资格成为答案起点。
+              "memoryKey": "thinkStart",
+              "memoryNotEquals": ""
+            }
+          ]
+        },
+        "actions": [
+          {
+            // 记住答案块的 block_id，打开 answerStart 阶段门。
+            "op": "setMemory",
+            "key": "answerStart",
+            "path": "$.patch_value.content_block[?(@.block_type=='10000')][0].block_id"
+          },
+          {
+            // 答案首帧自带正文，原样追加首段；该端点是严格增量，不需要 appendDelta 去重。
+            "op": "appendContent",
+            "path": "$.patch_value.content_block[?(@.block_type=='10000')][0].content.text_block.text"
+          }
+        ]
+      },
+      {
+        // 同上，但答案块出现在 STREAM_MSG_NOTIFY 里（非 patch 形状）。
+        "id": "answerStartNotifyInThinking",
+        "match": {
+          // 门 = `answerStart` 还空（只认第一帧）**且** `thinkStart` 非空（这一轮确实进过思考块）：只负责开答案阶段 + 收下这帧自带的答案首段；后续帧交给 delta handler。
+          "rawRegex": "(?m)^event:\\s*STREAM_MSG_NOTIFY\\s*\\ndata:\\s*(\\{.*\"block_type\"\\s*:\\s*10000\\s*,\\s*\"block_id\"\\s*:\\s*\"[^\"]*\"\\s*,\\s*\"content\".*\\})\\s*$",
+          "jsonGroup": 1,
+          "path": "$.content.content_block[?(@.block_type=='10000')][0].content.text_block.text",
+          "memoryKey": "answerStart",
+          "memoryEquals": "",
+          "anyOf": [
+            {
+              // thinkStart 非空，说明 NOTIFY 形状的答案帧也发生在思考阶段之后。
+              "memoryKey": "thinkStart",
+              "memoryNotEquals": ""
+            }
+          ]
+        },
+        "actions": [
+          {
+            // NOTIFY 形状同样记住答案块 ID，后续增量以它为阶段门。
+            "op": "setMemory",
+            "key": "answerStart",
+            "path": "$.content.content_block[?(@.block_type=='10000')][0].block_id"
+          },
+          {
+            // 原样追加 NOTIFY 答案首帧的正文，避免漏掉紧跟在起始帧里的首段。
+            "op": "appendContent",
+            "path": "$.content.content_block[?(@.block_type=='10000')][0].content.text_block.text"
+          }
+        ]
+      },
+      {
+        // 备份触发：豆包在答案开始时还会发 `perf_mark: answer_first_token`；结构断言万一失效，靠它把门打开。
+        "id": "answerPhaseMark",
+        "match": {
+          // 正信号、与帧顺序无关；存 patch_op 只是要一个非空值。
+          "rawRegex": "(?m)^data:\\s*(\\{.*answer_first_token.*\\})\\s*$",
+          "jsonGroup": 1
+        },
+        "actions": [
+          {
+            // 用非空的 patch_op 值打开 answerStart；这里只借它作为阶段标记。
+            "op": "setMemory",
+            "key": "answerStart",
+            "path": "$.patch_op"
+          }
+        ]
+      },
+      {
+        // 答案的 patch 增量（block_type=10000），走同一道门。
+        "id": "answerPatchDelta",
+        "match": {
+          // 门 = `answerStart 非空`（答案已开始）**或** `thinkStart 为空`（这一家根本没进思考块）：前者挡住思考阶段，后者保证普通档不被门误杀。
+          "rawRegex": "(?m)^event:\\s*STREAM_CHUNK\\s*\\ndata:\\s*(\\{.*\"block_type\"\\s*:\\s*10000.*\\})\\s*$",
+          "jsonGroup": 1,
+          "eventsPath": "$.patch_op[*]",
+          "path": "$.patch_value.content_block[?(@.block_type=='10000')][0].content.text_block.text",
+          "anyOf": [
+            {
+              // answerStart 非空表示正式答案已经开始，增量只能在这之后并入正文。
+              "memoryKey": "answerStart",
+              "memoryNotEquals": ""
+            },
+            {
+              // thinkStart 为空表示这一轮没有思考块，普通档可直接把文本当作正文。
+              "memoryKey": "thinkStart",
+              "memoryEquals": ""
+            }
+          ]
+        },
+        "actions": [
+          {
+            // 追加 STREAM_CHUNK 中的答案 patch 增量；该端点是严格增量。
+            "op": "appendContent",
+            "path": "$.patch_value.content_block[?(@.block_type=='10000')][0].content.text_block.text"
+          }
+        ]
+      },
+      {
+        // 普通档的答案首段也常常走 STREAM_MSG_NOTIFY（不是 patch）；同一道门收它。思考档里同帧会被 answerStartNotifyInThinking 抢先收下，本 handler 因快照仍是「答案未开始」而被跳过，天然不重复。
+        "id": "answerNotifyDelta",
+        "match": {
+          // 门同 patch/chunk：答案已开始，或这一家根本没进思考块。
+          "rawRegex": "(?m)^event:\\s*STREAM_MSG_NOTIFY\\s*\\ndata:\\s*(\\{.*\"block_type\"\\s*:\\s*10000.*\\})\\s*$",
+          "jsonGroup": 1,
+          "path": "$.content.content_block[?(@.block_type=='10000')][0].content.text_block.text",
+          "anyOf": [
+            {
+              // answerStart 非空表示正式答案已经开始，NOTIFY 增量只能在这之后并入正文。
+              "memoryKey": "answerStart",
+              "memoryNotEquals": ""
+            },
+            {
+              // thinkStart 为空表示这一轮没有思考块，普通档可直接接收 NOTIFY 文本。
+              "memoryKey": "thinkStart",
+              "memoryEquals": ""
+            }
+          ]
+        },
+        "actions": [
+          {
+            // 追加 STREAM_MSG_NOTIFY 中的答案增量；该端点是严格增量。
+            "op": "appendContent",
+            "path": "$.content.content_block[?(@.block_type=='10000')][0].content.text_block.text"
+          }
+        ]
+      },
+      {
+        // 裸 `{"text":…}` 增量两个阶段形状完全一样，必须靠同一道门区分。
+        "id": "chunkDelta",
+        "match": {
+          // 门 = `answerStart 非空`（答案已开始）**或** `thinkStart 为空`（这一家根本没进思考块）：前者挡住思考阶段，后者保证普通档不被门误杀。
+          "rawRegex": "(?m)^event:\\s*CHUNK_DELTA\\s*\\ndata:\\s*(\\{.*\"text\".*\\})\\s*$",
+          "jsonGroup": 1,
+          "path": "$.text",
+          "anyOf": [
+            {
+              // answerStart 非空表示正式答案已经开始，CHUNK_DELTA 才能并入正文。
+              "memoryKey": "answerStart",
+              "memoryNotEquals": ""
+            },
+            {
+              // thinkStart 为空表示这一轮没有思考块，普通档可直接接收 CHUNK_DELTA。
+              "memoryKey": "thinkStart",
+              "memoryEquals": ""
+            }
+          ]
+        },
+        "actions": [
+          {
+            // 追加 CHUNK_DELTA 的裸 text 增量；该端点是严格增量。
+            "op": "appendContent",
+            "path": "$.text"
+          }
+        ]
+      },
+      {
+        // 服务器收尾。
+        "id": "replyEnd",
+        "match": {
+          // 只在 end_type=1 的 SSE_REPLY_END 帧收尾，避免把异常结束当作正常完成。
+          "rawRegex": "event: SSE_REPLY_END\\ndata: (.+)\\n",
+          "jsonGroup": 1,
+          "path": "$.end_type",
+          "regex": "^1$"
+        },
+        "actions": [
+          {
+            // 将本轮标记为正常结束。
+            "op": "setFinishReason",
+            "value": "stop"
+          }
+        ]
+      }
+    ],
+    "final": [],
+    "request": {
+      // inline 模式改写最后一条消息中的 10000 文本块路径；该路径只定位当前用户内容，不触碰思考块或历史消息。
+      "userText": "$.messages[-1].content_block[?(@.block_type=='10000')][0].content.text_block.text"
+    }
+  }
+}

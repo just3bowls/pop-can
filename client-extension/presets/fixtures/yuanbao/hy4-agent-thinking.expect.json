@@ -1,0 +1,12 @@
+{
+  "provider": "yuanbao",
+  "dialect": "hy4-agent-thinking",
+  "comment": "Hy4 preview（带思考）：contents[] 里混有 type=think（页面思考），只有 type=text 是答案。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "agentContent"
+    ],
+    "finishReason": "stop"
+  }
+}

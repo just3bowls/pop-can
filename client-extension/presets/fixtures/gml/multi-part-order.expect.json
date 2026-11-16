@@ -1,0 +1,15 @@
+{
+  "provider": "gml",
+  "dialect": "multi-part-order",
+  "comment": "A think part precedes the text part. The rule must select content by type rather than assuming parts[0] / content[0].",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "gmlTextChunk",
+      "gmlFinishSnapshot"
+    ],
+    "mustNotContain": [
+      "hidden reasoning"
+    ]
+  }
+}

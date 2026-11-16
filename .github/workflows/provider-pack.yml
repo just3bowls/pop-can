@@ -1,0 +1,72 @@
+name: Provider Pack
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: provider-pack-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment:
+      name: provider-signing
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: client-extension/package-lock.json
+
+      - name: Install extension dependencies
+        run: npm ci --prefix client-extension
+
+      - name: Verify provider bundle
+        run: npm run presets:check:strict --prefix client-extension
+
+      - name: Build signed provider pack
+        env:
+          PROVIDER_PACK_PRIVATE_KEY: ${{ secrets.PROVIDER_PACK_PRIVATE_KEY }}
+        run: |
+          site="$(mktemp -d)"
+          npm run provider-pack:build --prefix client-extension -- --out "$site/provider-packs"
+          test -s "$site/provider-packs/provider-index.popcan.json"
+          test -n "$(find "$site/provider-packs" -name 'provider-pack-v*.popcan.json' -type f -print -quit)"
+          node client-extension/scripts/check-provider-pack-latest.mjs "$site/provider-packs"
+          curl -fsSL \
+            https://just3bowls.github.io/pop-can/provider-packs/provider-index.popcan.json \
+            -o "$site/previous-provider-index.json" || true
+          node client-extension/scripts/check-provider-pack-publish.mjs \
+            --new "$site/provider-packs/provider-index.popcan.json" \
+            --previous "$site/previous-provider-index.json"
+          echo "PAGES_ROOT=$site" >> "$GITHUB_ENV"
+
+      - name: Configure Pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        with:
+          path: ${{ env.PAGES_ROOT }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy provider pack
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

@@ -1,0 +1,21 @@
+{
+  "provider": "gml",
+  "dialect": "citation-split",
+  "comment": "A GML citation chip is split across SSE frames; neither the normalized nor streamed answer may leak it.",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "gmlTextChunk"
+    ],
+    "contentContains": [
+      "答案一答案二"
+    ],
+    "mustNotContain": [
+      "【citation:2】"
+    ],
+    "streamedMustNotContain": [
+      "【cit",
+      "【citation:2】"
+    ]
+  }
+}

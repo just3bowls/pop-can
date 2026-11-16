@@ -1,0 +1,16 @@
+id: 0
+event: STREAM_CHUNK
+data: {"message_id":"fixture","patch_op":[{"patch_object":1,"patch_type":3,"patch_value":{"content_block":[{"block_type":10101,"block_id":"loading","content":{},"is_finish":false}]}},{"patch_object":3,"patch_type":2,"patch_value":{"content_status":100}},{"patch_object":1,"patch_type":1,"patch_value":{"content_block":[{"block_type":10000,"block_id":"answer","content":{"text_block":{"text":"@@BEG:response@@\n@@BEG:reasoning_content@@\n"}},"is_finish":false}]}},{"patch_object":50,"patch_type":1,"patch_value":{"ext":{"perf_mark":"{\"marks\":[{\"ev_name\":\"answer_first_token\"}]}"}}}]}
+
+id: 1
+event: CHUNK_DELTA
+data: {"text":"ok\n@@END:reasoning_content@@\n\n@@BEG:content@@\nHello\n"}
+
+id: 2
+event: CHUNK_DELTA
+data: {"text":"@@END:content@@\n@@END:response@@"}
+
+id: 3
+event: SSE_REPLY_END
+data: {"end_type":1}
+

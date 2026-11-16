@@ -1,0 +1,273 @@
+{
+  // DeepSeek 网页 SSE：请求走 /api/v0/chat/completion，答案先以 RESPONSE 片段开局，后面是裸 data 文本增量；规则用 inResponse 阶段门屏蔽搜索、状态等非正文帧。
+  "schemaVersion": 2,
+  "name": "deepseek",
+  "page": {
+    // DeepSeek 的输入框是 textarea，New Chat 位于侧栏；fingerprints 用可编辑控件、父级布局和侧栏导航结构做二次定位，避免 XPath 漂移后误点。
+    "url": "https://chat.deepseek.com/",
+    "selectors": {
+      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='textarea'][1]",
+      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='span'][1]"
+    },
+    "fingerprints": {
+      "input": {
+        "ancestorClasses": [
+          "_24fad49",
+          "_020ab5b",
+          "_77cefa5",
+          "_9996a53",
+          "focused"
+        ],
+        "ancestorTexts": [
+          "深度思考智能搜索",
+          "深度思考智能搜索"
+        ],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1791666774414,
+        "classes": [
+          "_27c9245",
+          "ds-scroll-area",
+          "ds-scroll-area--show-on-focus-within",
+          "ds-scroll-area--enabled",
+          "d96f2d2a"
+        ],
+        "clickable": false,
+        "dataTestId": "",
+        "docX": 779.3000183105469,
+        "docY": 326.1000061035156,
+        "editable": true,
+        "height": 60,
+        "id": "",
+        "innerHeight": 711,
+        "innerWidth": 1298,
+        "name": "search",
+        "nearInput": false,
+        "nearestText": "",
+        "parentClasses": [
+          "_24fad49"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "给 DeepSeek 发送消息 ",
+        "role": "input",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [],
+        "tag": "textarea",
+        "text": "",
+        "width": 774.4000244140625,
+        "x": 779.3000183105469,
+        "y": 326.1000061035156
+      },
+      "new-chat": {
+        "ancestorClasses": [
+          "_5a8ac7a",
+          "a084f19e",
+          "dc1f7bee",
+          "_4bcc731",
+          "_7b40dad"
+        ],
+        "ancestorTexts": [
+          "开启新对话",
+          "开启新对话",
+          "开启新对话"
+        ],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1791666772517,
+        "classes": [],
+        "clickable": false,
+        "dataTestId": "",
+        "docX": 141.0999984741211,
+        "docY": 90.00000476837158,
+        "editable": false,
+        "height": 17.600000381469727,
+        "id": "",
+        "innerHeight": 711,
+        "innerWidth": 1298,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "",
+        "parentClasses": [
+          "_5a8ac7a",
+          "a084f19e"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "",
+        "role": "new-chat",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [],
+        "tag": "span",
+        "text": "开启新对话",
+        "width": 70,
+        "x": 141.0999984741211,
+        "y": 90.00000476837158
+      }
+    }
+  },
+  "network": {
+    // 只监听 /api/v0/chat/completion 的 SSE 流；这一家没有独立的 follow-up 快照端点。
+    "apiPatterns": [
+      "https://chat.deepseek.com/api/v0/chat/completion"
+    ],
+    "followUpPatterns": [],
+    "followUpIdentityPath": ""
+  },
+  "attachment": {
+    // file 模式使用页面中的隐藏 file input；selector 留空时由引擎从可用 text-like 文件输入中择优，避免绑定易变的生成类名。
+    "strategy": "input",
+    "selector": ""
+  },
+  "parserRule": {
+    // deepseek SSE. The answer starts with a RESPONSE fragment event and then streams as bare `data: {"v":"..."}` deltas; a memory flag marks that we are inside the response so status/search events are ignored.
+    "schemaVersion": 2,
+    "confidence": "high",
+    "missingInfo": [],
+    "memory": {},
+    "handlers": [
+      {
+        // First shape of the answer start: fan out fragments and select the RESPONSE fragment by type.
+        "id": "responseFragmentStart",
+        "match": {
+          // 从 response.fragments 中按 type=RESPONSE 选中答案起始片段，不依赖数组位置。
+          "rawRegex": "data: (\\{\"v\":\\{\"response\":\\{.*?\"type\":\"RESPONSE\".*?\\}\\}\\})",
+          "jsonGroup": 1,
+          "eventsPath": "$.v.response.fragments[*]",
+          "path": "$.type",
+          "regex": "RESPONSE"
+        },
+        "actions": [
+          {
+            // Flip the inResponse flag — the two append handlers below require it.
+            "op": "setMemory",
+            "key": "inResponse",
+            "value": "true"
+          },
+          {
+            // Opening piece of the answer.
+            "op": "appendContent",
+            "path": "$.content"
+          }
+        ]
+      },
+      {
+        // Alternative answer start shape (`p=response/fragments`); `o=APPEND` is optional in current web builds.
+        "id": "responseStart",
+        "match": {
+          // `o` 在部分 DeepSeek 版本中会省略；仍用 type=RESPONSE 区分思考/正文片段。
+          "rawRegex": "data: (\\{\"p\":\"response/fragments\"(?:,\"o\":\"[^\"]+\")?,\"v\":\\[.*\\]\\})",
+          "jsonGroup": 1,
+          "eventsPath": "$.v[*]",
+          "path": "$.type",
+          "regex": "RESPONSE"
+        },
+        "actions": [
+          {
+            // Same flag as above; without it the follow-up deltas would be dropped.
+            "op": "setMemory",
+            "key": "inResponse",
+            "value": "true"
+          },
+          {
+            // Opening piece of the answer.
+            "op": "appendContent",
+            "path": "$.content"
+          }
+        ]
+      },
+      {
+        // Search-enabled turns start the answer with a nested response batch: `p=response`, `o=BATCH`, containing `p=fragments`, `o=APPEND`, then the RESPONSE fragment.
+        "id": "batchedResponseFragmentStart",
+        "match": {
+          // 搜索档会把 fragments 包在 p=response、o=BATCH 的嵌套批次里；这里展开两层后仍按 type=RESPONSE 选中答案。
+          "rawRegex": "data: (\\{\"p\":\"response\",\"o\":\"BATCH\",\"v\":\\[.*\\]\\})",
+          "jsonGroup": 1,
+          "eventsPath": "$.v[*].v[*]",
+          "path": "$.type",
+          "regex": "RESPONSE"
+        },
+        "actions": [
+          {
+            // 打开 inResponse 阶段门，后续裸 data 增量只有过门后才会进入正文。
+            "op": "setMemory",
+            "key": "inResponse",
+            "value": "true"
+          },
+          {
+            // Opening piece of the answer from the nested RESPONSE fragment.
+            "op": "appendContent",
+            "path": "$.content"
+          }
+        ]
+      },
+      {
+        // Incremental content events; only accepted inside the response.
+        "id": "contentAppend",
+        "match": {
+          // `allOf` pins the patch path, and the negative lookahead drops `[reference:` fragments (citation payloads, not answer text).
+          "rawRegex": "data: (\\{\"p\":\"response/fragments/-1/content\".*\\})",
+          "jsonGroup": 1,
+          "path": "$.v",
+          "regex": "^(?!\\[reference:).*",
+          "memoryKey": "inResponse",
+          "memoryEquals": "true",
+          "allOf": [
+            {
+              // 只接受 response/fragments/-1/content 这条增量路径，排除同形但语义不同的 patch 事件。
+              "path": "$.p",
+              "regex": "^response/fragments/-1/content$"
+            }
+          ]
+        },
+        "actions": [
+          {
+            // Next piece of answer text.
+            "op": "appendContent",
+            "path": "$.v"
+          }
+        ]
+      },
+      {
+        // Bare `data: {"v":"..."}` deltas — they only appear after the response started.
+        "id": "directAppend",
+        "match": {
+          // 只在 inResponse 门已打开时接收裸 data 文本增量；负向条件同时过滤 [reference: 引用帧。
+          "rawRegex": "data: (\\{\"v\":\".*\"\\})",
+          "jsonGroup": 1,
+          "path": "$.v",
+          "regex": "^(?!\\[reference:).*",
+          "memoryKey": "inResponse",
+          "memoryEquals": "true"
+        },
+        "actions": [
+          {
+            // Next piece of answer text; `[reference:` payloads are filtered by the match regex.
+            "op": "appendContent",
+            "path": "$.v"
+          }
+        ]
+      }
+    ],
+    "contentTransforms": [
+      {
+        // DeepSeek search renders citation numbers as page-side source chips; the marker text only carries the unresolved display token.
+        "id": "dropCitationToken",
+        "regex": "\\[citation:[^\\]]+\\]",
+        "replacement": "",
+        "settle": {
+          "candidatePrefix": "[citation:"
+        }
+      }
+    ],
+    "final": [],
+    "request": {
+      // inline 模式改写请求体的 $.prompt；该字段承载当前用户输入，其余搜索/历史字段保持页面原样。
+      "userText": "$.prompt"
+    }
+  }
+}

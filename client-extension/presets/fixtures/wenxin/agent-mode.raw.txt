@@ -1,0 +1,51 @@
+event:message
+data:{"task_status":"created","qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":2}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":3,"data":{"message":{"updateTime":"1791960595695","metaData":{"state":"waiting-resp","endTurn":false,"userInfo":{"status":3}},"content":{"searchQuery":{"querys":["100 +1000"]}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":4,"data":{"message":{"updateTime":"1791960595696","metaData":{"state":"generating-resp","endTurn":false,"userInfo":{"status":3},"speedInfo":{"stage":"SPEED_INITIAL_THINKING_STAGE","labels":{"askType":"task_mode","entrance":"pc_aitab"}}},"content":{"generator":{"isFinished":false,"component":"agentProcess","data":{"type":"step/start","seq":1,"time":1791960595696,"data":{"step":1,"title":"正在理解用户需求"}},"interactiveArea":{"scene":21,"disableDeepSearch":true}}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":5,"data":{"message":{"updateTime":"1791960596945","metaData":{"state":"generating-resp","endTurn":false,"userInfo":{"status":3},"speedInfo":{"stage":"SPEED_PROCESS_STAGE","labels":{"askType":"task_mode","entrance":"pc_aitab"}}},"content":{"generator":{"isFinished":false,"component":"agentProcess","data":{"type":"assistant/chunk","seq":2,"time":1791960596945,"data":{"step":1,"chunk":{"type":"reasoning-delta","index":0,"text":"100 + 1000 = 1100.\n\nThe previous"}}}}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":6,"data":{"message":{"updateTime":"1791960597020","metaData":{"state":"generating-resp","endTurn":false,"userInfo":{"status":3},"speedInfo":{"stage":"SPEED_PROCESS_STAGE","labels":{"askType":"task_mode","entrance":"pc_aitab"}}},"content":{"generator":{"isFinished":false,"component":"agentProcess","data":{"type":"assistant/chunk","seq":3,"time":1791960597019,"data":{"step":1,"chunk":{"type":"reasoning-delta","index":0,"text":" response \"100 + 100 = 20\" was wrong"}}}}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":7,"data":{"message":{"updateTime":"1791960597079","metaData":{"state":"generating-resp","endTurn":false,"userInfo":{"status":3},"speedInfo":{"stage":"SPEED_PROCESS_STAGE","labels":{"askType":"task_mode","entrance":"pc_aitab"}}},"content":{"generator":{"isFinished":false,"component":"agentProcess","data":{"type":"assistant/chunk","seq":4,"time":1791960597078,"data":{"step":1,"chunk":{"type":"reasoning-delta","index":0,"text":" (I made an error). Now the current"}}}}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":8,"data":{"message":{"updateTime":"1791960597142","metaData":{"state":"generating-resp","endTurn":false,"userInfo":{"status":3},"speedInfo":{"stage":"SPEED_PROCESS_STAGE","labels":{"askType":"task_mode","entrance":"pc_aitab"}}},"content":{"generator":{"isFinished":false,"component":"agentProcess","data":{"type":"assistant/chunk","seq":5,"time":1791960597141,"data":{"step":1,"chunk":{"type":"reasoning-delta","index":0,"text":" question is 100 + 1000 = 1100.\n\nI should answer correctly"}}}}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":9,"data":{"message":{"updateTime":"1791960597176","metaData":{"state":"generating-resp","endTurn":false,"userInfo":{"status":3},"speedInfo":{"stage":"SPEED_PROCESS_STAGE","labels":{"askType":"task_mode","entrance":"pc_aitab"}}},"content":{"generator":{"isFinished":false,"component":"agentProcess","data":{"type":"assistant/chunk","seq":6,"time":1791960597176,"data":{"step":1,"chunk":{"type":"reasoning-delta","index":0,"text":". Maybe also briefly note the previous"}}}}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":10,"data":{"message":{"updateTime":"1791960597220","metaData":{"state":"generating-resp","endTurn":false,"userInfo":{"status":3},"speedInfo":{"stage":"SPEED_PROCESS_STAGE","labels":{"askType":"task_mode","entrance":"pc_aitab"}}},"content":{"generator":{"isFinished":false,"component":"agentProcess","data":{"type":"assistant/chunk","seq":7,"time":1791960597220,"data":{"step":1,"chunk":{"type":"reasoning-delta","index":0,"text":" error correction. Let me just answer."}}}}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":11,"data":{"message":{"updateTime":"1791960597280","metaData":{"state":"generating-resp","endTurn":false,"userInfo":{"status":3},"speedInfo":{"stage":"SPEED_PROCESS_STAGE","labels":{"askType":"task_mode","entrance":"pc_aitab"}}},"content":{"generator":{"isFinished":false,"component":"agentProcess","data":{"type":"step/title","seq":8,"time":1791960597280,"data":{"step":1,"title":"需求梳理完成"}}}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":12,"data":{"message":{"updateTime":"1791960597281","metaData":{"state":"generating-resp","endTurn":false,"userInfo":{"status":3},"speedInfo":{"stage":"SPEED_PROCESS_STAGE","labels":{"askType":"task_mode","entrance":"pc_aitab"}}},"content":{"generator":{"isFinished":false,"component":"agentProcess","data":{"type":"step/end","seq":9,"time":1791960597281,"data":{"step":1,"status":"completed"}}}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":13,"data":{"message":{"updateTime":"1791960597281","metaData":{"state":"generating-resp","endTurn":false,"userInfo":{"status":3},"speedInfo":{"stage":"SPEED_PROCESS_STAGE","costs":{"prehandle":1610,"sendFirstReasoning":2861,"modelFirstReasoning":1188},"labels":{"askType":"task_mode","entrance":"pc_aitab"}}},"content":{"generator":{"isFinished":false,"component":"markdown-yiyan","data":{"value":"100 + 1000 = 1100\n\n（另外","typing":{"cursor":false,"mode":"all","speed":10}},"group":1,"status":"processing"}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":14,"data":{"message":{"updateTime":"1791960597359","metaData":{"state":"generating-resp","endTurn":false,"userInfo":{"status":3},"speedInfo":{"stage":"SPEED_PROCESS_STAGE","labels":{"askType":"task_mode","entrance":"pc_aitab"}}},"content":{"generator":{"isFinished":false,"component":"markdown-yiyan","data":{"value":"更正一下：上一条我答错了，100 + 100 应该是 **200","typing":{"cursor":false,"mode":"all","speed":10}},"group":1,"status":"processing"}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":15,"data":{"message":{"updateTime":"1791960597506","metaData":{"state":"generating-resp","endTurn":false,"userInfo":{"status":3},"speedInfo":{"stage":"SPEED_PROCESS_STAGE","labels":{"askType":"task_mode","entrance":"pc_aitab"}}},"content":{"generator":{"isFinished":false,"component":"markdown-yiyan","data":{"value":"**，不是 20，抱歉。）","typing":{"cursor":false,"mode":"all","speed":10}},"group":1,"status":"processing"}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":16,"data":{"message":{"updateTime":"1791960598029","metaData":{"state":"generate-complete","endTurn":false,"userInfo":{"status":3},"speedInfo":{"labels":{"askType":"task_mode","entrance":"pc_aitab"}},"logInfo":{"markdownBlueLinksNum":0}},"content":{"generator":{"isFinished":false,"status":"success","isAIAnswer":true,"agentToken":"Kw3kJm7ouFMVvIsR9WU1N8XcujNMwKbLk1+Vr5Jfa9GOk9rJD4RyuQgW"}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":17,"data":{"message":{"updateTime":"1791960598029","metaData":{"state":"generating-resp","endTurn":false,"userInfo":{"status":3},"speedInfo":{"stage":"SPEED_PROCESS_STAGE","labels":{"askType":"task_mode","entrance":"pc_aitab"}},"logInfo":{"markdownBlueLinksNum":0}},"content":{"generator":{"text":"","type":"","dataType":"","showType":"","antiFlag":0,"isFinished":true,"interactiveArea":{"scene":21,"disableDeepSearch":true}}}}}}
+
+event:message
+data:{"status":0,"qid":"9178412787819703550","sessionId":"1000000000000000000","seq_id":18,"data":{"message":{"updateTime":"1791960598030","metaData":{"state":"generate-complete","endTurn":true,"userInfo":{"status":3},"speedInfo":{"labels":{"askType":"task_mode","entrance":"pc_aitab"},"costs":{"sendAll":3945,"modelAll":1766,"allPacketRelay":1214}},"logInfo":{"markdownBlueLinksNum":0}},"content":{"generator":{"isFinished":true}}}}}
+

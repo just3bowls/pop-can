@@ -1,0 +1,12 @@
+{
+  "provider": "yuanbao",
+  "dialect": "hy3-text",
+  "comment": "Hy3 普通档：event: speech_type=data: text，答案走 {\"type\":\"text\",\"msg\":…}（mode=text）。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "answerDelta"
+    ],
+    "finishReason": "stop"
+  }
+}

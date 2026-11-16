@@ -1,0 +1,12 @@
+{
+  "provider": "qianwen",
+  "dialect": "single-shot-complete",
+  "comment": "单次快照：只有 event: complete + bar/workflow/paa 卡片，答案仍是 multi_load/iframe 的一条全量快照。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "qianwenAnswerText"
+    ],
+    "finishReason": "stop"
+  }
+}

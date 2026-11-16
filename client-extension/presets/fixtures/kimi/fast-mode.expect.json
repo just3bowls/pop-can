@@ -1,0 +1,13 @@
+{
+  "provider": "kimi",
+  "dialect": "fast-mode",
+  "comment": "快速档：gRPC-Web 帧 + op/mask 增量，末尾 `done:{}` 收尾。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "answerStart",
+      "answerDelta"
+    ],
+    "finishReason": "stop"
+  }
+}

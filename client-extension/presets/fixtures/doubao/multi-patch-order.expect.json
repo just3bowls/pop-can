@@ -1,0 +1,13 @@
+{
+  "provider": "doubao",
+  "dialect": "multi-patch-order",
+  "comment": "The answer block is in patch_op[2] after loading/status patches. The rule must select block_type=10000 instead of assuming patch_op[0], otherwise the leading @@ is lost.",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "answerPatchDelta",
+      "chunkDelta"
+    ],
+    "finishReason": "stop"
+  }
+}

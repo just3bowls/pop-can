@@ -1,0 +1,13 @@
+{
+  "provider": "kimi",
+  "dialect": "queued",
+  "comment": "切 k2.8/k3 被排队：provider 回错误帧（resource_exhausted + 中文 localizedMessage），必须立刻失败而不是等 180s。",
+  "expect": {
+    "errorContains": "和Kimi聊天的人太多了",
+    "handlers": [
+      "turnDone",
+      "providerError"
+    ],
+    "finishReason": "stop"
+  }
+}

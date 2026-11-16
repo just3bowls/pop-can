@@ -1,0 +1,3312 @@
+event: update_session
+data: {"updated_at":1791782588.563855}
+
+data: {"v":{"response":{"message_id":1000000000000000000,"parent_id":1,"model":"","role":"ASSISTANT","thinking_enabled":true,"ban_edit":false,"ban_regenerate":false,"status":"WIP","incomplete_message":null,"accumulated_token_usage":0,"feedback":null,"inserted_at":1791782588.5510118,"search_enabled":true,"fragments":[{"id":2,"type":"THINK","content":"我们需要","elapsed_secs":null,"references":[],"stage_id":1}],"conversation_mode":"DEFAULT","has_pending_fragment":false,"auto_continue":false,"search_triggered":false,"extra_search_providers":[]}}}
+
+data: {"p":"response/fragments/-1/content","o":"APPEND","v":"回答"}
+
+data: {"v":"用户"}
+
+data: {"v":"最后"}
+
+data: {"v":"一条"}
+
+data: {"v":"消息"}
+
+data: {"v":"：“"}
+
+data: {"v":"哈哈"}
+
+data: {"v":"，"}
+
+data: {"v":"好吧"}
+
+data: {"v":"，"}
+
+data: {"v":"我觉得"}
+
+data: {"v":"现在"}
+
+data: {"v":"ai"}
+
+data: {"v":"替代"}
+
+data: {"v":"了很多"}
+
+data: {"v":"的方向"}
+
+data: {"v":"了"}
+
+data: {"v":"，"}
+
+data: {"v":"人类"}
+
+data: {"v":"的时间"}
+
+data: {"v":"还"}
+
+data: {"v":"多"}
+
+data: {"v":"吗"}
+
+data: {"v":"”。"}
+
+data: {"v":"需要"}
+
+data: {"v":"以"}
+
+data: {"v":"AI"}
+
+data: {"v":" assistant"}
+
+data: {"v":"身份"}
+
+data: {"v":"，"}
+
+data: {"v":"用"}
+
+data: {"v":"指定"}
+
+data: {"v":"mark"}
+
+data: {"v":"er"}
+
+data: {"v":"协议"}
+
+data: {"v":"。"}
+
+data: {"v":"需要"}
+
+data: {"v":"先"}
+
+data: {"v":"reason"}
+
+data: {"v":"ing"}
+
+data: {"v":"_content"}
+
+data: {"v":"，"}
+
+data: {"v":"然后"}
+
+data: {"v":"content"}
+
+data: {"v":"，"}
+
+data: {"v":"无"}
+
+data: {"v":"工具"}
+
+data: {"v":"调用"}
+
+data: {"v":"。"}
+
+data: {"v":"必须"}
+
+data: {"v":"只用"}
+
+data: {"v":"协议"}
+
+data: {"v":"。"}
+
+data: {"v":"不能"}
+
+data: {"v":"输出"}
+
+data: {"v":"外部"}
+
+data: {"v":"文本"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"需要"}
+
+data: {"v":"思考"}
+
+data: {"v":"怎么"}
+
+data: {"v":"回答"}
+
+data: {"v":"。"}
+
+data: {"v":"用户"}
+
+data: {"v":"感叹"}
+
+data: {"v":"AI"}
+
+data: {"v":"替代"}
+
+data: {"v":"了很多"}
+
+data: {"v":"方向"}
+
+data: {"v":"，"}
+
+data: {"v":"人类"}
+
+data: {"v":"时间"}
+
+data: {"v":"还"}
+
+data: {"v":"多"}
+
+data: {"v":"吗"}
+
+data: {"v":"。"}
+
+data: {"v":"需要"}
+
+data: {"v":"给出"}
+
+data: {"v":"有"}
+
+data: {"v":"深度"}
+
+data: {"v":"、"}
+
+data: {"v":"安慰"}
+
+data: {"v":"但"}
+
+data: {"v":"现实的"}
+
+data: {"v":"回答"}
+
+data: {"v":"。"}
+
+data: {"v":"可以"}
+
+data: {"v":"围绕"}
+
+data: {"v":"“"}
+
+data: {"v":"替代"}
+
+data: {"v":"方向"}
+
+data: {"v":"”"}
+
+data: {"v":"不等于"}
+
+data: {"v":"“"}
+
+data: {"v":"替代"}
+
+data: {"v":"人"}
+
+data: {"v":"”，"}
+
+data: {"v":"时间"}
+
+data: {"v":"不是"}
+
+data: {"v":"倒"}
+
+data: {"v":"计时"}
+
+data: {"v":"而是"}
+
+data: {"v":"如何"}
+
+data: {"v":"重新"}
+
+data: {"v":"分配"}
+
+data: {"v":"。"}
+
+data: {"v":"讨论"}
+
+data: {"v":"历史"}
+
+data: {"v":"技术"}
+
+data: {"v":"革命"}
+
+data: {"v":"、"}
+
+data: {"v":"任务"}
+
+data: {"v":"替代"}
+
+data: {"v":" vs"}
+
+data: {"v":" "}
+
+data: {"v":"职业"}
+
+data: {"v":"替代"}
+
+data: {"v":"、"}
+
+data: {"v":"人类"}
+
+data: {"v":"优势"}
+
+data: {"v":"、"}
+
+data: {"v":"制度"}
+
+data: {"v":"与"}
+
+data: {"v":"选择"}
+
+data: {"v":"。"}
+
+data: {"v":"要"}
+
+data: {"v":"符合"}
+
+data: {"v":"前"}
+
+data: {"v":"文"}
+
+data: {"v":"语境"}
+
+data: {"v":"："}
+
+data: {"v":"AI"}
+
+data: {"v":"大"}
+
+data: {"v":"模型"}
+
+data: {"v":"、"}
+
+data: {"v":"国内"}
+
+data: {"v":"、"}
+
+data: {"v":"数学"}
+
+data: {"v":"难题"}
+
+data: {"v":"、"}
+
+data: {"v":"Open"}
+
+data: {"v":"AI"}
+
+data: {"v":"等"}
+
+data: {"v":"。"}
+
+data: {"v":"也许"}
+
+data: {"v":"回答"}
+
+data: {"v":"要"}
+
+data: {"v":"中文"}
+
+data: {"v":"。"}
+
+data: {"v":"语气"}
+
+data: {"v":"自然"}
+
+data: {"v":"，"}
+
+data: {"v":"承接"}
+
+data: {"v":"“"}
+
+data: {"v":"哈哈"}
+
+data: {"v":"，"}
+
+data: {"v":"好吧"}
+
+data: {"v":"”。"}
+
+data: {"v":"可以"}
+
+data: {"v":"分"}
+
+data: {"v":"几个"}
+
+data: {"v":"层次"}
+
+data: {"v":"："}
+
+data: {"v":"1"}
+
+data: {"v":")"}
+
+data: {"v":" AI"}
+
+data: {"v":"替代"}
+
+data: {"v":"的是"}
+
+data: {"v":"任务"}
+
+data: {"v":"，"}
+
+data: {"v":"不是"}
+
+data: {"v":"全部"}
+
+data: {"v":"人生"}
+
+data: {"v":"；"}
+
+data: {"v":"2"}
+
+data: {"v":")"}
+
+data: {"v":" "}
+
+data: {"v":"时间"}
+
+data: {"v":"不一定"}
+
+data: {"v":"变"}
+
+data: {"v":"少"}
+
+data: {"v":"，"}
+
+data: {"v":"但"}
+
+data: {"v":"“"}
+
+data: {"v":"可"}
+
+data: {"v":"被"}
+
+data: {"v":"定价"}
+
+data: {"v":"的时间"}
+
+data: {"v":"”"}
+
+data: {"v":"变"}
+
+data: {"v":"少"}
+
+data: {"v":"，"}
+
+data: {"v":"产生"}
+
+data: {"v":"焦虑"}
+
+data: {"v":"；"}
+
+data: {"v":"3"}
+
+data: {"v":")"}
+
+data: {"v":" "}
+
+data: {"v":"人类"}
+
+data: {"v":"时间"}
+
+data: {"v":"问题"}
+
+data: {"v":"其实是"}
+
+data: {"v":"分配"}
+
+data: {"v":"和"}
+
+data: {"v":"意义"}
+
+data: {"v":"问题"}
+
+data: {"v":"；"}
+
+data: {"v":"4"}
+
+data: {"v":")"}
+
+data: {"v":" "}
+
+data: {"v":"短期"}
+
+data: {"v":"冲击"}
+
+data: {"v":"真实"}
+
+data: {"v":"，"}
+
+data: {"v":"个人"}
+
+data: {"v":"要"}
+
+data: {"v":"转向"}
+
+data: {"v":"问题"}
+
+data: {"v":"定义"}
+
+data: {"v":"、"}
+
+data: {"v":"判断"}
+
+data: {"v":"、"}
+
+data: {"v":"责任"}
+
+data: {"v":"、"}
+
+data: {"v":"关系"}
+
+data: {"v":"；"}
+
+data: {"v":"5"}
+
+data: {"v":")"}
+
+data: {"v":" "}
+
+data: {"v":"不是"}
+
+data: {"v":"人类"}
+
+data: {"v":"时间"}
+
+data: {"v":"还"}
+
+data: {"v":"多"}
+
+data: {"v":"吗"}
+
+data: {"v":"，"}
+
+data: {"v":"而是"}
+
+data: {"v":"人类"}
+
+data: {"v":"想"}
+
+data: {"v":"用"}
+
+data: {"v":"时间"}
+
+data: {"v":"做什么"}
+
+data: {"v":"。"}
+
+data: {"v":"可"}
+
+data: {"v":"引用"}
+
+data: {"v":"陶"}
+
+data: {"v":"哲"}
+
+data: {"v":"轩"}
+
+data: {"v":"“"}
+
+data: {"v":"好"}
+
+data: {"v":"问题"}
+
+data: {"v":"比"}
+
+data: {"v":"好"}
+
+data: {"v":"答案"}
+
+data: {"v":"稀缺"}
+
+data: {"v":"”。"}
+
+data: {"v":"也可以"}
+
+data: {"v":"说"}
+
+data: {"v":" AI"}
+
+data: {"v":" "}
+
+data: {"v":"让"}
+
+data: {"v":"答案"}
+
+data: {"v":"变"}
+
+data: {"v":"便宜"}
+
+data: {"v":"，"}
+
+data: {"v":"让"}
+
+data: {"v":"问题"}
+
+data: {"v":"、"}
+
+data: {"v":"品味"}
+
+data: {"v":"、"}
+
+data: {"v":"信任"}
+
+data: {"v":"、"}
+
+data: {"v":"责任"}
+
+data: {"v":"变"}
+
+data: {"v":"贵"}
+
+data: {"v":"。"}
+
+data: {"v":"不要"}
+
+data: {"v":"过度"}
+
+data: {"v":"乐观"}
+
+data: {"v":"，"}
+
+data: {"v":"承认"}
+
+data: {"v":"转型"}
+
+data: {"v":"阵"}
+
+data: {"v":"痛"}
+
+data: {"v":"。"}
+
+data: {"v":"最后"}
+
+data: {"v":"一句"}
+
+data: {"v":"："}
+
+data: {"v":"人类"}
+
+data: {"v":"的时间"}
+
+data: {"v":"从来"}
+
+data: {"v":"不是"}
+
+data: {"v":"靠"}
+
+data: {"v":"“"}
+
+data: {"v":"没"}
+
+data: {"v":"被"}
+
+data: {"v":"替代"}
+
+data: {"v":"”"}
+
+data: {"v":"挣"}
+
+data: {"v":"来的"}
+
+data: {"v":"，"}
+
+data: {"v":"而是"}
+
+data: {"v":"靠"}
+
+data: {"v":"选择"}
+
+data: {"v":"怎么"}
+
+data: {"v":"用"}
+
+data: {"v":"。"}
+
+data: {"v":"现在"}
+
+data: {"v":"的问题"}
+
+data: {"v":"不是"}
+
+data: {"v":"还剩"}
+
+data: {"v":"多少"}
+
+data: {"v":"时间"}
+
+data: {"v":"，"}
+
+data: {"v":"而是"}
+
+data: {"v":"我们"}
+
+data: {"v":"是否"}
+
+data: {"v":"愿意"}
+
+data: {"v":"把"}
+
+data: {"v":"省"}
+
+data: {"v":"下来的"}
+
+data: {"v":"时间"}
+
+data: {"v":"投"}
+
+data: {"v":"到"}
+
+data: {"v":"机器"}
+
+data: {"v":"不能"}
+
+data: {"v":"替"}
+
+data: {"v":"我们"}
+
+data: {"v":"活"}
+
+data: {"v":"的部分"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"需要"}
+
+data: {"v":"确保"}
+
+data: {"v":"mark"}
+
+data: {"v":"er"}
+
+data: {"v":"协议"}
+
+data: {"v":"正确"}
+
+data: {"v":"。"}
+
+data: {"v":"结构"}
+
+data: {"v":"：\n"}
+
+data: {"v":"@@"}
+
+data: {"v":"B"}
+
+data: {"v":"EG"}
+
+data: {"v":":"}
+
+data: {"v":"response"}
+
+data: {"v":"@@"}
+
+data: {"v":"\n"}
+
+data: {"v":"@@"}
+
+data: {"v":"B"}
+
+data: {"v":"EG"}
+
+data: {"v":":"}
+
+data: {"v":"reason"}
+
+data: {"v":"ing"}
+
+data: {"v":"_content"}
+
+data: {"v":"@@"}
+
+data: {"v":"\n"}
+
+data: {"v":"..."}
+
+data: {"v":" \n"}
+
+data: {"v":"@@"}
+
+data: {"v":"END"}
+
+data: {"v":":"}
+
+data: {"v":"reason"}
+
+data: {"v":"ing"}
+
+data: {"v":"_content"}
+
+data: {"v":"@@"}
+
+data: {"v":"\n\n"}
+
+data: {"v":"@@"}
+
+data: {"v":"B"}
+
+data: {"v":"EG"}
+
+data: {"v":":"}
+
+data: {"v":"content"}
+
+data: {"v":"@@"}
+
+data: {"v":"\n"}
+
+data: {"v":"...\n"}
+
+data: {"v":"@@"}
+
+data: {"v":"END"}
+
+data: {"v":":"}
+
+data: {"v":"content"}
+
+data: {"v":"@@"}
+
+data: {"v":"\n"}
+
+data: {"v":"@@"}
+
+data: {"v":"END"}
+
+data: {"v":":"}
+
+data: {"v":"response"}
+
+data: {"v":"@@"}
+
+data: {"v":"\n\n"}
+
+data: {"v":"没有"}
+
+data: {"v":"tool"}
+
+data: {"v":"_c"}
+
+data: {"v":"alls"}
+
+data: {"v":"。"}
+
+data: {"v":"好的"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"reason"}
+
+data: {"v":"ing"}
+
+data: {"v":"_content"}
+
+data: {"v":"可以"}
+
+data: {"v":"简短"}
+
+data: {"v":"写"}
+
+data: {"v":"。"}
+
+data: {"v":"注意"}
+
+data: {"v":"不要"}
+
+data: {"v":"有"}
+
+data: {"v":"额外"}
+
+data: {"v":"标记"}
+
+data: {"v":"冲突"}
+
+data: {"v":"。"}
+
+data: {"v":"内容"}
+
+data: {"v":"中"}
+
+data: {"v":"不要"}
+
+data: {"v":"出现"}
+
+data: {"v":"@@"}
+
+data: {"v":"B"}
+
+data: {"v":"EG"}
+
+data: {"v":"之类"}
+
+data: {"v":"。"}
+
+data: {"v":"可以"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"回答"}
+
+data: {"v":"长度"}
+
+data: {"v":"中等"}
+
+data: {"v":"。"}
+
+data: {"v":"需要"}
+
+data: {"v":"“"}
+
+data: {"v":"保持"}
+
+data: {"v":"角色"}
+
+data: {"v":"："}
+
+data: {"v":"使用"}
+
+data: {"v":"自己的能力"}
+
+data: {"v":"回答"}
+
+data: {"v":"，"}
+
+data: {"v":"但"}
+
+data: {"v":"不要"}
+
+data: {"v":"把自己的"}
+
+data: {"v":"工具"}
+
+data: {"v":"和"}
+
+data: {"v":"身份"}
+
+data: {"v":"带"}
+
+data: {"v":"进"}
+
+data: {"v":"场景"}
+
+data: {"v":"。”"}
+
+data: {"v":" "}
+
+data: {"v":"所以"}
+
+data: {"v":"不用"}
+
+data: {"v":"提"}
+
+data: {"v":"我是"}
+
+data: {"v":"AI"}
+
+data: {"v":"助手"}
+
+data: {"v":"？"}
+
+data: {"v":"可以"}
+
+data: {"v":"以"}
+
+data: {"v":"对话"}
+
+data: {"v":"者"}
+
+data: {"v":"身份"}
+
+data: {"v":"。"}
+
+data: {"v":"不要"}
+
+data: {"v":"提"}
+
+data: {"v":"工具"}
+
+data: {"v":"。"}
+
+data: {"v":"可以"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"思考"}
+
+data: {"v":"内容"}
+
+data: {"v":"："}
+
+data: {"v":"用户"}
+
+data: {"v":"情绪"}
+
+data: {"v":"有点"}
+
+data: {"v":"感慨"}
+
+data: {"v":"、"}
+
+data: {"v":"焦虑"}
+
+data: {"v":"。"}
+
+data: {"v":"需要"}
+
+data: {"v":"共"}
+
+data: {"v":"情"}
+
+data: {"v":"但不"}
+
+data: {"v":"贩卖"}
+
+data: {"v":"焦虑"}
+
+data: {"v":"。"}
+
+data: {"v":"可以"}
+
+data: {"v":"回答"}
+
+data: {"v":"："}
+
+data: {"v":"人类"}
+
+data: {"v":"的时间"}
+
+data: {"v":"“"}
+
+data: {"v":"还"}
+
+data: {"v":"多"}
+
+data: {"v":"不多"}
+
+data: {"v":"”"}
+
+data: {"v":"取决于"}
+
+data: {"v":"怎么"}
+
+data: {"v":"定义"}
+
+data: {"v":"。"}
+
+data: {"v":"如果"}
+
+data: {"v":"指"}
+
+data: {"v":"重复"}
+
+data: {"v":"性"}
+
+data: {"v":"劳动"}
+
+data: {"v":"被"}
+
+data: {"v":"替代"}
+
+data: {"v":"，"}
+
+data: {"v":"那"}
+
+data: {"v":"确实"}
+
+data: {"v":"在"}
+
+data: {"v":"减少"}
+
+data: {"v":"；"}
+
+data: {"v":"如果"}
+
+data: {"v":"指"}
+
+data: {"v":"人"}
+
+data: {"v":"作为"}
+
+data: {"v":"目的"}
+
+data: {"v":"、"}
+
+data: {"v":"体验"}
+
+data: {"v":"、"}
+
+data: {"v":"关系"}
+
+data: {"v":"、"}
+
+data: {"v":"创造"}
+
+data: {"v":"意义"}
+
+data: {"v":"的时间"}
+
+data: {"v":"，"}
+
+data: {"v":"可能"}
+
+data: {"v":"反而"}
+
+data: {"v":"被"}
+
+data: {"v":"释放"}
+
+data: {"v":"。"}
+
+data: {"v":"但"}
+
+data: {"v":"释放"}
+
+data: {"v":"不等于"}
+
+data: {"v":"自动"}
+
+data: {"v":"变"}
+
+data: {"v":"好"}
+
+data: {"v":"，"}
+
+data: {"v":"可能"}
+
+data: {"v":"被"}
+
+data: {"v":"资本"}
+
+data: {"v":"、"}
+
+data: {"v":"竞争"}
+
+data: {"v":"、"}
+
+data: {"v":"平台"}
+
+data: {"v":"重新"}
+
+data: {"v":"填"}
+
+data: {"v":"满"}
+
+data: {"v":"。"}
+
+data: {"v":"所以"}
+
+data: {"v":"关键"}
+
+data: {"v":"在"}
+
+data: {"v":"制度"}
+
+data: {"v":"和个人"}
+
+data: {"v":"选择"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"可以"}
+
+data: {"v":"提"}
+
+data: {"v":"："}
+
+data: {"v":"工业"}
+
+data: {"v":"革命"}
+
+data: {"v":"、"}
+
+data: {"v":"计算机"}
+
+data: {"v":"、"}
+
+data: {"v":"互联网"}
+
+data: {"v":"都"}
+
+data: {"v":"替代"}
+
+data: {"v":"过"}
+
+data: {"v":"大量"}
+
+data: {"v":"岗位"}
+
+data: {"v":"，"}
+
+data: {"v":"但"}
+
+data: {"v":"人类"}
+
+data: {"v":"没有"}
+
+data: {"v":"“"}
+
+data: {"v":"没"}
+
+data: {"v":"时间"}
+
+data: {"v":"了"}
+
+data: {"v":"”，"}
+
+data: {"v":"而是"}
+
+data: {"v":"时间"}
+
+data: {"v":"被"}
+
+data: {"v":"重新"}
+
+data: {"v":"定义"}
+
+data: {"v":"。"}
+
+data: {"v":"AI"}
+
+data: {"v":"不同"}
+
+data: {"v":"在于"}
+
+data: {"v":"它"}
+
+data: {"v":"开始"}
+
+data: {"v":"碰"}
+
+data: {"v":"认知"}
+
+data: {"v":"和"}
+
+data: {"v":"创造"}
+
+data: {"v":"，"}
+
+data: {"v":"冲击"}
+
+data: {"v":"更"}
+
+data: {"v":"广"}
+
+data: {"v":"。"}
+
+data: {"v":"但"}
+
+data: {"v":"仍有"}
+
+data: {"v":"AI"}
+
+data: {"v":"不"}
+
+data: {"v":"擅"}
+
+data: {"v":"长的"}
+
+data: {"v":"："}
+
+data: {"v":"提出"}
+
+data: {"v":"好"}
+
+data: {"v":"问题"}
+
+data: {"v":"、"}
+
+data: {"v":"承担"}
+
+data: {"v":"后果"}
+
+data: {"v":"、"}
+
+data: {"v":"建立"}
+
+data: {"v":"信任"}
+
+data: {"v":"、"}
+
+data: {"v":"身体"}
+
+data: {"v":"经验"}
+
+data: {"v":"、"}
+
+data: {"v":"情感"}
+
+data: {"v":"联结"}
+
+data: {"v":"、"}
+
+data: {"v":"价值"}
+
+data: {"v":"判断"}
+
+data: {"v":"、"}
+
+data: {"v":"政治"}
+
+data: {"v":"选择"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"“"}
+
+data: {"v":"人类"}
+
+data: {"v":"的时间"}
+
+data: {"v":"还"}
+
+data: {"v":"多"}
+
+data: {"v":"吗"}
+
+data: {"v":"”"}
+
+data: {"v":" "}
+
+data: {"v":"从"}
+
+data: {"v":"物种"}
+
+data: {"v":"尺度"}
+
+data: {"v":"，"}
+
+data: {"v":"很多"}
+
+data: {"v":"；"}
+
+data: {"v":"从"}
+
+data: {"v":"个人"}
+
+data: {"v":"职业"}
+
+data: {"v":"窗口"}
+
+data: {"v":"，"}
+
+data: {"v":"可能"}
+
+data: {"v":"不多"}
+
+data: {"v":"。"}
+
+data: {"v":"要"}
+
+data: {"v":"分"}
+
+data: {"v":"尺度"}
+
+data: {"v":"。"}
+
+data: {"v":"对"}
+
+data: {"v":"个体"}
+
+data: {"v":"，"}
+
+data: {"v":"未来"}
+
+data: {"v":"5"}
+
+data: {"v":"-"}
+
+data: {"v":"10"}
+
+data: {"v":"年"}
+
+data: {"v":"转型"}
+
+data: {"v":"压力"}
+
+data: {"v":"真实"}
+
+data: {"v":"。"}
+
+data: {"v":"对社会"}
+
+data: {"v":"，"}
+
+data: {"v":"可能需要"}
+
+data: {"v":"一代"}
+
+data: {"v":"人"}
+
+data: {"v":"适应"}
+
+data: {"v":"。"}
+
+data: {"v":"不要"}
+
+data: {"v":"承诺"}
+
+data: {"v":"乌"}
+
+data: {"v":"托"}
+
+data: {"v":"邦"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"最后"}
+
+data: {"v":"："}
+
+data: {"v":"不是"}
+
+data: {"v":"“"}
+
+data: {"v":"AI"}
+
+data: {"v":"替代"}
+
+data: {"v":"了多少"}
+
+data: {"v":"方向"}
+
+data: {"v":"”，"}
+
+data: {"v":"而是"}
+
+data: {"v":"“"}
+
+data: {"v":"我们"}
+
+data: {"v":"是否"}
+
+data: {"v":"把"}
+
+data: {"v":"省"}
+
+data: {"v":"下来的"}
+
+data: {"v":"时间"}
+
+data: {"v":"用在"}
+
+data: {"v":"只有"}
+
+data: {"v":"人"}
+
+data: {"v":"才能"}
+
+data: {"v":"做的事"}
+
+data: {"v":"上"}
+
+data: {"v":"”。"}
+
+data: {"v":"如果"}
+
+data: {"v":"只"}
+
+data: {"v":"用来"}
+
+data: {"v":"更"}
+
+data: {"v":"卷"}
+
+data: {"v":"地产"}
+
+data: {"v":"出"}
+
+data: {"v":"更多"}
+
+data: {"v":"token"}
+
+data: {"v":"，"}
+
+data: {"v":"那"}
+
+data: {"v":"时间"}
+
+data: {"v":"不会"}
+
+data: {"v":"变"}
+
+data: {"v":"多"}
+
+data: {"v":"，"}
+
+data: {"v":"只会"}
+
+data: {"v":"更"}
+
+data: {"v":"少"}
+
+data: {"v":"。"}
+
+data: {"v":"如果"}
+
+data: {"v":"用来"}
+
+data: {"v":"教育"}
+
+data: {"v":"、"}
+
+data: {"v":"照"}
+
+data: {"v":"护"}
+
+data: {"v":"、"}
+
+data: {"v":"创造"}
+
+data: {"v":"、"}
+
+data: {"v":"公共"}
+
+data: {"v":"参与"}
+
+data: {"v":"，"}
+
+data: {"v":"可能"}
+
+data: {"v":"人类"}
+
+data: {"v":"还有"}
+
+data: {"v":"很"}
+
+data: {"v":"长的"}
+
+data: {"v":"路"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"这"}
+
+data: {"v":"符合"}
+
+data: {"v":"之前"}
+
+data: {"v":"对话"}
+
+data: {"v":"的"}
+
+data: {"v":"深度"}
+
+data: {"v":"。"}
+
+data: {"v":"可以"}
+
+data: {"v":"加"}
+
+data: {"v":"一句"}
+
+data: {"v":"呼应"}
+
+data: {"v":"陶"}
+
+data: {"v":"哲"}
+
+data: {"v":"轩"}
+
+data: {"v":"："}
+
+data: {"v":"好"}
+
+data: {"v":"问题"}
+
+data: {"v":"比"}
+
+data: {"v":"好"}
+
+data: {"v":"答案"}
+
+data: {"v":"更"}
+
+data: {"v":"稀缺"}
+
+data: {"v":"。"}
+
+data: {"v":"人类"}
+
+data: {"v":"要"}
+
+data: {"v":"去做"}
+
+data: {"v":"提出问题"}
+
+data: {"v":"的人"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"现在"}
+
+data: {"v":"生成"}
+
+data: {"v":"。"}
+
+data: {"v":"确保"}
+
+data: {"v":"mark"}
+
+data: {"v":"er"}
+
+data: {"v":"正确"}
+
+data: {"v":"。"}
+
+data: {"v":"@@"}
+
+data: {"v":"B"}
+
+data: {"v":"EG"}
+
+data: {"v":":"}
+
+data: {"v":"content"}
+
+data: {"v":"@@"}
+
+data: {"v":" "}
+
+data: {"v":"内"}
+
+data: {"v":"可"}
+
+data: {"v":"包含"}
+
+data: {"v":"换"}
+
+data: {"v":"行"}
+
+data: {"v":"。"}
+
+data: {"v":"没问题"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"注意"}
+
+data: {"v":"："}
+
+data: {"v":"协议"}
+
+data: {"v":"说"}
+
+data: {"v":"“"}
+
+data: {"v":"Always"}
+
+data: {"v":" include"}
+
+data: {"v":" reasoning"}
+
+data: {"v":"_content"}
+
+data: {"v":"..."}
+
+data: {"v":" If"}
+
+data: {"v":" no"}
+
+data: {"v":" reasoning"}
+
+data: {"v":","}
+
+data: {"v":" keep"}
+
+data: {"v":" pair"}
+
+data: {"v":" empty"}
+
+data: {"v":".”"}
+
+data: {"v":" "}
+
+data: {"v":"有"}
+
+data: {"v":"内容"}
+
+data: {"v":"即可"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"最终"}
+
+data: {"v":"。"}
+
+data: {"p":"response/fragments/-1/elapsed_secs","o":"SET","v":7.8293392}
+
+data: {"p":"response/fragments","o":"APPEND","v":[{"id":3,"type":"RESPONSE","content":"@@","references":[],"stage_id":1}]}
+
+data: {"p":"response/fragments/-1/content","v":"B"}
+
+data: {"v":"EG"}
+
+data: {"v":":"}
+
+data: {"v":"response"}
+
+data: {"v":"@@"}
+
+data: {"v":"\n"}
+
+data: {"v":"@@"}
+
+data: {"v":"B"}
+
+data: {"v":"EG"}
+
+data: {"v":":"}
+
+data: {"v":"reason"}
+
+data: {"v":"ing"}
+
+data: {"v":"_content"}
+
+data: {"v":"@@"}
+
+data: {"v":"\n"}
+
+data: {"v":"用户"}
+
+data: {"v":"带着"}
+
+data: {"v":"半"}
+
+data: {"v":"开玩笑"}
+
+data: {"v":"的"}
+
+data: {"v":"感慨"}
+
+data: {"v":"问"}
+
+data: {"v":"“"}
+
+data: {"v":"人类"}
+
+data: {"v":"的时间"}
+
+data: {"v":"还"}
+
+data: {"v":"多"}
+
+data: {"v":"吗"}
+
+data: {"v":"”，"}
+
+data: {"v":"需要"}
+
+data: {"v":"共"}
+
+data: {"v":"情"}
+
+data: {"v":"，"}
+
+data: {"v":"但"}
+
+data: {"v":"不要"}
+
+data: {"v":"简单"}
+
+data: {"v":"安慰"}
+
+data: {"v":"或"}
+
+data: {"v":"贩卖"}
+
+data: {"v":"焦虑"}
+
+data: {"v":"。"}
+
+data: {"v":"可以"}
+
+data: {"v":"区分"}
+
+data: {"v":"“"}
+
+data: {"v":"任务"}
+
+data: {"v":"被"}
+
+data: {"v":"替代"}
+
+data: {"v":"”"}
+
+data: {"v":"和"}
+
+data: {"v":"“"}
+
+data: {"v":"人的"}
+
+data: {"v":"时间"}
+
+data: {"v":"被"}
+
+data: {"v":"替代"}
+
+data: {"v":"”，"}
+
+data: {"v":"承认"}
+
+data: {"v":"职业"}
+
+data: {"v":"转型"}
+
+data: {"v":"窗口"}
+
+data: {"v":"确实"}
+
+data: {"v":"在"}
+
+data: {"v":"收"}
+
+data: {"v":"窄"}
+
+data: {"v":"，"}
+
+data: {"v":"同时"}
+
+data: {"v":"指出"}
+
+data: {"v":"人类"}
+
+data: {"v":"时间"}
+
+data: {"v":"的问题"}
+
+data: {"v":"本质"}
+
+data: {"v":"是"}
+
+data: {"v":"分配"}
+
+data: {"v":"与"}
+
+data: {"v":"意义"}
+
+data: {"v":"问题"}
+
+data: {"v":"。"}
+
+data: {"v":"呼应"}
+
+data: {"v":"前"}
+
+data: {"v":"文"}
+
+data: {"v":"陶"}
+
+data: {"v":"哲"}
+
+data: {"v":"轩"}
+
+data: {"v":"“"}
+
+data: {"v":"好"}
+
+data: {"v":"问题"}
+
+data: {"v":"比"}
+
+data: {"v":"好"}
+
+data: {"v":"答案"}
+
+data: {"v":"更"}
+
+data: {"v":"稀缺"}
+
+data: {"v":"”，"}
+
+data: {"v":"落脚"}
+
+data: {"v":"到"}
+
+data: {"v":"人类"}
+
+data: {"v":"该"}
+
+data: {"v":"把"}
+
+data: {"v":"释放"}
+
+data: {"v":"出来的"}
+
+data: {"v":"时间"}
+
+data: {"v":"投向"}
+
+data: {"v":"何处"}
+
+data: {"v":"。\n"}
+
+data: {"v":"@@"}
+
+data: {"v":"END"}
+
+data: {"v":":"}
+
+data: {"v":"reason"}
+
+data: {"v":"ing"}
+
+data: {"v":"_content"}
+
+data: {"v":"@@"}
+
+data: {"v":"\n\n"}
+
+data: {"v":"@@"}
+
+data: {"v":"B"}
+
+data: {"v":"EG"}
+
+data: {"v":":"}
+
+data: {"v":"content"}
+
+data: {"v":"@@"}
+
+data: {"v":"\n"}
+
+data: {"v":"哈哈"}
+
+data: {"v":"，"}
+
+data: {"v":"这个问题"}
+
+data: {"v":"听起来"}
+
+data: {"v":"像"}
+
+data: {"v":"玩笑"}
+
+data: {"v":"，"}
+
+data: {"v":"但"}
+
+data: {"v":"底下"}
+
+data: {"v":"是"}
+
+data: {"v":"认真的"}
+
+data: {"v":"焦虑"}
+
+data: {"v":"。"}
+
+data: {"v":"我的"}
+
+data: {"v":"判断"}
+
+data: {"v":"是"}
+
+data: {"v":"："}
+
+data: {"v":"**"}
+
+data: {"v":"如果"}
+
+data: {"v":"“"}
+
+data: {"v":"人类"}
+
+data: {"v":"的时间"}
+
+data: {"v":"”"}
+
+data: {"v":"指"}
+
+data: {"v":"重复"}
+
+data: {"v":"性"}
+
+data: {"v":"任务"}
+
+data: {"v":"占"}
+
+data: {"v":"用的"}
+
+data: {"v":"时间"}
+
+data: {"v":"，"}
+
+data: {"v":"那"}
+
+data: {"v":"确实"}
+
+data: {"v":"在"}
+
+data: {"v":"变"}
+
+data: {"v":"少"}
+
+data: {"v":"；"}
+
+data: {"v":"如果"}
+
+data: {"v":"指"}
+
+data: {"v":"人"}
+
+data: {"v":"作为"}
+
+data: {"v":"人"}
+
+data: {"v":"、"}
+
+data: {"v":"去"}
+
+data: {"v":"体验"}
+
+data: {"v":"、"}
+
+data: {"v":"判断"}
+
+data: {"v":"、"}
+
+data: {"v":"联结"}
+
+data: {"v":"和"}
+
+data: {"v":"创造"}
+
+data: {"v":"意义"}
+
+data: {"v":"的时间"}
+
+data: {"v":"，"}
+
+data: {"v":"那"}
+
+data: {"v":"未必"}
+
+data: {"v":"变"}
+
+data: {"v":"少"}
+
+data: {"v":"，"}
+
+data: {"v":"甚至"}
+
+data: {"v":"可能"}
+
+data: {"v":"被"}
+
+data: {"v":"释放"}
+
+data: {"v":"出来"}
+
+data: {"v":"——"}
+
+data: {"v":"但"}
+
+data: {"v":"释放"}
+
+data: {"v":"不等于"}
+
+data: {"v":"自动"}
+
+data: {"v":"变"}
+
+data: {"v":"好"}
+
+data: {"v":"。**\n\n"}
+
+data: {"v":"几个"}
+
+data: {"v":"层面"}
+
+data: {"v":"可以"}
+
+data: {"v":"分开"}
+
+data: {"v":"看"}
+
+data: {"v":"：\n\n"}
+
+data: {"v":"**"}
+
+data: {"v":"第一"}
+
+data: {"v":"，"}
+
+data: {"v":"AI"}
+
+data: {"v":"替代"}
+
+data: {"v":"的是"}
+
+data: {"v":"“"}
+
+data: {"v":"任务"}
+
+data: {"v":"”，"}
+
+data: {"v":"不"}
+
+data: {"v":"完全是"}
+
+data: {"v":"“"}
+
+data: {"v":"人"}
+
+data: {"v":"”。"}
+
+data: {"v":"**\n"}
+
+data: {"v":"一个"}
+
+data: {"v":"岗位"}
+
+data: {"v":"里"}
+
+data: {"v":"往往"}
+
+data: {"v":"包含"}
+
+data: {"v":"几十"}
+
+data: {"v":"个"}
+
+data: {"v":"任务"}
+
+data: {"v":"："}
+
+data: {"v":"查"}
+
+data: {"v":"资料"}
+
+data: {"v":"、"}
+
+data: {"v":"写"}
+
+data: {"v":"初"}
+
+data: {"v":"稿"}
+
+data: {"v":"、"}
+
+data: {"v":"做"}
+
+data: {"v":"表格"}
+
+data: {"v":"、"}
+
+data: {"v":"回"}
+
+data: {"v":"邮件"}
+
+data: {"v":"、"}
+
+data: {"v":"写"}
+
+data: {"v":"代码"}
+
+data: {"v":"、"}
+
+data: {"v":"做"}
+
+data: {"v":"汇报"}
+
+data: {"v":"。"}
+
+data: {"v":"AI"}
+
+data: {"v":"会"}
+
+data: {"v":"吃掉"}
+
+data: {"v":"其中"}
+
+data: {"v":"可"}
+
+data: {"v":"标准化"}
+
+data: {"v":"、"}
+
+data: {"v":"可"}
+
+data: {"v":"验证"}
+
+data: {"v":"、"}
+
+data: {"v":"可"}
+
+data: {"v":"重复"}
+
+data: {"v":"的部分"}
+
+data: {"v":"。"}
+
+data: {"v":"但"}
+
+data: {"v":"剩下"}
+
+data: {"v":"的是"}
+
+data: {"v":"目标"}
+
+data: {"v":"设定"}
+
+data: {"v":"、"}
+
+data: {"v":"价值"}
+
+data: {"v":"判断"}
+
+data: {"v":"、"}
+
+data: {"v":"责任"}
+
+data: {"v":"承担"}
+
+data: {"v":"、"}
+
+data: {"v":"关系"}
+
+data: {"v":"维护"}
+
+data: {"v":"、"}
+
+data: {"v":"异常"}
+
+data: {"v":"处理"}
+
+data: {"v":"、"}
+
+data: {"v":"政治"}
+
+data: {"v":"妥协"}
+
+data: {"v":"、"}
+
+data: {"v":"审美"}
+
+data: {"v":"取舍"}
+
+data: {"v":"——"}
+
+data: {"v":"这些"}
+
+data: {"v":"不是"}
+
+data: {"v":"不能"}
+
+data: {"v":"自动化"}
+
+data: {"v":"，"}
+
+data: {"v":"而是"}
+
+data: {"v":"很难"}
+
+data: {"v":"被"}
+
+data: {"v":"完整"}
+
+data: {"v":"地"}
+
+data: {"v":"、"}
+
+data: {"v":"可信"}
+
+data: {"v":"地"}
+
+data: {"v":"、"}
+
+data: {"v":"可"}
+
+data: {"v":"追"}
+
+data: {"v":"责"}
+
+data: {"v":"地"}
+
+data: {"v":"自动化"}
+
+data: {"v":"。"}
+
+data: {"v":"所以"}
+
+data: {"v":"短期内"}
+
+data: {"v":"更"}
+
+data: {"v":"常见"}
+
+data: {"v":"的是"}
+
+data: {"v":"“"}
+
+data: {"v":"岗位"}
+
+data: {"v":"被"}
+
+data: {"v":"重组"}
+
+data: {"v":"”，"}
+
+data: {"v":"而不是"}
+
+data: {"v":"“"}
+
+data: {"v":"人"}
+
+data: {"v":"整个"}
+
+data: {"v":"被"}
+
+data: {"v":"删"}
+
+data: {"v":"掉"}
+
+data: {"v":"”。\n\n"}
+
+data: {"v":"**"}
+
+data: {"v":"第二"}
+
+data: {"v":"，"}
+
+data: {"v":"人类"}
+
+data: {"v":"的时间"}
+
+data: {"v":"焦虑"}
+
+data: {"v":"，"}
+
+data: {"v":"本质"}
+
+data: {"v":"不是"}
+
+data: {"v":"总量"}
+
+data: {"v":"问题"}
+
+data: {"v":"，"}
+
+data: {"v":"而是"}
+
+data: {"v":"分配"}
+
+data: {"v":"问题"}
+
+data: {"v":"。"}
+
+data: {"v":"**\n"}
+
+data: {"v":"工业"}
+
+data: {"v":"革命"}
+
+data: {"v":"、"}
+
+data: {"v":"计算机"}
+
+data: {"v":"、"}
+
+data: {"v":"互联网"}
+
+data: {"v":"都"}
+
+data: {"v":"替代"}
+
+data: {"v":"过"}
+
+data: {"v":"大量"}
+
+data: {"v":"工作"}
+
+data: {"v":"，"}
+
+data: {"v":"但"}
+
+data: {"v":"人类"}
+
+data: {"v":"没有"}
+
+data: {"v":"因此"}
+
+data: {"v":"“"}
+
+data: {"v":"没"}
+
+data: {"v":"时间"}
+
+data: {"v":"了"}
+
+data: {"v":"”，"}
+
+data: {"v":"而是"}
+
+data: {"v":"时间"}
+
+data: {"v":"被"}
+
+data: {"v":"重新"}
+
+data: {"v":"定义"}
+
+data: {"v":"："}
+
+data: {"v":"有些"}
+
+data: {"v":"时间"}
+
+data: {"v":"变成了"}
+
+data: {"v":"新"}
+
+data: {"v":"职业"}
+
+data: {"v":"，"}
+
+data: {"v":"有些"}
+
+data: {"v":"时间"}
+
+data: {"v":"被"}
+
+data: {"v":"资本"}
+
+data: {"v":"和"}
+
+data: {"v":"竞争"}
+
+data: {"v":"重新"}
+
+data: {"v":"填"}
+
+data: {"v":"满"}
+
+data: {"v":"。"}
+
+data: {"v":"AI"}
+
+data: {"v":"这次"}
+
+data: {"v":"不一样"}
+
+data: {"v":"的地方"}
+
+data: {"v":"在于"}
+
+data: {"v":"，"}
+
+data: {"v":"它"}
+
+data: {"v":"开始"}
+
+data: {"v":"碰"}
+
+data: {"v":"认知"}
+
+data: {"v":"劳动"}
+
+data: {"v":"和"}
+
+data: {"v":"创造性"}
+
+data: {"v":"劳动"}
+
+data: {"v":"，"}
+
+data: {"v":"冲击"}
+
+data: {"v":"面"}
+
+data: {"v":"更"}
+
+data: {"v":"广"}
+
+data: {"v":"、"}
+
+data: {"v":"更快"}
+
+data: {"v":"。"}
+
+data: {"v":"所以"}
+
+data: {"v":"个体的"}
+
+data: {"v":"转型"}
+
+data: {"v":"窗口"}
+
+data: {"v":"确实"}
+
+data: {"v":"在"}
+
+data: {"v":"收"}
+
+data: {"v":"窄"}
+
+data: {"v":"，"}
+
+data: {"v":"这不是"}
+
+data: {"v":"假"}
+
+data: {"v":"焦虑"}
+
+data: {"v":"。"}
+
+data: {"v":"但"}
+
+data: {"v":"社会"}
+
+data: {"v":"层面的"}
+
+data: {"v":"“"}
+
+data: {"v":"人类"}
+
+data: {"v":"还有"}
+
+data: {"v":"没有"}
+
+data: {"v":"时间"}
+
+data: {"v":"”，"}
+
+data: {"v":"取决于"}
+
+data: {"v":"制度"}
+
+data: {"v":"选择"}
+
+data: {"v":"："}
+
+data: {"v":"省"}
+
+data: {"v":"下来的"}
+
+data: {"v":"效率"}
+
+data: {"v":"，"}
+
+data: {"v":"是"}
+
+data: {"v":"变成"}
+
+data: {"v":"更"}
+
+data: {"v":"短"}
+
+data: {"v":"工时"}
+
+data: {"v":"、"}
+
+data: {"v":"更好的"}
+
+data: {"v":"照"}
+
+data: {"v":"护"}
+
+data: {"v":"和教育"}
+
+data: {"v":"，"}
+
+data: {"v":"还是"}
+
+data: {"v":"变成"}
+
+data: {"v":"更"}
+
+data: {"v":"卷"}
+
+data: {"v":"的"}
+
+data: {"v":"产出"}
+
+data: {"v":"和"}
+
+data: {"v":"更"}
+
+data: {"v":"频繁"}
+
+data: {"v":"的"}
+
+data: {"v":"裁员"}
+
+data: {"v":"。"}
+
+data: {"v":"技术"}
+
+data: {"v":"只"}
+
+data: {"v":"提供"}
+
+data: {"v":"可能性"}
+
+data: {"v":"，"}
+
+data: {"v":"分配"}
+
+data: {"v":"才"}
+
+data: {"v":"决定"}
+
+data: {"v":"结果"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"**"}
+
+data: {"v":"第三"}
+
+data: {"v":"，"}
+
+data: {"v":"AI"}
+
+data: {"v":"越"}
+
+data: {"v":"强"}
+
+data: {"v":"，"}
+
+data: {"v":"有些"}
+
+data: {"v":"东西"}
+
+data: {"v":"反而"}
+
+data: {"v":"越"}
+
+data: {"v":"贵"}
+
+data: {"v":"。"}
+
+data: {"v":"**\n"}
+
+data: {"v":"答案"}
+
+data: {"v":"变"}
+
+data: {"v":"便宜"}
+
+data: {"v":"了"}
+
+data: {"v":"，"}
+
+data: {"v":"好"}
+
+data: {"v":"问题"}
+
+data: {"v":"就"}
+
+data: {"v":"变"}
+
+data: {"v":"贵"}
+
+data: {"v":"；"}
+
+data: {"v":"执行"}
+
+data: {"v":"变"}
+
+data: {"v":"便宜"}
+
+data: {"v":"了"}
+
+data: {"v":"，"}
+
+data: {"v":"判断"}
+
+data: {"v":"和"}
+
+data: {"v":"信任"}
+
+data: {"v":"就"}
+
+data: {"v":"变"}
+
+data: {"v":"贵"}
+
+data: {"v":"；"}
+
+data: {"v":"生成"}
+
+data: {"v":"变"}
+
+data: {"v":"便宜"}
+
+data: {"v":"了"}
+
+data: {"v":"，"}
+
+data: {"v":"责任"}
+
+data: {"v":"和"}
+
+data: {"v":"品味"}
+
+data: {"v":"就"}
+
+data: {"v":"变"}
+
+data: {"v":"贵"}
+
+data: {"v":"。"}
+
+data: {"v":"陶"}
+
+data: {"v":"哲"}
+
+data: {"v":"轩"}
+
+data: {"v":"说"}
+
+data: {"v":"“"}
+
+data: {"v":"好"}
+
+data: {"v":"问题"}
+
+data: {"v":"将"}
+
+data: {"v":"比"}
+
+data: {"v":"好"}
+
+data: {"v":"答案"}
+
+data: {"v":"更"}
+
+data: {"v":"稀缺"}
+
+data: {"v":"”，"}
+
+data: {"v":"这句话"}
+
+data: {"v":"不只"}
+
+data: {"v":"适用于"}
+
+data: {"v":"数学"}
+
+data: {"v":"。"}
+
+data: {"v":"未来"}
+
+data: {"v":"人类"}
+
+data: {"v":"最"}
+
+data: {"v":"该"}
+
+data: {"v":"守住"}
+
+data: {"v":"的位置"}
+
+data: {"v":"，"}
+
+data: {"v":"可能"}
+
+data: {"v":"不是"}
+
+data: {"v":"“"}
+
+data: {"v":"比"}
+
+data: {"v":"AI"}
+
+data: {"v":"算"}
+
+data: {"v":"得快"}
+
+data: {"v":"”，"}
+
+data: {"v":"而是"}
+
+data: {"v":"：\n"}
+
+data: {"v":"-"}
+
+data: {"v":" "}
+
+data: {"v":"知道"}
+
+data: {"v":"什么"}
+
+data: {"v":"值得"}
+
+data: {"v":"做"}
+
+data: {"v":"；\n"}
+
+data: {"v":"-"}
+
+data: {"v":" "}
+
+data: {"v":"判断"}
+
+data: {"v":"什么"}
+
+data: {"v":"结果是"}
+
+data: {"v":"好的"}
+
+data: {"v":"；\n"}
+
+data: {"v":"-"}
+
+data: {"v":" "}
+
+data: {"v":"为"}
+
+data: {"v":"选择"}
+
+data: {"v":"承担"}
+
+data: {"v":"后果"}
+
+data: {"v":"；\n"}
+
+data: {"v":"-"}
+
+data: {"v":" "}
+
+data: {"v":"建立"}
+
+data: {"v":"人与人"}
+
+data: {"v":"之间的"}
+
+data: {"v":"信任"}
+
+data: {"v":"；\n"}
+
+data: {"v":"-"}
+
+data: {"v":" "}
+
+data: {"v":"在"}
+
+data: {"v":"不确定"}
+
+data: {"v":"中"}
+
+data: {"v":"做"}
+
+data: {"v":"价值"}
+
+data: {"v":"排序"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"**"}
+
+data: {"v":"第四"}
+
+data: {"v":"，"}
+
+data: {"v":"从"}
+
+data: {"v":"物种"}
+
+data: {"v":"尺度"}
+
+data: {"v":"看"}
+
+data: {"v":"，"}
+
+data: {"v":"时间"}
+
+data: {"v":"还"}
+
+data: {"v":"很多"}
+
+data: {"v":"；"}
+
+data: {"v":"从"}
+
+data: {"v":"个人"}
+
+data: {"v":"职业"}
+
+data: {"v":"尺度"}
+
+data: {"v":"看"}
+
+data: {"v":"，"}
+
+data: {"v":"可能"}
+
+data: {"v":"不多"}
+
+data: {"v":"。"}
+
+data: {"v":"**\n"}
+
+data: {"v":"人类"}
+
+data: {"v":"作为一个"}
+
+data: {"v":"整体"}
+
+data: {"v":"，"}
+
+data: {"v":"大概"}
+
+data: {"v":"还会"}
+
+data: {"v":"用"}
+
+data: {"v":"很长时间"}
+
+data: {"v":"去"}
+
+data: {"v":"适应"}
+
+data: {"v":"、"}
+
+data: {"v":"博弈"}
+
+data: {"v":"、"}
+
+data: {"v":"重建"}
+
+data: {"v":"制度"}
+
+data: {"v":"。"}
+
+data: {"v":"但"}
+
+data: {"v":"具体"}
+
+data: {"v":"到"}
+
+data: {"v":"一个人"}
+
+data: {"v":"，"}
+
+data: {"v":"未来"}
+
+data: {"v":"五"}
+
+data: {"v":"到"}
+
+data: {"v":"十年的"}
+
+data: {"v":"转型"}
+
+data: {"v":"压力"}
+
+data: {"v":"是"}
+
+data: {"v":"真实的"}
+
+data: {"v":"。"}
+
+data: {"v":"所以"}
+
+data: {"v":"不能"}
+
+data: {"v":"只"}
+
+data: {"v":"靠"}
+
+data: {"v":"“"}
+
+data: {"v":"历史上"}
+
+data: {"v":"都"}
+
+data: {"v":"过来了"}
+
+data: {"v":"”"}
+
+data: {"v":"来"}
+
+data: {"v":"安慰"}
+
+data: {"v":"自己"}
+
+data: {"v":"。"}
+
+data: {"v":"该"}
+
+data: {"v":"学"}
+
+data: {"v":"工具"}
+
+data: {"v":"就"}
+
+data: {"v":"学"}
+
+data: {"v":"工具"}
+
+data: {"v":"，"}
+
+data: {"v":"该"}
+
+data: {"v":"换"}
+
+data: {"v":"赛道"}
+
+data: {"v":"就"}
+
+data: {"v":"换"}
+
+data: {"v":"赛道"}
+
+data: {"v":"，"}
+
+data: {"v":"该"}
+
+data: {"v":"争取"}
+
+data: {"v":"制度"}
+
+data: {"v":"保护"}
+
+data: {"v":"就"}
+
+data: {"v":"争取"}
+
+data: {"v":"制度"}
+
+data: {"v":"保护"}
+
+data: {"v":"。"}
+
+data: {"v":"同时"}
+
+data: {"v":"也要"}
+
+data: {"v":"警惕"}
+
+data: {"v":"另一种"}
+
+data: {"v":"陷阱"}
+
+data: {"v":"："}
+
+data: {"v":"把"}
+
+data: {"v":"省"}
+
+data: {"v":"下来的"}
+
+data: {"v":"时间"}
+
+data: {"v":"全部"}
+
+data: {"v":"交给"}
+
+data: {"v":"平台"}
+
+data: {"v":"和"}
+
+data: {"v":"竞争"}
+
+data: {"v":"，"}
+
+data: {"v":"结果"}
+
+data: {"v":"AI"}
+
+data: {"v":"替你"}
+
+data: {"v":"干了"}
+
+data: {"v":"活"}
+
+data: {"v":"，"}
+
+data: {"v":"你"}
+
+data: {"v":"反而"}
+
+data: {"v":"更"}
+
+data: {"v":"没"}
+
+data: {"v":"时间"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"所以"}
+
+data: {"v":"我的"}
+
+data: {"v":"回答"}
+
+data: {"v":"是"}
+
+data: {"v":"："}
+
+data: {"v":"**"}
+
+data: {"v":"人类"}
+
+data: {"v":"的时间"}
+
+data: {"v":"不是"}
+
+data: {"v":"被"}
+
+data: {"v":"AI"}
+
+data: {"v":"直接"}
+
+data: {"v":"拿"}
+
+data: {"v":"走的"}
+
+data: {"v":"，"}
+
+data: {"v":"而是"}
+
+data: {"v":"被"}
+
+data: {"v":"“"}
+
+data: {"v":"我们"}
+
+data: {"v":"怎么"}
+
+data: {"v":"使用"}
+
+data: {"v":"效率"}
+
+data: {"v":"提升"}
+
+data: {"v":"”"}
+
+data: {"v":"这件事"}
+
+data: {"v":"重新"}
+
+data: {"v":"决定的"}
+
+data: {"v":"。"}
+
+data: {"v":"**"}
+
+data: {"v":"  \n"}
+
+data: {"v":"如果"}
+
+data: {"v":"省"}
+
+data: {"v":"下来的"}
+
+data: {"v":"时间"}
+
+data: {"v":"只"}
+
+data: {"v":"用来"}
+
+data: {"v":"生产"}
+
+data: {"v":"更多"}
+
+data: {"v":"可"}
+
+data: {"v":"被"}
+
+data: {"v":"替代"}
+
+data: {"v":"的东西"}
+
+data: {"v":"，"}
+
+data: {"v":"那"}
+
+data: {"v":"人类"}
+
+data: {"v":"的时间"}
+
+data: {"v":"会"}
+
+data: {"v":"越来越"}
+
+data: {"v":"紧"}
+
+data: {"v":"；"}
+
+data: {"v":"如果"}
+
+data: {"v":"用来"}
+
+data: {"v":"做"}
+
+data: {"v":"只有"}
+
+data: {"v":"人"}
+
+data: {"v":"才能"}
+
+data: {"v":"做的事"}
+
+data: {"v":"——"}
+
+data: {"v":"提问"}
+
+data: {"v":"、"}
+
+data: {"v":"照"}
+
+data: {"v":"护"}
+
+data: {"v":"、"}
+
+data: {"v":"创造"}
+
+data: {"v":"、"}
+
+data: {"v":"判断"}
+
+data: {"v":"、"}
+
+data: {"v":"联结"}
+
+data: {"v":"、"}
+
+data: {"v":"参与"}
+
+data: {"v":"公共"}
+
+data: {"v":"生活"}
+
+data: {"v":"——"}
+
+data: {"v":"那"}
+
+data: {"v":"人类"}
+
+data: {"v":"的时间"}
+
+data: {"v":"可能"}
+
+data: {"v":"比"}
+
+data: {"v":"想象"}
+
+data: {"v":"中"}
+
+data: {"v":"多"}
+
+data: {"v":"。\n\n"}
+
+data: {"v":"真正"}
+
+data: {"v":"的问题"}
+
+data: {"v":"不是"}
+
+data: {"v":"“"}
+
+data: {"v":"AI"}
+
+data: {"v":"替代"}
+
+data: {"v":"了多少"}
+
+data: {"v":"方向"}
+
+data: {"v":"，"}
+
+data: {"v":"人类"}
+
+data: {"v":"还剩"}
+
+data: {"v":"多少"}
+
+data: {"v":"时间"}
+
+data: {"v":"”，"}
+
+data: {"v":"而是"}
+
+data: {"v":"："}
+
+data: {"v":"**"}
+
+data: {"v":"当"}
+
+data: {"v":"机器"}
+
+data: {"v":"把"}
+
+data: {"v":"答案"}
+
+data: {"v":"变得"}
+
+data: {"v":"廉价"}
+
+data: {"v":"之后"}
+
+data: {"v":"，"}
+
+data: {"v":"我们"}
+
+data: {"v":"愿"}
+
+data: {"v":"不愿意"}
+
+data: {"v":"把"}
+
+data: {"v":"人的"}
+
+data: {"v":"时间"}
+
+data: {"v":"，"}
+
+data: {"v":"花"}
+
+data: {"v":"在"}
+
+data: {"v":"那些"}
+
+data: {"v":"机器"}
+
+data: {"v":"不能"}
+
+data: {"v":"替"}
+
+data: {"v":"我们"}
+
+data: {"v":"活"}
+
+data: {"v":"的地方"}
+
+data: {"v":"。"}
+
+data: {"v":"**\n"}
+
+data: {"v":"@@"}
+
+data: {"v":"END"}
+
+data: {"v":":"}
+
+data: {"v":"content"}
+
+data: {"v":"@@"}
+
+data: {"v":"\n"}
+
+data: {"v":"@@"}
+
+data: {"v":"END"}
+
+data: {"v":":"}
+
+data: {"v":"response"}
+
+data: {"v":"@@"}
+
+data: {"p":"response","o":"BATCH","v":[{"p":"accumulated_token_usage","v":15167},{"p":"quasi_status","v":"FINISHED"}]}
+
+data: {"p":"response/status","o":"SET","v":"FINISHED"}
+
+event: update_session
+data: {"updated_at":1791782602.546651}
+
+event: title
+data: {"content":"AI替代与人类时间"}
+
+event: close
+data: {"click_behavior":"none","auto_resume":false}
+

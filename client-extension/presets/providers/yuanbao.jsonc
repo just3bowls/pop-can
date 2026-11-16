@@ -1,0 +1,217 @@
+{
+  // Yuanbao SSE：同一端点存在 Hy3、Hy4 agent、DeepSeek 快速和 search_with_text 等多种方言；规则按帧形状匹配，不按 speech_type 能力声明分派。
+  "schemaVersion": 2,
+  "name": "yuanbao",
+  "page": {
+    // Yuanbao 使用 Quill ql-editor 富文本输入，New Chat 在会话导航中；fingerprints 依赖编辑器 class 和页面结构。
+    "url": "https://yuanbao.tencent.com/chat/naQivTmsDa",
+    "selectors": {
+      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][5]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='section'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]",
+      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][2]/*[local-name()='div'][4]/*[local-name()='div'][2]/*[local-name()='div'][1]"
+    },
+    "fingerprints": {
+      "input": {
+        "ancestorClasses": [
+          "chat-command-editor-specail",
+          "InputTextArea_hightLightTextAreaNew__aKxTD",
+          "ql-container",
+          "flex",
+          "min-h-5",
+          "w-full",
+          "items-start",
+          "px-[6px]",
+          "[&>#search-bar]:!pl-0"
+        ],
+        "ancestorTexts": [],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1790592417441,
+        "classes": [
+          "ql-editor",
+          "ql-blank"
+        ],
+        "clickable": false,
+        "dataTestId": "",
+        "docX": 775.8000183105469,
+        "docY": 594.4000244140625,
+        "editable": true,
+        "height": 20,
+        "id": "",
+        "innerHeight": 711,
+        "innerWidth": 1298,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "",
+        "parentClasses": [
+          "chat-command-editor-specail",
+          "InputTextArea_hightLightTextAreaNew__aKxTD",
+          "ql-container"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "",
+        "role": "input",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [],
+        "tag": "div",
+        "text": "",
+        "width": 914.4000244140625,
+        "x": 775.8000183105469,
+        "y": 594.4000244140625
+      },
+      "new-chat": {
+        "ancestorClasses": [
+          "yb-new-chat-entry",
+          "yb-nav__content",
+          "yb-nav__content-wrapper"
+        ],
+        "ancestorTexts": [
+          "新建对话",
+          "新建对话AI 创作分组分组示例最近Flink 作业流生产问题及解决OpenClaw记忆系统设计解析Hermes与OpenClaw的区别Flink Doris 面试核心问题解析Doris索引类型及底层原理Debezium底层实现及CDC原理大",
+          "元宝新建对话AI 创作分组分组示例最近Flink 作业流生产问题及解决OpenClaw记忆系统设计解析Hermes与OpenClaw的区别Flink Doris 面试核心问题解析Doris索引类型及底层原理Debezium底层实现及CDC原"
+        ],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "新建对话",
+        "capturedAt": 1790592411169,
+        "classes": [
+          "yb-new-chat-entry__item"
+        ],
+        "clickable": true,
+        "dataTestId": "",
+        "docX": 130,
+        "docY": 118,
+        "editable": false,
+        "height": 32,
+        "id": "",
+        "innerHeight": 767,
+        "innerWidth": 1298,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "",
+        "parentClasses": [
+          "yb-new-chat-entry"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "",
+        "role": "new-chat",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [],
+        "tag": "div",
+        "text": "新建对话",
+        "width": 232,
+        "x": 130,
+        "y": 118
+      }
+    }
+  },
+  "network": {
+    // 监听 /api/chat SSE；meta/chainID 标签在流末尾才出现，不能用于开头模式分派。
+    "apiPatterns": [
+      "https://yuanbao.tencent.com/api/chat"
+    ],
+    "followUpPatterns": [],
+    "followUpIdentityPath": ""
+  },
+  "attachment": {
+    // file 模式使用 paste 把 .txt 交给 ql-editor，因为富文本编辑器通过剪贴板事件接收附件最稳定。
+    "strategy": "paste",
+    "selector": "div.ql-editor"
+  },
+  "parserRule": {
+    // Yuanbao SSE, one endpoint, several dialects — **不用 mode 分派**：它的 `event: speech_type` 是一串能力声明（实测一轮里出现过 `status` → `search_with_text` → `text` → `hint_v2_tip`，顺序还随模式变），拿第一个非 status 当标签会锁错（2026-10-14 实测：DeepSeek 快速档被锁成 search_with_text，handler 全被跳过、正文 0）。所以改为纯形状匹配：帧级 `type=text` 走 `answerDelta`（$.msg），`deepSearchAgent` 帧的 `contents[].type=text` 走 `agentContent`（$.text）。`meta.chainID` 命名了同一件事（DeepSearch / DeepSeekR1 / WorkingAgentDirect），但它在流末尾才到，也不用于分派。
+    "schemaVersion": 2,
+    "confidence": "high",
+    "missingInfo": [],
+    "contentTransforms": [
+      {
+        // Yuanbao citation markers are display metadata rather than answer text.
+        "id": "dropCitationToken",
+        "regex": "\\[citation:\\d+\\]",
+        "replacement": "",
+        "settle": {
+          "candidatePrefix": "[citation:"
+        }
+      },
+      {
+        // Yuanbao emits source-underline metadata as [](@name=value) tokens.
+        "id": "dropUnderlineToken",
+        "regex": "\\[\\]\\(@[a-zA-Z_]+=[^)]+\\)",
+        "replacement": "",
+        "settle": {
+          "candidatePrefix": "[](@"
+        }
+      }
+    ],
+    "memory": {},
+    "handlers": [
+      {
+        // 经典方言（Hy3 / Hy3 深度思考 / DeepSeek 快速档 / search_with_text 档等）：答案走 `{"type":"text","msg":…}`。
+        "id": "answerDelta",
+        "match": {
+          // 帧级 `$.type=text` 且带 `$.msg`；agent 方言的帧级 type 是 deepSearchAgent，天然不会被收。
+          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+          "jsonGroup": 1,
+          "path": "$.type",
+          "regex": "^text$"
+        },
+        "actions": [
+          {
+            // Append raw text; contentTransforms strips citation and underline metadata.
+            "op": "appendContent",
+            "path": "$.msg"
+          }
+        ]
+      },
+      {
+        // agent 方言（Hy4 preview / OneAgent）：one contents[] item per frame，type=text 是答案，type=think 是页面自己的思考。
+        "id": "agentContent",
+        "match": {
+          // 帧级正则要求 deepSearchAgent（classic 帧没有 contents，本 handler 不会收）。
+          "rawRegex": "(?m)^data:\\s*(\\{.*\"type\"\\s*:\\s*\"deepSearchAgent\".*\\})\\s*$",
+          "jsonGroup": 1,
+          "eventsPath": "$.contents[*]",
+          "path": "$.type",
+          "regex": "^text$"
+        },
+        "actions": [
+          {
+            // Fragments can legitimately repeat (e.g. `\n\n`), so append verbatim; appendDelta would drop them.
+            "op": "appendContent",
+            "path": "$.text"
+          }
+        ]
+      },
+      {
+        // type=meta with stopReason=stop — the server finished this answer.
+        "id": "messageMeta",
+        "match": {
+          // 匹配最终 meta 帧中的 stopReason=stop，不把中途能力声明或 agent 状态当作结束。
+          "rawRegex": "data: (\\{\"type\":\"meta\".*\\})\\n",
+          "jsonGroup": 1,
+          "path": "$.stopReason",
+          "regex": "^stop$"
+        },
+        "actions": [
+          {
+            // 将本轮标记为正常结束。
+            "op": "setFinishReason",
+            "value": "stop"
+          }
+        ]
+      }
+    ],
+    "final": [],
+    "request": {
+      // inline 模式同时改写 $.prompt 与 $.displayPrompt，保持真实请求字段和页面显示文本一致。
+      "userText": [
+        "$.prompt",
+        "$.displayPrompt"
+      ]
+    }
+  }
+}

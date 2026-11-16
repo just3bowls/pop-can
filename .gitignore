@@ -1,0 +1,49 @@
+# Build outputs
+target/
+**/target/
+build/
+**/build/
+server/.cache/
+client-extension/dist/
+client-extension/dev-extension/
+/release/artifacts/
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# IDE
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+**/out/
+.vscode/
+
+# Metals / Bloop (Scala LSP)
+.metals/
+.bloop/
+.bsp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+log/
+*.log
+
+# Agent runtime (Codex)
+AGENTS.md
+.agents/
+.codex/
+
+# Provider pack signing keys
+provider-pack-private-key.pem
+*.popcan.private.pem
+extension-private-key.pem
+
+# Misc
+*.class
+*.jar

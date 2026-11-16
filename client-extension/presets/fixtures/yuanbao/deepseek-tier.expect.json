@@ -1,0 +1,15 @@
+{
+  "provider": "yuanbao",
+  "dialect": "deepseek-tier",
+  "comment": "DeepSeek 档：speech_type=deep_search，deepSearch 卡片是页面自己的思考，答案仍走 text/msg（mode=deep_search）。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "answerDelta"
+    ],
+    "mustNotContain": [
+      "We"
+    ],
+    "finishReason": "stop"
+  }
+}

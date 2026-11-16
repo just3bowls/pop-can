@@ -1,0 +1,12 @@
+{
+  "provider": "gml",
+  "dialect": "task-driven",
+  "comment": "任务驱动轮：同一形状，用来钉住“两条链路都要能把尾巴放出来”。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "gmlTextChunk",
+      "gmlFinishSnapshot"
+    ]
+  }
+}

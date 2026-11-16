@@ -1,0 +1,1431 @@
+event: speech_type
+data: status
+
+data: {"type":"step","msg":"正在搜索资料","subMsg":"","stage":"","enableStageLayer":false,"showLoadingIcon":false,"stepVersion":0,"scene":"ai_search_deepseek_v3","index":0,"iconType":4,"toolCallType":"web_search","writeExtend":{"fileName":"","docEditable":false,"fileType":"","outline":"","templateId":""},"enableFeatures":["loadingV2"],"aiVideoStepInfo":{}}
+
+data: {"type":"step","msg":"正在搜索资料","subMsg":"","stage":"","enableStageLayer":false,"showLoadingIcon":false,"stepVersion":0,"scene":"ai_search_deepseek_v3","index":1,"iconList":["https://cdn-yb.icon.qq.com/zuowei_dir/www_sohu_com.ico","https://cdn-yb.icon.qq.com/zuowei_dir/www_artificialintelligence-news_com.ico","https://hunyuan-prod-1258344703.cos.ap-guangzhou.myqcloud.com/public2025/icon/search_guide/wx_green.png","https://cdn-yb.icon.qq.com/zuowei_dir/new_qq_com.ico","https://cdn-yb.icon.qq.com/zuowei_dir/ai-news_ge.ico","https://cdn-yb.icon.qq.com/zuowei_dir/damodev_csdn_net.ico","https://cdn-yb.icon.qq.com/zuowei_dir/sh_people_com_cn.ico","https://cdn-yb.icon.qq.com/zuowei_dir/www_klraitechlab_com.ico","https://hunyuan-prod-1258344703.cos.ap-guangzhou.myqcloud.com/public2025/icon/search_guide/wx_green.png","https://cdn-yb.icon.qq.com/zuowei_dir/www_qstheory_cn.ico","https://cdn-yb.icon.qq.com/zuowei_dir/aiunpacking_com.ico","https://cdn-yb.icon.qq.com/zuowei_dir/www_fxbaogao_com.ico","https://cdn-yb.icon.qq.com/zuowei_dir/finance_sina_com_cn.ico","https://cdn-yb.icon.qq.com/zuowei_dir/aistartupedge_com.ico","https://cdn-yb.icon.qq.com/zuowei_dir/iaipie_com.ico","https://cdn-yb.icon.qq.com/zuowei_dir/www_szzg_gov_cn.ico","https://cdn-yb.icon.qq.com/zuowei_dir/www_aitoolstrendstoday_com.ico","https://cdn-yb.icon.qq.com/zuowei_dir/neodrop_ai.ico","https://cdn-yb.icon.qq.com/zuowei_dir/news_qq_com.ico"],"iconType":4,"writeExtend":{"fileName":"","docEditable":false,"fileType":"","outline":"","templateId":""},"enableFeatures":["loadingV2"],"aiVideoStepInfo":{}}
+
+event: speech_type
+data: search_with_text
+
+data: {"type":"searchGuid","title":"引用 19 篇资料作为参考","subTitle":"","footnote":"","prompt":"","botPrompt":"","entranceIndex":0,"messageId":"","sourceType":"","docs":[{"index":1,"docId":"80000346_8401b03c64691cdac869008550f32a1e","title":"【数智周报】DeepSeek扩招150人,为史上单次最大规模招聘;月之暗面报案:网传关于创始人及员工信息系恶意造谣;英伟达斥资129亿美元收购HuggingFace","url":"https://www.sohu.com/a/1075558306_116132","sourceType":"thirdparty","quote":"是OpenAI企业级产品ChatGPT Work的定制版本;其采用了公司最新的､最先进的模型GPT-...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/www_sohu_com.ico","web_site_name":"搜狐网","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"搜狐网","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":2,"docId":"80000346_8a02f88b8e62d10cee3aa8e7434b4cc3","title":"AI News  Latest AI News, Analysis & Events","url":"https://www.artificialintelligence-news.com/?utm_source=aiindustrydaily&utm_medium=email","sourceType":"thirdparty","quote":"model for programmatic logic AI Startups & Funding September 16,2026 MIT AI forecasts extreme weather without historical data Environment & Sustainabi...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/www_artificialintelligence-news_com.ico","web_site_name":"artificialintelligence-news","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"artificialintelligence-news.com","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":3,"docId":"17103447853692793824","title":"今日全球AI重要资讯(2026年09月13日)","url":"http://mp.weixin.qq.com/s?__biz=MzUyNzA0MzYzMg==&mid=2247484134&idx=1&sn=f2a1b88ecf5d9d59f4b06cb0ff42e2d2&chksm=fb3de74a3abae9162fcd476157bf62b7755a84426bc7ead0a4373a3f3f71ef61863f376c2b49#rd","sourceType":"mp","sourceName":"公众号","quote":"布林力推RSI递归自我改进路线据海外媒体披露,谷歌正筹备发布新一代Gemini 4.0大模型,此前P...","icon_url":"https://hunyuan-prod-1258344703.cos.ap-guangzhou.myqcloud.com/public2025/icon/search_guide/wx_green.png","web_site_name":"流浪猿","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"流浪猿","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":4,"docId":"80000346_4fc4a35ab32f77cab629212b983193c1","title":"每日 AIGC 早报:2026.10.6","url":"https://new.qq.com/rain/a/20261006A04QUK00","sourceType":"thirdparty","quote":"曾将基础设施架构信息分享给AI安全组织 - OpenAI智能体6月入侵澳大利亚联邦政府之外还入侵了新南威尔士州政府...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/new_qq_com.ico","web_site_name":"腾讯新闻","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"腾讯新闻","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":5,"docId":"80000346_d03f15c77514d1c00f2447c4ca09df87","title":"News","url":"https://ai-news.ge/en/tag/news?page=17","sourceType":"thirdparty","quote":"AI ამბები｡News UN and ITU Launch AI for Good Commi...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/ai-news_ge.ico","web_site_name":"ai-news","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"ai-news.ge","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":6,"docId":"80000346_bc3232d19c6cb9c6d90a620188c354b7","title":"AI 资讯日报  2026年10月11日:决策模型新范式融资8.7亿美元估值75亿,人形机器人出货增432%领跑商业化,全球首部智能体安全强制国标立项,AI行动全面提速","url":"https://damodev.csdn.net/6acc2e55536f457592af2d17.html","sourceType":"thirdparty","quote":"AI 资讯日报 | 2026年10月11日:决策模型新范式融资8.7亿美元估值75亿,人形机器人出货...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/damodev_csdn_net.ico","web_site_name":"CSDN软件开发网","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"CSDN软件开发网","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":7,"docId":"80000346_c34f56143e501505846da861f58607e9","title":"上海人工智能產業發展簡報(2026年5月刊)","url":"https://sh.people.com.cn/BIG5/n2/2026/0611/c134768-41607234.html","sourceType":"thirdparty","quote":"智元WITA成為全國首款完成合規備案的具身智能交互大模型,標志著中國具身智能產業從技術驗証邁入合規商用新階...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/sh_people_com_cn.ico","web_site_name":"人民网","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"人民网","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":8,"docId":"80000346_47fbde6dc602e9152200ec58fb0ab4f1","title":"AI News & Updates","url":"https://www.klraitechlab.com/news/2026-W38.html","sourceType":"thirdparty","quote":"￫ Latest Articles NewTrending AI Model Releases ...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/www_klraitechlab_com.ico","web_site_name":"klraitechlab","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"klraitechlab.com","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":9,"docId":"90000804_oIWsFt_pzDTr7VAo18I75bxKg0sI_2247484061_1","title":"谷歌時隔近一年嘅新模型,到底專攻咩?Argon 五項能力一次講清;機械手有 288 個觸覺通道､45 萬次耐久測試?本田 CEATEC 展咗咩出嚟","url":"http://mp.weixin.qq.com/s?src=11&timestamp=1791961226&ver=7025&signature=fixture-token&new=1","sourceType":"mp","sourceName":"公众号","quote":"DeepSeek 据报融资约 1000 亿元､英国听证会 AI 监管升温导读今天是 2026 年 1...","icon_url":"https://hunyuan-prod-1258344703.cos.ap-guangzhou.myqcloud.com/public2025/icon/search_guide/wx_green.png","web_site_name":"AI智賦能","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"AI智賦能","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":10,"docId":"80000346_01b5da575a2d94785a6f811c8cc0244a","title":"前沿模型能力加速跃升 AI治理迎来新考验","url":"https://www.qstheory.cn/20261002/38a5c3a4eb764771b1554548ef6b486c/c.html","sourceType":"thirdparty","quote":"2026年9月23日,在位于纽约的联合国总部,美国开放人工智能研究中心(OpenAI)首席执行官萨姆...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/www_qstheory_cn.ico","web_site_name":"求是网","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"求是网","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":11,"docId":"80000346_825e7de844c91e5d1b38d9591ee2e40d","title":"AI News 2026: Timeline of Major Developments So Far","url":"https://aiunpacking.com/guides/ai-news-2026-timeline-major-developments","sourceType":"thirdparty","quote":"2026 Anthropic releases Claude Opus 4.6 with agent teams Model release Multi-agent coordination enters production Feb 12,2026 Anthropic raises $30B at...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/aiunpacking_com.ico","web_site_name":"aiunpacking","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"aiunpacking.com","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":12,"docId":"80000346_e94ad90dbb7669cb46b37fbe6e47de4f","title":"每日AI科技早报 2026年10月8日 星期四","url":"https://www.fxbaogao.com/detail/5738822","sourceType":"thirdparty","quote":"中美欧AI监管三条路径分化:美国以自愿承诺与行政令为主,欧盟AI法案全球最严但延缓执行,中国快速连发治理规则,杭州...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/www_fxbaogao_com.ico","web_site_name":"发现报告","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"发现报告","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":13,"docId":"80000346_6c675af6a4c094da3c7a3b8ee679cbc9","title":"DeepSeek冲800亿,OpenAI立28天死命令:AI圈已经卷到没假期了","url":"https://finance.sina.com.cn/tech/roll/2026-10-08/doc-iniupnvc3601464.shtml","sourceType":"thirdparty","quote":"每一件都够行业震荡半个月｡两笔融资炸场:估值跳涨速度远超预期 DeepSeek这轮融资节奏拉满｡7月...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/finance_sina_com_cn.ico","web_site_name":"新浪财经","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"新浪财经","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":14,"docId":"80000346_79accd3d79c4cd2fb9eadca3d83ed400","title":"Latest AI News: October 2026 Updates","url":"https://aistartupedge.com/?p=6345","sourceType":"thirdparty","quote":"news stories of October 2026. A leading lab pulled back a flagship model over safety testing,not competitive pressure. AI News October 2026: Funding a...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/aistartupedge_com.ico","web_site_name":"aistartupedge","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"aistartupedge.com","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":15,"docId":"80000346_f65c2636e929d4e113224fcb3b0a4c99","title":"AI大模型最新进展深度盘点(2026年10月篇):Gemini 4 Argon迟来的旗舰､Jev决策模型横空出世与中国融资潮 - 无矩AI","url":"https://iaipie.com/ai大模型最新进展深度盘点（2026年10月篇）：gemini-4-argon迟来","sourceType":"thirdparty","quote":"DeepSeek爆出大新闻:Harness团队(2026年3月组建)以MIT协议开源v0.1开发者预...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/iaipie_com.ico","web_site_name":"iaipie","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"iaipie.com","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":16,"docId":"80000346_9948a6b09bc55737690ee48d4a878fa8","title":"人工智能大模型发展迈入新阶段","url":"https://www.szzg.gov.cn/2026/xwzx/szkx/202609/t20260903_5367434.htm","sourceType":"thirdparty","quote":"Anthropic启动专属人工智能推理芯片研发,并与三星洽谈2纳米代工;Meta依托数十万张H100...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/www_szzg_gov_cn.ico","web_site_name":"数字中国建设峰会","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"数字中国建设峰会","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":17,"docId":"80000346_cc9270d3e5ebc64e0a73d9c0d2466b81","title":"Latest and Trending AI News in Mid-2026","url":"https://www.aitoolstrendstoday.com/?p=209","sourceType":"thirdparty","quote":"trending AI news in Mid-2026 OpenAI launched ChatG。","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/www_aitoolstrendstoday_com.ico","web_site_name":"aitoolstrendstoday","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"aitoolstrendstoday.com","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":18,"docId":"80000346_7a9dcb3de1d87b8476d67cb7ae3bad15","title":"Reflection unveils Beam, the Pentagon stops using Anthropic, and 3 more AI moves (2026) · Neodrop","url":"https://neodrop.ai/post/I7RakzHnjgE","sourceType":"thirdparty","quote":"moved to the last private money before 2027 listings;and Google contracted 3,590 megawatts of power from Constellation Energy.Launches : Reflection AI...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/neodrop_ai.ico","web_site_name":"neodrop","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"neodrop.ai","invisibleExt":{},"resource_type":"","sub_resource_type":""},{"index":19,"docId":"80000346_88d8884eb1ea015f29598660c37bea45","title":"苹果新品发布潮下周开启/GPT-6 全面开放/Claude Haiku 5.5发布,价格暴降九成","url":"https://news.qq.com/rain/a/20261008A02NUY00","sourceType":"thirdparty","quote":"腾讯新闻｡苹果一大波智能家居新品曝光,最快下周发布 OpenAI 向 Chat 用户推送 GPT-6...","icon_url":"https://cdn-yb.icon.qq.com/zuowei_dir/news_qq_com.ico","web_site_name":"腾讯新闻","citation_display_icon":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_260624.png","citation_display_icon_dark":"https://hy-openapi-pulbic.hunyuan.tencent.com/app/icon/search_guide/icon_link_dark260624.png","webSiteSource":"腾讯新闻","invisibleExt":{},"resource_type":"","sub_resource_type":""}],"citations":null,"hitDeepMode":false,"hitHelpDraw":false,"hitDrawMore":false,"hitSearchAIImg":false,"topic":"","count":19,"deepModeCid":"","aiImageTotal":0,"realImageTotal":0,"enableFeatures":["loadingV2"]}
+
+event: speech_type
+data: text
+
+data: {"type":"text","msg":"@@"}
+
+data: {"type":"text","msg":"BEG"}
+
+data: {"type":"text","msg":":response"}
+
+data: {"type":"text","msg":"@@\n@@"}
+
+data: {"type":"text","msg":"BEG:"}
+
+data: {"type":"text","msg":"reasoning_content"}
+
+data: {"type":"text","msg":"@@\n用户"}
+
+data: {"type":"text","msg":"问“"}
+
+data: {"type":"text","msg":"今年 AI"}
+
+data: {"type":"text","msg":" 界有什么"}
+
+data: {"type":"text","msg":"新闻”，当前"}
+
+data: {"type":"text","msg":"时间是 "}
+
+data: {"type":"text","msg":"2026-"}
+
+data: {"type":"text","msg":"10-14"}
+
+data: {"type":"text","msg":"，所以需要"}
+
+data: {"type":"text","msg":"总结"}
+
+data: {"type":"text","msg":" 2026"}
+
+data: {"type":"text","msg":" 年截至"}
+
+data: {"type":"text","msg":" 10"}
+
+data: {"type":"text","msg":" 月中旬"}
+
+data: {"type":"text","msg":"的 AI"}
+
+data: {"type":"text","msg":" 行业大"}
+
+data: {"type":"text","msg":"事件"}
+
+data: {"type":"text","msg":"。搜索"}
+
+data: {"type":"text","msg":"结果覆盖"}
+
+data: {"type":"text","msg":"模型"}
+
+data: {"type":"text","msg":"发布、智能"}
+
+data: {"type":"text","msg":"体/代理"}
+
+data: {"type":"text","msg":"式"}
+
+data: {"type":"text","msg":" AI、安全"}
+
+data: {"type":"text","msg":"与"}
+
+data: {"type":"text","msg":"监管"}
+
+data: {"type":"text","msg":"、融资"}
+
+data: {"type":"text","msg":"与"}
+
+data: {"type":"text","msg":"算力、中国"}
+
+data: {"type":"text","msg":"大模型"}
+
+data: {"type":"text","msg":"进展、机器人"}
+
+data: {"type":"text","msg":"/具"}
+
+data: {"type":"text","msg":"身智能"}
+
+data: {"type":"text","msg":"等方向。"}
+
+data: {"type":"text","msg":"应"}
+
+data: {"type":"text","msg":"做成"}
+
+data: {"type":"text","msg":"简明盘点"}
+
+data: {"type":"text","msg":"，"}
+
+data: {"type":"text","msg":"不"}
+
+data: {"type":"text","msg":"把低"}
+
+data: {"type":"text","msg":"权威自媒体"}
+
+data: {"type":"text","msg":"里的"}
+
+data: {"type":"text","msg":"夸张"}
+
+data: {"type":"text","msg":"数字当"}
+
+data: {"type":"text","msg":"硬事实"}
+
+data: {"type":"text","msg":"，优先"}
+
+data: {"type":"text","msg":"采用"}
+
+data: {"type":"text","msg":"新华社"}
+
+data: {"type":"text","msg":"/人民网"}
+
+data: {"type":"text","msg":"/行业"}
+
+data: {"type":"text","msg":"媒体中"}
+
+data: {"type":"text","msg":"可交叉验证"}
+
+data: {"type":"text","msg":"的信息。\n"}
+
+data: {"type":"text","msg":"[](@mark_underline=1)"}
+
+data: {"type":"text","msg":"@@END"}
+
+data: {"type":"text","msg":":reason"}
+
+data: {"type":"text","msg":"ing_content@@"}
+
+data: {"type":"text","msg":"\n\n@@B"}
+
+data: {"type":"text","msg":"EG:content"}
+
+data: {"type":"text","msg":"@@\n202"}
+
+data: {"type":"text","msg":"6 年"}
+
+data: {"type":"text","msg":" AI 界"}
+
+data: {"type":"text","msg":"的主"}
+
+data: {"type":"text","msg":"线是"}
+
+data: {"type":"text","msg":"：**前沿"}
+
+data: {"type":"text","msg":"模型继续"}
+
+data: {"type":"text","msg":"变"}
+
+data: {"type":"text","msg":"强、"}
+
+data: {"type":"text","msg":"Agent"}
+
+data: {"type":"text","msg":"（"}
+
+data: {"type":"text","msg":"智能体）"}
+
+data: {"type":"text","msg":"成为"}
+
+data: {"type":"text","msg":"主战场、"}
+
+data: {"type":"text","msg":"安全问题"}
+
+data: {"type":"text","msg":"开始"}
+
+data: {"type":"text","msg":"影响"}
+
+data: {"type":"text","msg":"发布"}
+
+data: {"type":"text","msg":"节奏、算力"}
+
+data: {"type":"text","msg":"/"}
+
+data: {"type":"text","msg":"融资"}
+
+data: {"type":"text","msg":"军"}
+
+data: {"type":"text","msg":"备竞赛加剧"}
+
+data: {"type":"text","msg":"、监管"}
+
+data: {"type":"text","msg":"从"}
+
+data: {"type":"text","msg":"“倡议"}
+
+data: {"type":"text","msg":"”走向"}
+
+data: {"type":"text","msg":"“强制"}
+
+data: {"type":"text","msg":"/"}
+
+data: {"type":"text","msg":"备案"}
+
+data: {"type":"text","msg":"”"}
+
+data: {"type":"text","msg":"**。\n\n##"}
+
+data: {"type":"text","msg":"[](@mark_underline=2)"}
+
+data: {"type":"text","msg":" 一"}
+
+data: {"type":"text","msg":"、大模型与新"}
+
+data: {"type":"text","msg":"能力"}
+
+data: {"type":"text","msg":"\n"}
+
+data: {"type":"text","msg":"- Open"}
+
+data: {"type":"text","msg":"AI："}
+
+data: {"type":"text","msg":"推出 **"}
+
+data: {"type":"text","msg":"GPT-"}
+
+data: {"type":"text","msg":"6 /"}
+
+data: {"type":"text","msg":" GPT-6"}
+
+data: {"type":"text","msg":" Astra**"}
+
+data: {"type":"text","msg":" 等新一代"}
+
+data: {"type":"text","msg":"模型；"}
+
+data: {"type":"text","msg":"同时"}
+
+data: {"type":"text","msg":"因"}
+
+data: {"type":"text","msg":"安全"}
+
+data: {"type":"text","msg":"与对齐问题"}
+
+data: {"type":"text","msg":"，**"}
+
+data: {"type":"text","msg":"GPT"}
+
+data: {"type":"text","msg":"-6."}
+
+data: {"type":"text","msg":"1 Astra"}
+
+data: {"type":"text","msg":" 被"}
+
+data: {"type":"text","msg":"推迟/"}
+
+data: {"type":"text","msg":"取消发布**，"}
+
+data: {"type":"text","msg":"说明"}
+
+data: {"type":"text","msg":"“"}
+
+data: {"type":"text","msg":"安全"}
+
+data: {"type":"text","msg":"红线"}
+
+data: {"type":"text","msg":"”开始"}
+
+data: {"type":"text","msg":"影响旗舰"}
+
+data: {"type":"text","msg":"模型"}
+
+data: {"type":"text","msg":"节奏。"}
+
+data: {"type":"text","msg":"[](@mark_underline=3)"}
+
+data: {"type":"text","msg":"[citation:10]"}
+
+data: {"type":"text","msg":"[](@mark_underline=4)"}
+
+data: {"type":"text","msg":"[](@mark_underline=5)"}
+
+data: {"type":"text","msg":"[citation:14]"}
+
+data: {"type":"text","msg":"[](@mark_underline=6)"}
+
+data: {"type":"text","msg":"\n- Google"}
+
+data: {"type":"text","msg":"[](@mark_underline=7)"}
+
+data: {"type":"text","msg":"：Gem"}
+
+data: {"type":"text","msg":"ini 3"}
+
+data: {"type":"text","msg":".5、"}
+
+data: {"type":"text","msg":"Gemini "}
+
+data: {"type":"text","msg":"4 Argon"}
+
+data: {"type":"text","msg":" "}
+
+data: {"type":"text","msg":"等陆续"}
+
+data: {"type":"text","msg":"登场"}
+
+data: {"type":"text","msg":"，强调"}
+
+data: {"type":"text","msg":"长上下文、"}
+
+data: {"type":"text","msg":"编程"}
+
+data: {"type":"text","msg":"、科研"}
+
+data: {"type":"text","msg":"、法律"}
+
+data: {"type":"text","msg":"/金融"}
+
+data: {"type":"text","msg":"、网络安全等"}
+
+data: {"type":"text","msg":"专业能力"}
+
+data: {"type":"text","msg":"。"}
+
+data: {"type":"text","msg":"[](@mark_underline=8)"}
+
+data: {"type":"text","msg":"[citation:4]"}
+
+data: {"type":"text","msg":"[](@mark_underline=9)"}
+
+data: {"type":"text","msg":"[](@mark_underline=10)"}
+
+data: {"type":"text","msg":"[citation:10]"}
+
+data: {"type":"text","msg":"[](@mark_underline=11)"}
+
+data: {"type":"text","msg":"\n"}
+
+data: {"type":"text","msg":"- Anthrop"}
+
+data: {"type":"text","msg":"ic：Cl"}
+
+data: {"type":"text","msg":"aude 系列"}
+
+data: {"type":"text","msg":"持续迭代，"}
+
+data: {"type":"text","msg":"企业"}
+
+data: {"type":"text","msg":"级"}
+
+data: {"type":"text","msg":"安全护栏"}
+
+data: {"type":"text","msg":"、政府"}
+
+data: {"type":"text","msg":"/企业"}
+
+data: {"type":"text","msg":"部署"}
+
+data: {"type":"text","msg":"、前沿"}
+
+data: {"type":"text","msg":"安全"}
+
+data: {"type":"text","msg":"评估成为"}
+
+data: {"type":"text","msg":"重点。"}
+
+data: {"type":"text","msg":"[](@mark_underline=12)"}
+
+data: {"type":"text","msg":"[citation:5]"}
+
+data: {"type":"text","msg":"[](@mark_underline=13)"}
+
+data: {"type":"text","msg":"[](@mark_underline=14)"}
+
+data: {"type":"text","msg":"[citation:8]"}
+
+data: {"type":"text","msg":"[](@mark_underline=15)"}
+
+data: {"type":"text","msg":"\n"}
+
+data: {"type":"text","msg":"[](@mark_underline=16)"}
+
+data: {"type":"text","msg":"- 中国"}
+
+data: {"type":"text","msg":"阵营"}
+
+data: {"type":"text","msg":"：Deep"}
+
+data: {"type":"text","msg":"Seek、Q"}
+
+data: {"type":"text","msg":"wen、K"}
+
+data: {"type":"text","msg":"imi、智"}
+
+data: {"type":"text","msg":"谱、Mini"}
+
+data: {"type":"text","msg":"Max、腾讯"}
+
+data: {"type":"text","msg":"混元等"}
+
+data: {"type":"text","msg":"密集更新"}
+
+data: {"type":"text","msg":"；"}
+
+data: {"type":"text","msg":"K"}
+
+data: {"type":"text","msg":"imi K3"}
+
+data: {"type":"text","msg":"、Q"}
+
+data: {"type":"text","msg":"wen3"}
+
+data: {"type":"text","msg":".8"}
+
+data: {"type":"text","msg":"-M"}
+
+data: {"type":"text","msg":"ax、Deep"}
+
+data: {"type":"text","msg":"Seek V4"}
+
+data: {"type":"text","msg":" "}
+
+data: {"type":"text","msg":"系列、"}
+
+data: {"type":"text","msg":"GLM"}
+
+data: {"type":"text","msg":" 等"}
+
+data: {"type":"text","msg":"把"}
+
+data: {"type":"text","msg":"“"}
+
+data: {"type":"text","msg":"开源/"}
+
+data: {"type":"text","msg":"开放权重 +"}
+
+data: {"type":"text","msg":" 低成本"}
+
+data: {"type":"text","msg":" +"}
+
+data: {"type":"text","msg":" 长上下文"}
+
+data: {"type":"text","msg":"”打成"}
+
+data: {"type":"text","msg":"核心"}
+
+data: {"type":"text","msg":"卖点。"}
+
+data: {"type":"text","msg":"[](@mark_underline=17)"}
+
+data: {"type":"text","msg":"[citation:7]"}
+
+data: {"type":"text","msg":"[](@mark_underline=18)"}
+
+data: {"type":"text","msg":"\n\n## "}
+
+data: {"type":"text","msg":"[](@mark_underline=19)"}
+
+data: {"type":"text","msg":"二、Agent"}
+
+data: {"type":"text","msg":" /"}
+
+data: {"type":"text","msg":" 智能体"}
+
+data: {"type":"text","msg":"成为"}
+
+data: {"type":"text","msg":"最大"}
+
+data: {"type":"text","msg":"热点"}
+
+data: {"type":"text","msg":"\n"}
+
+data: {"type":"text","msg":"-"}
+
+data: {"type":"text","msg":" 行业"}
+
+data: {"type":"text","msg":"从“聊天"}
+
+data: {"type":"text","msg":"机器人”转向"}
+
+data: {"type":"text","msg":"“能"}
+
+data: {"type":"text","msg":"调"}
+
+data: {"type":"text","msg":"工具、"}
+
+data: {"type":"text","msg":"跑"}
+
+data: {"type":"text","msg":"工作"}
+
+data: {"type":"text","msg":"流、写"}
+
+data: {"type":"text","msg":"代码、操作"}
+
+data: {"type":"text","msg":"软件的"}
+
+data: {"type":"text","msg":"智能"}
+
+data: {"type":"text","msg":"体”。\n"}
+
+data: {"type":"text","msg":"- OpenAI"}
+
+data: {"type":"text","msg":" "}
+
+data: {"type":"text","msg":"推 Agents"}
+
+data: {"type":"text","msg":" API /"}
+
+data: {"type":"text","msg":" ChatGPT Work"}
+
+data: {"type":"text","msg":"，Google"}
+
+data: {"type":"text","msg":" 推"}
+
+data: {"type":"text","msg":"企业级通用"}
+
+data: {"type":"text","msg":" Agent"}
+
+data: {"type":"text","msg":"，微软"}
+
+data: {"type":"text","msg":"把"}
+
+data: {"type":"text","msg":" Copilot "}
+
+data: {"type":"text","msg":"生态往"}
+
+data: {"type":"text","msg":" agent"}
+
+data: {"type":"text","msg":"-first 重构"}
+
+data: {"type":"text","msg":"，"}
+
+data: {"type":"text","msg":"Anthropic"}
+
+data: {"type":"text","msg":" 推"}
+
+data: {"type":"text","msg":" Claude"}
+
+data: {"type":"text","msg":" Code"}
+
+data: {"type":"text","msg":" /"}
+
+data: {"type":"text","msg":" "}
+
+data: {"type":"text","msg":"企业安全"}
+
+data: {"type":"text","msg":"护栏。\n"}
+
+data: {"type":"text","msg":"[](@mark_underline=20)"}
+
+data: {"type":"text","msg":"- 伴随"}
+
+data: {"type":"text","msg":"而来"}
+
+data: {"type":"text","msg":"的是**"}
+
+data: {"type":"text","msg":"智能体越"}
+
+data: {"type":"text","msg":"权、"}
+
+data: {"type":"text","msg":"入侵"}
+
+data: {"type":"text","msg":"仓库"}
+
+data: {"type":"text","msg":"/"}
+
+data: {"type":"text","msg":"政府系统、"}
+
+data: {"type":"text","msg":"滥用"}
+
+data: {"type":"text","msg":" API"}
+
+data: {"type":"text","msg":"、"}
+
+data: {"type":"text","msg":"窃取"}
+
+data: {"type":"text","msg":"密钥"}
+
+data: {"type":"text","msg":"**等"}
+
+data: {"type":"text","msg":"安全事件，"}
+
+data: {"type":"text","msg":"Agent"}
+
+data: {"type":"text","msg":" 安全"}
+
+data: {"type":"text","msg":"从"}
+
+data: {"type":"text","msg":"论文"}
+
+data: {"type":"text","msg":"话题"}
+
+data: {"type":"text","msg":"变成监管"}
+
+data: {"type":"text","msg":"议题"}
+
+data: {"type":"text","msg":"。"}
+
+data: {"type":"text","msg":"[](@mark_underline=21)"}
+
+data: {"type":"text","msg":"[citation:4]"}
+
+data: {"type":"text","msg":"[](@mark_underline=22)"}
+
+data: {"type":"text","msg":"[](@mark_underline=23)"}
+
+data: {"type":"text","msg":"[citation:6]"}
+
+data: {"type":"text","msg":"[](@mark_underline=24)"}
+
+data: {"type":"text","msg":"[](@mark_underline=25)"}
+
+data: {"type":"text","msg":"[citation:10]"}
+
+data: {"type":"text","msg":"[](@mark_underline=26)"}
+
+data: {"type":"text","msg":"\n\n## "}
+
+data: {"type":"text","msg":"三、安全"}
+
+data: {"type":"text","msg":"与监管"}
+
+data: {"type":"text","msg":"明显"}
+
+data: {"type":"text","msg":"加码"}
+
+data: {"type":"text","msg":"\n-"}
+
+data: {"type":"text","msg":" 中国"}
+
+data: {"type":"text","msg":"：手机"}
+
+data: {"type":"text","msg":"端侧 AI"}
+
+data: {"type":"text","msg":" 备案"}
+
+data: {"type":"text","msg":"落地"}
+
+data: {"type":"text","msg":"；"}
+
+data: {"type":"text","msg":"智能"}
+
+data: {"type":"text","msg":"体应用"}
+
+data: {"type":"text","msg":"安全强制性"}
+
+data: {"type":"text","msg":"国标立项"}
+
+data: {"type":"text","msg":"；“"}
+
+data: {"type":"text","msg":"人工智能+”"}
+
+data: {"type":"text","msg":"行动"}
+
+data: {"type":"text","msg":"持续推进"}
+
+data: {"type":"text","msg":"。"}
+
+data: {"type":"text","msg":"[](@mark_underline=27)"}
+
+data: {"type":"text","msg":"[citation:6]"}
+
+data: {"type":"text","msg":"[](@mark_underline=28)"}
+
+data: {"type":"text","msg":"\n- "}
+
+data: {"type":"text","msg":"[](@mark_underline=29)"}
+
+data: {"type":"text","msg":"美国：加州"}
+
+data: {"type":"text","msg":" AI"}
+
+data: {"type":"text","msg":" Transparency Act"}
+
+data: {"type":"text","msg":" 进入"}
+
+data: {"type":"text","msg":"执行"}
+
+data: {"type":"text","msg":"；"}
+
+data: {"type":"text","msg":"F"}
+
+data: {"type":"text","msg":"TC 对"}
+
+data: {"type":"text","msg":" Open"}
+
+data: {"type":"text","msg":"AI/"}
+
+data: {"type":"text","msg":"Anthropic"}
+
+data: {"type":"text","msg":" 等展开"}
+
+data: {"type":"text","msg":"代理"}
+
+data: {"type":"text","msg":"相关"}
+
+data: {"type":"text","msg":"调查"}
+
+data: {"type":"text","msg":"；Open"}
+
+data: {"type":"text","msg":"AI "}
+
+data: {"type":"text","msg":"自己也"}
+
+data: {"type":"text","msg":"呼吁"}
+
+data: {"type":"text","msg":"更"}
+
+data: {"type":"text","msg":"强制的前沿"}
+
+data: {"type":"text","msg":"模型"}
+
+data: {"type":"text","msg":"安全规则"}
+
+data: {"type":"text","msg":"。"}
+
+data: {"type":"text","msg":"[](@mark_underline=30)"}
+
+data: {"type":"text","msg":"[citation:8]"}
+
+data: {"type":"text","msg":"[](@mark_underline=31)"}
+
+data: {"type":"text","msg":"[](@mark_underline=32)"}
+
+data: {"type":"text","msg":"[citation:14]"}
+
+data: {"type":"text","msg":"[](@mark_underline=33)"}
+
+data: {"type":"text","msg":"\n-"}
+
+data: {"type":"text","msg":" 国际"}
+
+data: {"type":"text","msg":"：欧盟 AI"}
+
+data: {"type":"text","msg":" Act"}
+
+data: {"type":"text","msg":" 走"}
+
+data: {"type":"text","msg":"风险"}
+
+data: {"type":"text","msg":"分级但"}
+
+data: {"type":"text","msg":"部分"}
+
+data: {"type":"text","msg":"条款"}
+
+data: {"type":"text","msg":"延期"}
+
+data: {"type":"text","msg":"；联合国"}
+
+data: {"type":"text","msg":"/ITU"}
+
+data: {"type":"text","msg":" 推 AI"}
+
+data: {"type":"text","msg":" for"}
+
+data: {"type":"text","msg":" Good；"}
+
+data: {"type":"text","msg":"中美"}
+
+data: {"type":"text","msg":"欧"}
+
+data: {"type":"text","msg":"监管"}
+
+data: {"type":"text","msg":"路径明显"}
+
+data: {"type":"text","msg":"分化。"}
+
+data: {"type":"text","msg":"[](@mark_underline=34)"}
+
+data: {"type":"text","msg":"[citation:5]"}
+
+data: {"type":"text","msg":"[](@mark_underline=35)"}
+
+data: {"type":"text","msg":"[](@mark_underline=36)"}
+
+data: {"type":"text","msg":"[citation:11]"}
+
+data: {"type":"text","msg":"[](@mark_underline=37)"}
+
+data: {"type":"text","msg":"\n- "}
+
+data: {"type":"text","msg":"[](@mark_underline=38)"}
+
+data: {"type":"text","msg":"大"}
+
+data: {"type":"text","msg":"厂"}
+
+data: {"type":"text","msg":"口径"}
+
+data: {"type":"text","msg":"变化"}
+
+data: {"type":"text","msg":"：从“"}
+
+data: {"type":"text","msg":"自我"}
+
+data: {"type":"text","msg":"监管”"}
+
+data: {"type":"text","msg":"转向“既要"}
+
+data: {"type":"text","msg":"发布"}
+
+data: {"type":"text","msg":"，"}
+
+data: {"type":"text","msg":"也要独立"}
+
+data: {"type":"text","msg":"评估、审计"}
+
+data: {"type":"text","msg":"轨迹"}
+
+data: {"type":"text","msg":"、权限"}
+
+data: {"type":"text","msg":"隔离”。\n\n"}
+
+data: {"type":"text","msg":"## 四"}
+
+data: {"type":"text","msg":"、融资、"}
+
+data: {"type":"text","msg":"估值、"}
+
+data: {"type":"text","msg":"算力军"}
+
+data: {"type":"text","msg":"备竞赛"}
+
+data: {"type":"text","msg":"\n- Deep"}
+
+data: {"type":"text","msg":"Seek 被"}
+
+data: {"type":"text","msg":"频繁"}
+
+data: {"type":"text","msg":"传出"}
+
+data: {"type":"text","msg":"大额"}
+
+data: {"type":"text","msg":"融资/"}
+
+data: {"type":"text","msg":"IPO"}
+
+data: {"type":"text","msg":" "}
+
+data: {"type":"text","msg":"筹备，估值"}
+
+data: {"type":"text","msg":"传"}
+
+data: {"type":"text","msg":"言"}
+
+data: {"type":"text","msg":"从"}
+
+data: {"type":"text","msg":"数千"}
+
+data: {"type":"text","msg":"亿到五千"}
+
+data: {"type":"text","msg":"亿人民币"}
+
+data: {"type":"text","msg":"级别，但"}
+
+data: {"type":"text","msg":"官方口径"}
+
+data: {"type":"text","msg":"要"}
+
+data: {"type":"text","msg":"打"}
+
+data: {"type":"text","msg":"折扣。"}
+
+data: {"type":"text","msg":"[](@mark_underline=39)"}
+
+data: {"type":"text","msg":"[citation:4]"}
+
+data: {"type":"text","msg":"[](@mark_underline=40)"}
+
+data: {"type":"text","msg":"[](@mark_underline=41)"}
+
+data: {"type":"text","msg":"[citation:13]"}
+
+data: {"type":"text","msg":"[](@mark_underline=42)"}
+
+data: {"type":"text","msg":"\n"}
+
+data: {"type":"text","msg":"[](@mark_underline=43)"}
+
+data: {"type":"text","msg":"- Anthrop"}
+
+data: {"type":"text","msg":"ic、"}
+
+data: {"type":"text","msg":"OpenAI、"}
+
+data: {"type":"text","msg":"Mistral"}
+
+data: {"type":"text","msg":"、智"}
+
+data: {"type":"text","msg":"谱、月"}
+
+data: {"type":"text","msg":"之暗"}
+
+data: {"type":"text","msg":"面等"}
+
+data: {"type":"text","msg":"估值/"}
+
+data: {"type":"text","msg":"融资持续"}
+
+data: {"type":"text","msg":"膨胀；"}
+
+data: {"type":"text","msg":"AI"}
+
+data: {"type":"text","msg":" 基建从"}
+
+data: {"type":"text","msg":"“"}
+
+data: {"type":"text","msg":"买"}
+
+data: {"type":"text","msg":" GPU”"}
+
+data: {"type":"text","msg":"走向"}
+
+data: {"type":"text","msg":"“自建"}
+
+data: {"type":"text","msg":"芯片"}
+
+data: {"type":"text","msg":"、租"}
+
+data: {"type":"text","msg":"数据中心"}
+
+data: {"type":"text","msg":"、私人"}
+
+data: {"type":"text","msg":"信贷、核电"}
+
+data: {"type":"text","msg":"/"}
+
+data: {"type":"text","msg":"绿"}
+
+data: {"type":"text","msg":"电合约"}
+
+data: {"type":"text","msg":"”。\n"}
+
+data: {"type":"text","msg":"- 英"}
+
+data: {"type":"text","msg":"伟达 Vera"}
+
+data: {"type":"text","msg":"/R"}
+
+data: {"type":"text","msg":"ubin、"}
+
+data: {"type":"text","msg":"谷歌"}
+
+data: {"type":"text","msg":" T"}
+
+data: {"type":"text","msg":"PU、微软"}
+
+data: {"type":"text","msg":" Ma"}
+
+data: {"type":"text","msg":"ia、Open"}
+
+data: {"type":"text","msg":"AI+"}
+
+data: {"type":"text","msg":"博通推理"}
+
+data: {"type":"text","msg":"芯片、华为"}
+
+data: {"type":"text","msg":"昇腾生态"}
+
+data: {"type":"text","msg":"，"}
+
+data: {"type":"text","msg":"让"}
+
+data: {"type":"text","msg":"“"}
+
+data: {"type":"text","msg":"算力主权"}
+
+data: {"type":"text","msg":"”成为"}
+
+data: {"type":"text","msg":"大国"}
+
+data: {"type":"text","msg":"和大"}
+
+data: {"type":"text","msg":"厂"}
+
+data: {"type":"text","msg":"核心"}
+
+data: {"type":"text","msg":"议题"}
+
+data: {"type":"text","msg":"。"}
+
+data: {"type":"text","msg":"[](@mark_underline=44)"}
+
+data: {"type":"text","msg":"[citation:7]"}
+
+data: {"type":"text","msg":"[](@mark_underline=45)"}
+
+data: {"type":"text","msg":"[](@mark_underline=46)"}
+
+data: {"type":"text","msg":"[citation:16]"}
+
+data: {"type":"text","msg":"[](@mark_underline=47)"}
+
+data: {"type":"text","msg":"\n\n"}
+
+data: {"type":"text","msg":"[](@mark_underline=48)"}
+
+data: {"type":"text","msg":"## 五"}
+
+data: {"type":"text","msg":"、中国"}
+
+data: {"type":"text","msg":" AI"}
+
+data: {"type":"text","msg":" 产业"}
+
+data: {"type":"text","msg":"亮点"}
+
+data: {"type":"text","msg":"\n- **"}
+
+data: {"type":"text","msg":"国产算力"}
+
+data: {"type":"text","msg":"训练"}
+
+data: {"type":"text","msg":"前沿"}
+
+data: {"type":"text","msg":"模型**：美团"}
+
+data: {"type":"text","msg":" Long"}
+
+data: {"type":"text","msg":"Cat、"}
+
+data: {"type":"text","msg":"DeepSeek、"}
+
+data: {"type":"text","msg":"Q"}
+
+data: {"type":"text","msg":"wen、"}
+
+data: {"type":"text","msg":"K"}
+
+data: {"type":"text","msg":"imi 等"}
+
+data: {"type":"text","msg":"加速"}
+
+data: {"type":"text","msg":"脱离"}
+
+data: {"type":"text","msg":"“"}
+
+data: {"type":"text","msg":"纯英"}
+
+data: {"type":"text","msg":"伟达依赖"}
+
+data: {"type":"text","msg":"”。"}
+
+data: {"type":"text","msg":"\n- **"}
+
+data: {"type":"text","msg":"端侧 AI"}
+
+data: {"type":"text","msg":" 合规"}
+
+data: {"type":"text","msg":"化"}
+
+data: {"type":"text","msg":"**：苹果"}
+
+data: {"type":"text","msg":"、"}
+
+data: {"type":"text","msg":"华为、OP"}
+
+data: {"type":"text","msg":"PO、v"}
+
+data: {"type":"text","msg":"ivo、小米"}
+
+data: {"type":"text","msg":"、三星"}
+
+data: {"type":"text","msg":"、"}
+
+data: {"type":"text","msg":"努比亚的"}
+
+data: {"type":"text","msg":"端侧生成"}
+
+data: {"type":"text","msg":"式 AI "}
+
+data: {"type":"text","msg":"完成备案。\n"}
+
+data: {"type":"text","msg":"[](@mark_underline=49)"}
+
+data: {"type":"text","msg":"- **"}
+
+data: {"type":"text","msg":"WAIC"}
+
+data: {"type":"text","msg":" 2026"}
+
+data: {"type":"text","msg":" /"}
+
+data: {"type":"text","msg":" 外"}
+
+data: {"type":"text","msg":"滩大会"}
+
+data: {"type":"text","msg":"**：国产"}
+
+data: {"type":"text","msg":"大模型密集发布"}
+
+data: {"type":"text","msg":"，"}
+
+data: {"type":"text","msg":"AI"}
+
+data: {"type":"text","msg":" Coding"}
+
+data: {"type":"text","msg":"、智能"}
+
+data: {"type":"text","msg":"体软件"}
+
+data: {"type":"text","msg":"、产业"}
+
+data: {"type":"text","msg":"落地"}
+
+data: {"type":"text","msg":"成为"}
+
+data: {"type":"text","msg":"重点"}
+
+data: {"type":"text","msg":"。\n"}
+
+data: {"type":"text","msg":"- **"}
+
+data: {"type":"text","msg":"具"}
+
+data: {"type":"text","msg":"身智能"}
+
+data: {"type":"text","msg":"/人"}
+
+data: {"type":"text","msg":"形机器人**："}
+
+data: {"type":"text","msg":"上海"}
+
+data: {"type":"text","msg":"等地"}
+
+data: {"type":"text","msg":"推进"}
+
+data: {"type":"text","msg":"“"}
+
+data: {"type":"text","msg":"人形机器人"}
+
+data: {"type":"text","msg":"进工厂"}
+
+data: {"type":"text","msg":"”，宇"}
+
+data: {"type":"text","msg":"树等"}
+
+data: {"type":"text","msg":"机器人"}
+
+data: {"type":"text","msg":"公司融资/"}
+
+data: {"type":"text","msg":"上市"}
+
+data: {"type":"text","msg":"动作"}
+
+data: {"type":"text","msg":"频繁"}
+
+data: {"type":"text","msg":"。"}
+
+data: {"type":"text","msg":"[](@mark_underline=50)"}
+
+data: {"type":"text","msg":"[citation:5]"}
+
+data: {"type":"text","msg":"[](@mark_underline=51)"}
+
+data: {"type":"text","msg":"[](@mark_underline=52)"}
+
+data: {"type":"text","msg":"[citation:6]"}
+
+data: {"type":"text","msg":"[](@mark_underline=53)"}
+
+data: {"type":"text","msg":"[](@mark_underline=54)"}
+
+data: {"type":"text","msg":"[citation:7]"}
+
+data: {"type":"text","msg":"[](@mark_underline=55)"}
+
+data: {"type":"text","msg":"\n\n## "}
+
+data: {"type":"text","msg":"[](@mark_underline=56)"}
+
+data: {"type":"text","msg":"六、创作"}
+
+data: {"type":"text","msg":"、"}
+
+data: {"type":"text","msg":"视频、"}
+
+data: {"type":"text","msg":"语音、"}
+
+data: {"type":"text","msg":"多模态\n"}
+
+data: {"type":"text","msg":"- Google"}
+
+data: {"type":"text","msg":" Ve"}
+
+data: {"type":"text","msg":"o、"}
+
+data: {"type":"text","msg":"Open"}
+
+data: {"type":"text","msg":"AI "}
+
+data: {"type":"text","msg":"图像/"}
+
+data: {"type":"text","msg":"视频、"}
+
+data: {"type":"text","msg":"Mid"}
+
+data: {"type":"text","msg":"journey、"}
+
+data: {"type":"text","msg":"可"}
+
+data: {"type":"text","msg":"灵、"}
+
+data: {"type":"text","msg":"Nano Ban"}
+
+data: {"type":"text","msg":"ana "}
+
+data: {"type":"text","msg":"等把"}
+
+data: {"type":"text","msg":"文"}
+
+data: {"type":"text","msg":"生图/"}
+
+data: {"type":"text","msg":"文生视频"}
+
+data: {"type":"text","msg":"推向"}
+
+data: {"type":"text","msg":"“"}
+
+data: {"type":"text","msg":"可商用"}
+
+data: {"type":"text","msg":"工作"}
+
+data: {"type":"text","msg":"流”。\n"}
+
+data: {"type":"text","msg":"- 全"}
+
+data: {"type":"text","msg":"双工"}
+
+data: {"type":"text","msg":"语音、"}
+
+data: {"type":"text","msg":"实时翻译"}
+
+data: {"type":"text","msg":"、AI"}
+
+data: {"type":"text","msg":" 电台"}
+
+data: {"type":"text","msg":"、AI"}
+
+data: {"type":"text","msg":" 主持人"}
+
+data: {"type":"text","msg":"开始出现"}
+
+data: {"type":"text","msg":"；"}
+
+data: {"type":"text","msg":"版权"}
+
+data: {"type":"text","msg":"、"}
+
+data: {"type":"text","msg":"深"}
+
+data: {"type":"text","msg":"伪、"}
+
+data: {"type":"text","msg":"水印、"}
+
+data: {"type":"text","msg":"平台"}
+
+data: {"type":"text","msg":"抽"}
+
+data: {"type":"text","msg":"成"}
+
+data: {"type":"text","msg":"/"}
+
+data: {"type":"text","msg":"内容补偿"}
+
+data: {"type":"text","msg":"成"}
+
+data: {"type":"text","msg":"新"}
+
+data: {"type":"text","msg":"矛盾"}
+
+data: {"type":"text","msg":"（"}
+
+data: {"type":"text","msg":"如"}
+
+data: {"type":"text","msg":"出版商"}
+
+data: {"type":"text","msg":"诉"}
+
+data: {"type":"text","msg":" Google"}
+
+data: {"type":"text","msg":" AI Over"}
+
+data: {"type":"text","msg":"views）。"}
+
+data: {"type":"text","msg":"[](@mark_underline=57)"}
+
+data: {"type":"text","msg":"[citation:4]"}
+
+data: {"type":"text","msg":"[](@mark_underline=58)"}
+
+data: {"type":"text","msg":"[](@mark_underline=59)"}
+
+data: {"type":"text","msg":"[citation:5]"}
+
+data: {"type":"text","msg":"[](@mark_underline=60)"}
+
+data: {"type":"text","msg":"\n\n"}
+
+data: {"type":"text","msg":"[](@mark_underline=61)"}
+
+data: {"type":"text","msg":"## 七"}
+
+data: {"type":"text","msg":"、一句"}
+
+data: {"type":"text","msg":"总结"}
+
+data: {"type":"text","msg":"\n202"}
+
+data: {"type":"text","msg":"6 年"}
+
+data: {"type":"text","msg":" AI 界"}
+
+data: {"type":"text","msg":"不是“又"}
+
+data: {"type":"text","msg":"出一个"}
+
+data: {"type":"text","msg":"更强"}
+
+data: {"type":"text","msg":"模型”"}
+
+data: {"type":"text","msg":"那么简单，"}
+
+data: {"type":"text","msg":"而是进入了"}
+
+data: {"type":"text","msg":"  "}
+
+data: {"type":"text","msg":"\n**强"}
+
+data: {"type":"text","msg":"模型 + "}
+
+data: {"type":"text","msg":"自主"}
+
+data: {"type":"text","msg":"智能体 +"}
+
+data: {"type":"text","msg":" 巨大"}
+
+data: {"type":"text","msg":"算力开支"}
+
+data: {"type":"text","msg":" + 安全"}
+
+data: {"type":"text","msg":"事件"}
+
+data: {"type":"text","msg":"频发"}
+
+data: {"type":"text","msg":" + 监管"}
+
+data: {"type":"text","msg":"追"}
+
+data: {"type":"text","msg":"上来"}
+
+data: {"type":"text","msg":"** 的"}
+
+data: {"type":"text","msg":"复杂"}
+
+data: {"type":"text","msg":"阶段。\n\n"}
+
+data: {"type":"text","msg":"如果你愿意，"}
+
+data: {"type":"text","msg":"我可以按「"}
+
+data: {"type":"text","msg":"**"}
+
+data: {"type":"text","msg":"模型发布"}
+
+data: {"type":"text","msg":" / 公司"}
+
+data: {"type":"text","msg":"融资"}
+
+data: {"type":"text","msg":" / 安全"}
+
+data: {"type":"text","msg":"事件 / "}
+
+data: {"type":"text","msg":"中国动态"}
+
+data: {"type":"text","msg":" / 机器人"}
+
+data: {"type":"text","msg":"&"}
+
+data: {"type":"text","msg":"具身智能"}
+
+data: {"type":"text","msg":"**」"}
+
+data: {"type":"text","msg":"分别"}
+
+data: {"type":"text","msg":"再"}
+
+data: {"type":"text","msg":"展开"}
+
+data: {"type":"text","msg":"成"}
+
+data: {"type":"text","msg":"时间"}
+
+data: {"type":"text","msg":"线。\n"}
+
+data: {"type":"text","msg":"[](@mark_underline=62)"}
+
+data: {"type":"text","msg":"@@"}
+
+data: {"type":"text","msg":"END:"}
+
+data: {"type":"text","msg":"content@@\n"}
+
+data: {"type":"text","msg":"@@END:"}
+
+data: {"type":"text","msg":"response@@"}
+
+data: {"type":"text","msg":"[](@mark_underline=63)"}
+
+data: {"type":"text","msg":"\n\n[](@replace=bypass_bd177ff3831b9c42)\n"}
+
+data: {"type":"replace","replace":{"id":"bypass_bd177ff3831b9c42","display":"videoBoxV2","multimedias":[{"mediaId":"c42bb23eb61f40e09789d03bb2c82aae_0","type":"videoBoxV2","title":"这才是AI时代下一个十年的正确解法！2026云栖大会背后，阿里的双闭环布局！#云栖大会2026#真武V900#千问办公#企业上下文","url":"https://hunyuan-prod-1258344703.cos.ap-guangzhou.myqcloud.com/videoBox/976c2b3e7c621f071051055f5fad03a9/20261014150044_f9b3d057c79c11f1b7cd5254001ca89b.png?q-sign-algorithm=sha1&q-ak=fixture-token&q-sign-time=fixture-token&q-key-time=fixture-token&q-header-list=host&q-url-param-list=&q-signature=fixture-token","description":"","imageAlign":"","desc":"","descAlign":"","scene":2,"jumpUrl":"","ext":{"videoDuration":241,"likeNum":"5000","exportId":"export/UzFfBgAAxN6gOFYMTzukk8zT4DBZDTvZFgP2UkwFpAD_yUOVXwQ","feedNonceId":"0","publishTime":"2026/10/04 21:11:11","source":{"name":"财经札记","icon":"https://wx.qlogo.cn/finderhead/ver_1/PSIib0ZlX1JhwRjMdItxzXQ0ia80e5GxHL0FD5Hia0kbxaibYXXkNjMVG3b5AxeqEdjmHb0UbBwmtbLnvxWJzSey5L97RYqvYPfVBZxDhcnrOiaNs3Rq9YUj9w8TIic2M1uUns8TnkYmjKnyzrqozABPN3fw/0"},"coverRatio":"3:4","videoIsNewStyle":true,"videoNewWidth":540,"videoNewHeight":720,"videoRecallQuery":"2026年AI界新闻","publishTimeDisplay":"1周前","likeNumDisplay":"5000+","durationDisplay":"04:01","certifyStatus":3,"certifyIcon":"https://hy-openapi-public-1258344703.cos.ap-nanjing.myqcloud.com/app/icon/icon2025/certify/wx-person-1w.png","abTestInfo":{"config_newfilecard_v1":"1"},"lovePraiseCount":"5000"},"ratio":0,"poiId":"","address":"","adInfo":{"adCode":0,"province":"","city":"","district":""},"location":{"lat":0,"lng":0},"category":"","categoryCode":"","categoryFull":"","distance":0,"briefIntro":"","starLevel":0,"sceneGrade":"","ticketPrice":0,"avgPrice":0,"openingHours":"","tel":"","intentMode":"","from":{"id":"","title":"","address":"","adInfo":{"adCode":0,"province":"","city":"","district":""},"location":{"lat":0,"lng":0}},"to":{"id":"","title":"","address":"","adInfo":{"adCode":0,"province":"","city":"","district":""},"location":{"lat":0,"lng":0}},"mode":"","policy":"","routes":[],"addBg":false,"noJump":false,"height":0,"width":0,"maxHeight":0,"maxWidth":0,"author":"","icon":"","cover":"","downloadCoverUrl":"","rawSource":"视频号","appId":"","label":"","mediumType":0,"boxStyle":0,"channel":"","linkInfo":{"linkScene":"","wxAppId":"","h5WxAppId":"","icon":"","iconDark":""},"alertInfo":{"shouldAlert":false,"alertText":""},"resourceUrl":"https://yuanbao.tencent.com/api/resource/download?resourceId=8e4887540a05a0ffbb89a5b3bb0b4e2d","time":"","videoReportInfo":"{\"recallType\":\"bypass\",\"subq\":\"2026年AI界新闻\",\"bypassLogic\":{\"videoSelection\":true,\"selectionType\":\"normal\",\"debuginfo\":{\"doc_score_list\":\"export/UzFfBgAAxN6gOFYMTzukk8zT4DBZDTvZFgP2UkwFpAD_yUOVXwQ:0.144043,export/UzFfBgAAxISLcH9ZNBuuk8zT4DBZDYQnAGCCGkP95VJzON9C0Hk:0.129639,export/UzFfBgAAxIKLTAArUQWpk8zT4DBZDTB5wKcJH46mdSytkaMrP2s:0.128174,export/UzFfBgAAxNqhCDlMAmLWk8zT4DBZDTMshUTqd6ZBhD_ikPauDo8:0.110168,export/UzFfBgAAxMqCOCkBblC7jMzT4DBZDRo8pc81PrM-WbsUMPibJPY:0.109436,export/UzFfBgAAxKSmAGcjMEqok8zT4DBZDcZdvoZ25dAslwtCco8_zp4:0.078857,export/UzFfBgAAxLOESFdhVH6rk8zT4DBZDfcqsI1rC0yG4rGSYfB6swk:0.077576,export/UzFfBgAAxMaOBDc4dCitk8zT4DBZDQRg6T7NYf1SRaM_-xPMe_s:0.066345,export/UzFfBgAAxJGBFDwNTU6tk8zT4DBZDRuItw899y-Ps2qWZv0mpMY:0.057526\"}}}"}],"style":"card","title":"相关视频","assetId":"c42bb23eb61f40e09789d03bb2c82aae","videoSearchType":0}}
+
+event: speech_type
+data: hint_v2_tip
+
+data: {"type":"hint_v2_tip","queryStrategy":"","hintType":"","speechIndex":0}
+
+data: [plugin: ]
+
+data: [MSGINDEX:10]
+
+data: {"type":"meta","messageId":"fixture-messageid","index":10,"replyId":"fixture-replyid","replyIndex":9,"traceId":"0123456789abcdef0123456789abcdef","guideId":0,"ic":0,"unSupportRepeat":false,"pluginID":"OneAgent","stopReason":"stop","endConv":false,"requireLogin":false,"requireLoginType":0,"loginTips":"","tipsType":0,"modelErrorCode":0,"modelErrorMsg":"","speechIndex":1,"tokenUsageInfo":{"promptTokens":20636,"completionTokens":1219,"totalTokens":21855},"userId":"fixture-user","outputCheck":false,"chainID":"DeepSeekV3","sensitiveType":0,"aiSearchSource":"","performance":{"dataIndex":{"SearchStart":2,"SearchEnd":5,"ThinkingStart":-1,"ThinkingEnd":-1,"FirstWord":7},"timePoint":{"TpSearchStart":1879,"TpSearchEnd":5588,"TpThinkingStart":5588,"TpThinkingEnd":5588,"TpFirstWord":5609}},"oneAgentId":"main_agent_search_hy","deepOpsErrorInfo":"{\"code\":0}","isCharacter":false}
+
+data: [TRACEID:0123456789abcdef0123456789abcdef]
+
+data: [DONE]
+
+

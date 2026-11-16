@@ -1,0 +1,15 @@
+event: update_session
+data: {"updated_at":1794105566.8758779}
+
+data: {"p":"response/fragments","v":[{"id":2,"type":"THINK","content":"hidden reasoning"},{"id":3,"type":"RESPONSE","content":"@@BEG:response@@\n@@BEG:reasoning_content@@\n"}]}
+
+data: {"v":"ok\n@@END:reasoning_content@@\n\n@@BEG:content@@\nHello from DeepSeek\n"}
+
+data: {"v":"@@END:content@@\n@@END:response@@"}
+
+data: {"p":"response","o":"BATCH","v":[{"p":"accumulated_token_usage","v":100},{"p":"quasi_status","v":"FINISHED"}]}
+
+data: {"p":"response/status","o":"SET","v":"FINISHED"}
+
+event: close
+data: {"click_behavior":"none","auto_resume":false}

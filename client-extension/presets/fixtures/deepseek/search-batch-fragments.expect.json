@@ -1,0 +1,23 @@
+{
+  "provider": "deepseek",
+  "dialect": "search-batch-fragments",
+  "comment": "Search-enabled DeepSeek turns start the answer through response/BATCH/fragments/APPEND instead of the two legacy response-start shapes.",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "batchedResponseFragmentStart",
+      "contentAppend",
+      "directAppend"
+    ],
+    "contentContains": [
+      "Batch response parsed, with citations."
+    ],
+    "mustNotContain": [
+      "2026年10月人工智能领域新闻",
+      "[citation:"
+    ],
+    "streamedMustNotContain": [
+      "[citation:"
+    ]
+  }
+}

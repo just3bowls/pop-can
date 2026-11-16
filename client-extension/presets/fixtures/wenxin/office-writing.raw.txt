@@ -1,0 +1,11 @@
+event:message
+data:{"data":{"message":{"metaData":{"state":"generating-resp","endTurn":false},"content":{"generator":{"component":"officeWriting","data":{"content":"@@BEG:response@@\n@@BEG:reasoning_content@@\n用户询问近期The Weeknd在香港是否有演唱会，属于实时动态类信息，需要调用browser_search工具搜索最新官宣信息。\n@@END:reasoning_content@@\n\n"}}}}}}
+
+event:message
+data:{"data":{"message":{"metaData":{"state":"generating-resp","endTurn":false},"content":{"generator":{"component":"officeWriting","data":{"content":"@@BEG:tool_calls@@\n@@BEG:tool_call@@\n@@BEG:name@@browser_search@@END:name@@\n@@BEG:arguments@@\n@@BEG:query:string@@2026年10月 The Weeknd 香港演唱会 最新官宣场次安排@@END:query:string@@\n@@END:arguments@@\n@@END:tool_call@@\n"}}}}}}
+
+event:message
+data:{"data":{"message":{"metaData":{"state":"generating-resp","endTurn":false},"content":{"generator":{"component":"officeWriting","data":{"content":"@@END:tool_calls@@\n@@END:response@@"}}}}}}
+
+event:message
+data:{"data":{"message":{"metaData":{"state":"generate-complete","endTurn":true},"content":{"generator":{"text":"","isFinished":true}}}}}

@@ -1,0 +1,24 @@
+{
+  "provider": "gml",
+  "dialect": "interleaved-chips-split",
+  "comment": "Two independent GML chip transforms are split across interleaved SSE frames.",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "gmlTextChunk"
+    ],
+    "contentContains": [
+      "答案一答案二"
+    ],
+    "mustNotContain": [
+      "【turn0search2】",
+      "【citation:2】"
+    ],
+    "streamedMustNotContain": [
+      "【tur",
+      "【cita",
+      "【turn0search2】",
+      "【citation:2】"
+    ]
+  }
+}

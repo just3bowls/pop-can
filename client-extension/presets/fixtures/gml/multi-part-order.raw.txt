@@ -1,0 +1,6 @@
+data: {"parts":[{"status":"init","content":[{"type":"think","text":"hidden reasoning"}]},{"status":"init","content":[{"type":"text","text":"@@BEG:response@@\n@@BEG:reasoning_content@@\n"}]}]}
+
+data: {"parts":[{"status":"init","content":[{"type":"think","text":"hidden reasoning"}]},{"status":"init","content":[{"type":"text","text":"ok\n@@END:reasoning_content@@\n\n@@BEG:content@@\nHello\n"}]}]}
+
+data: {"parts":[{"status":"finish","content":[{"type":"think","text":"hidden reasoning"}]},{"status":"finish","content":[{"type":"text","text":"@@BEG:response@@\n@@BEG:reasoning_content@@\nok\n@@END:reasoning_content@@\n\n@@BEG:content@@\nHello\n@@END:content@@\n@@END:response@@"}]}]}
+

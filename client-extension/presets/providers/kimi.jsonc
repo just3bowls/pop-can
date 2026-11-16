@@ -1,0 +1,256 @@
+{
+  // Kimi 使用 gRPC-Web 帧承载 JSON operation log；规则识别 text block 的 set/append、message completed、done 与 provider error 控制帧。
+  "schemaVersion": 2,
+  "name": "kimi",
+  "page": {
+    // Kimi 的编辑器是 contenteditable，New Chat 在侧栏；fingerprints 依赖编辑器角色与页面布局，而不是容易变化的深层节点序号。
+    "url": "https://www.kimi.com/",
+    "selectors": {
+      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][2]",
+      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='aside'][1]/*[local-name()='div'][2]/*[local-name()='a'][1]"
+    },
+    "fingerprints": {
+      "input": {
+        "ancestorClasses": [
+          "chat-input-editor-container",
+          "chat-input",
+          "chat-editor-input-wrap"
+        ],
+        "ancestorTexts": [
+          "输入 \"/\" 唤起插件和技能",
+          "输入 \"/\" 唤起插件和技能",
+          "输入 \"/\" 唤起插件和技能"
+        ],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1791509633882,
+        "classes": [
+          "chat-input-editor"
+        ],
+        "clickable": false,
+        "dataTestId": "",
+        "docX": 758.2000122070312,
+        "docY": 312.20001220703125,
+        "editable": true,
+        "height": 48,
+        "id": "",
+        "innerHeight": 711,
+        "innerWidth": 1298,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "输入 \"/\" 唤起插件和技能",
+        "parentClasses": [
+          "chat-input-editor-container"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "",
+        "role": "input",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [
+          "输入 \"/\" 唤起插件和技能"
+        ],
+        "tag": "div",
+        "text": "",
+        "width": 734.4000244140625,
+        "x": 758.2000122070312,
+        "y": 312.20001220703125
+      },
+      "new-chat": {
+        "ancestorClasses": [
+          "sidebar-new-chat",
+          "sidebar",
+          "next-sidebar",
+          "sidebar-shell",
+          "sidebar-shell--interactive"
+        ],
+        "ancestorTexts": [
+          "#NewChatAnimatedIcon-svg-rs-ew8n6j-p1{transform-box:view-box;transform-origin:0 0;animation:NewChatAnimatedIcon-svg-rs-e",
+          "#LeftBarAnimatedIcon-enter-rs-1sihg8c-mh2{transform-box:view-box;transform-origin:0 0;animation:LeftBarAnimatedIcon-ente",
+          "#LeftBarAnimatedIcon-enter-rs-1sihg8c-mh2{transform-box:view-box;transform-origin:0 0;animation:LeftBarAnimatedIcon-ente"
+        ],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1791509632154,
+        "classes": [
+          "new-chat-btn"
+        ],
+        "clickable": true,
+        "dataTestId": "sidebar-new-chat",
+        "docX": 120,
+        "docY": 82.80000114440918,
+        "editable": false,
+        "height": 41.60000228881836,
+        "id": "",
+        "innerHeight": 711,
+        "innerWidth": 1298,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "",
+        "parentClasses": [
+          "sidebar-new-chat"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "",
+        "role": "new-chat",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [],
+        "tag": "a",
+        "text": "#NewChatAnimatedIcon-svg-rs-ew8n6j-p1{transform-box:view-box;transform-origin:0 0;animation:NewChatAnimatedIcon-svg-rs-ew8n6j-p1 0.4167s linear 1 forwards}@keyframes NewChatAnimatedIcon-svg-rs-ew8n6j-",
+        "width": 224,
+        "x": 120,
+        "y": 82.80000114440918
+      }
+    }
+  },
+  "network": {
+    // 监听 Kimi ChatService/Chat 的 gRPC-Web POST；帧解包由请求层完成，parserRule 只解释解包后的 JSON。
+    "apiPatterns": [
+      "https://www.kimi.com/apiv2/kimi.gateway.chat.v1.ChatService/Chat"
+    ],
+    "followUpPatterns": [],
+    "followUpIdentityPath": ""
+  },
+  "attachment": {
+    // file 模式使用页面隐藏的 input.hidden-input；固定 selector 避免页面其他上传控件干扰。
+    "strategy": "input",
+    "selector": "input.hidden-input"
+  },
+  "parserRule": {
+    // Kimi streams gRPC-Web frames whose payload is a JSON operation log (op=set / op=append on masks); this rule reads the decoded frames, the framing itself is handled by the request layer. 另外认两种控制帧：`"done":{}`（收尾）与 `{"error":{"code":…}}`（provider 报错，直接失败而不是等超时）。 另认两种控制帧：`done:{}`（正常收尾）与错误帧（报可读原因，别等超时）。
+    "schemaVersion": 2,
+    "confidence": "high",
+    "missingInfo": [],
+    "contentTransforms": [
+      {
+        // Kimi citation references are page-rendered metadata rather than answer text.
+        "id": "dropReferenceBlock",
+        "regex": "<REF>[\\s\\S]*?</REF>",
+        "replacement": "",
+        "settle": {
+          "candidatePrefix": "<REF>"
+        }
+      }
+    ],
+    "memory": {},
+    "handlers": [
+      {
+        // op=set on block.text — the block's first, whole content.
+        "id": "answerStart",
+        "match": {
+          // 匹配 mask=block.text 的 set 操作，读取 text block 的完整首段内容。
+          "rawRegex": "\\{\"op\"\\s*:\\s*\"set\"\\s*,\\s*\"mask\"\\s*:\\s*\"block\\.text\"\\s*,\\s*\"eventOffset\"\\s*:\\s*\\d+\\s*,\\s*\"block\"\\s*:\\s*\\{[^{}]*?\"text\"\\s*:\\s*\\{\\s*\"content\"\\s*:\\s*\"(?:[^\"\\\\]|\\\\.)*\"\\s*\\}[^{}]*?\\}\\}",
+          "jsonGroup": 0,
+          "path": "$.block.text.content"
+        },
+        "actions": [
+          {
+            // Append raw content; contentTransforms is the single normalization layer.
+            "op": "appendContent",
+            "path": "$.block.text.content"
+          }
+        ]
+      },
+      {
+        // op=append on block.text.content — incremental pieces of the same block.
+        "id": "answerDelta",
+        "match": {
+          // 匹配 mask=block.text.content 的 append 操作，读取同一 text block 的增量。
+          "rawRegex": "\\{\"op\"\\s*:\\s*\"append\"\\s*,\\s*\"mask\"\\s*:\\s*\"block\\.text\\.content\"\\s*,\\s*\"eventOffset\"\\s*:\\s*\\d+\\s*,\\s*\"block\"\\s*:\\s*\\{[^{}]*?\"text\"\\s*:\\s*\\{\\s*\"content\"\\s*:\\s*\"(?:[^\"\\\\]|\\\\.)*\"\\s*\\}[^{}]*?\\}\\}",
+          "jsonGroup": 0,
+          "path": "$.block.text.content"
+        },
+        "actions": [
+          {
+            // Append raw content; contentTransforms is the single normalization layer.
+            "op": "appendContent",
+            "path": "$.block.text.content"
+          }
+        ]
+      },
+      {
+        // op=set on message.status=MESSAGE_STATUS_COMPLETED — the turn is over.
+        "id": "messageCompleted",
+        "match": {
+          // 匹配 message.status=MESSAGE_STATUS_COMPLETED 的完成控制帧。
+          "rawRegex": "\\{\"op\"\\s*:\\s*\"set\"\\s*,\\s*\"mask\"\\s*:\\s*\"message\\.status\"\\s*,\\s*\"eventOffset\"\\s*:\\s*\\d+\\s*,\\s*\"message\"\\s*:\\s*\\{[^{}]*?\"status\"\\s*:\\s*\"MESSAGE_STATUS_COMPLETED\"\\s*[^{}]*?\\}\\}",
+          "jsonGroup": 0,
+          "path": "$.message.status",
+          "regex": "^MESSAGE_STATUS_COMPLETED$"
+        },
+        "actions": [
+          {
+            // 将本轮标记为正常结束。
+            "op": "setFinishReason",
+            "value": "stop"
+          }
+        ]
+      },
+      {
+        // gRPC-Web 帧里 `{"eventOffset":N,"done":{}}` = 这一轮结束（成功流末尾、用户中断、排队都会发）。不认它就只能等超时（实测白等 180s）。
+        "id": "turnDone",
+        "match": {
+          // 帧头是二进制长度前缀，只认 JSON 片段本身。
+          "rawRegex": "(\\{\"eventOffset\":\\d+,\"done\":\\{\\}\\})",
+          "jsonGroup": 1
+        },
+        "actions": [
+          {
+            // 将本轮标记为正常结束。
+            "op": "setFinishReason",
+            "value": "stop"
+          }
+        ]
+      },
+      {
+        // provider 侧错误帧（kimi 切 k2.8/k3 排队 = `resource_exhausted`，带中文 localizedMessage）：先报 code 兜底，再被可读消息覆盖，然后收尾。
+        "id": "providerError",
+        "match": {
+          // 整帧 JSON 解析后按 `$.error.code` 判定。
+          "rawRegex": "(\\{\"error\":\\{.*\\}\\})",
+          "jsonGroup": 1,
+          "path": "$.error.code",
+          "regex": "^[a-z_]+$"
+        },
+        "actions": [
+          {
+            // 先用 error.code 立即终止本轮，避免页面错误被等到超时才暴露。
+            "op": "setError",
+            "path": "$.error.code"
+          },
+          {
+            // details 是候选集合，不是固定 tuple：按 ErrorDetail 类型筛选，再取首个本地化消息。
+            "op": "setError",
+            "path": "$.error.details[?(@.type=='common.error.v1.ErrorDetail')][0].debug.localizedMessage.message"
+          },
+          {
+            // 错误已经设置后结束本轮，不再等待后续帧。
+            "op": "setFinishReason",
+            "value": "stop"
+          }
+        ]
+      }
+    ],
+    "final": [],
+    "request": {
+      // ChatService schema 把 message.blocks 定义为有序的用户消息块；这次捕获的请求只有一个文本块。
+      // 该顺序由协议保证，不是可重排的候选集合，所以保留 [0] 并由 buildEvidence 绑定 request fixture。
+      "userText": "$.message.blocks[0].text.content"
+    }
+  },
+  "buildEvidence": {
+    "fixedIndexes": [
+      {
+        "path": "$.message.blocks[0].text.content",
+        "kind": "request",
+        "reason": "ChatService defines message.blocks as an ordered user-message tuple; the captured request has exactly one text block.",
+        "fixture": "chat.request.json"
+      }
+    ]
+  }
+}

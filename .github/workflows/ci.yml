@@ -1,0 +1,144 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Java
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: sbt
+
+      - name: Set up sbt
+        uses: sbt/setup-sbt@67d461eba2c4753196c230e02da850757ba4775e # v1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: client-extension/package-lock.json
+
+      - name: Install extension dependencies
+        run: npm ci --prefix client-extension
+
+      - name: Audit extension dependencies
+        run: npm audit --prefix client-extension --audit-level=high
+
+      - name: Check provider preset bundle
+        run: npm run presets:check:strict --prefix client-extension
+
+      - name: Check fixture privacy
+        run: npm run fixtures:privacy --prefix client-extension
+
+      - name: Check product version
+        run: node release/check-version.mjs
+
+      - name: Check fixed extension ID
+        run: node release/check-extension-id.mjs
+
+      - name: Check architecture
+        run: node client-extension/scripts/check-architecture.mjs
+
+      - name: Check deprecated paths
+        run: node release/check-deprecated-paths.mjs
+
+      - name: Check JavaScript syntax
+        run: find client-extension/scripts -name '*.mjs' -print0 | xargs -0 -n1 node --check
+
+      - name: Check shell syntax
+        run: find release server/scripts -name '*.sh' -print0 | xargs -0 -n1 bash -n
+
+      - name: Install ShellCheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck
+        run: |
+          shellcheck release/*.sh server/scripts/*.sh
+
+      - name: Validate GitHub Actions workflows
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: "1.24.5"
+
+      - name: Install pinned actionlint
+        run: |
+          go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.9
+          "$(go env GOPATH)/bin/actionlint" -color
+
+      - name: Run server tests
+        run: sbt -batch server/test
+
+      - name: Run extension tests
+        run: sbt -batch extension/test
+
+      - name: Link extension
+        run: sbt -batch extension/fastLinkJS
+
+      - name: Check linked JavaScript
+        run: node client-extension/scripts/check-linked-js.mjs
+
+      - name: Check formatting
+        run: sbt -batch scalafmtCheckAll
+
+      - name: Build extension
+        run: |
+          sbt -batch extension/fullLinkJS
+          npm run build --prefix client-extension
+
+      - name: Check provider pack exclusion
+        run: node client-extension/scripts/check-provider-pack-exclusion.mjs
+
+      - name: Upload extension build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ci-extension-dist
+          path: client-extension/dist
+          if-no-files-found: error
+          retention-days: 7
+
+  verify-windows-scripts:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+
+      - name: Analyze Windows scripts
+        shell: pwsh
+        run: |
+          Invoke-ScriptAnalyzer -Path release -Recurse -Severity Error -EnableExit
+          Invoke-ScriptAnalyzer -Path server/scripts -Recurse -Severity Error -EnableExit
+
+  verify-macos-scripts:
+    runs-on: macos-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Check macOS shell syntax
+        run: find release server/scripts -name '*.sh' -print0 | xargs -0 -n1 bash -n

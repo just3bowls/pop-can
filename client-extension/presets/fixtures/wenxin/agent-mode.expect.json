@@ -1,0 +1,14 @@
+{
+  "provider": "wenxin",
+  "dialect": "agent-mode",
+  "comment": "agent 端点：答案同样在 markdown-yiyan，但这轮出现“整段改写”（22→32→13 字完全不同的三段），appendContent 会把它们拼起来——目前只影响非 marker 的原生回答，记录在此备查。",
+  "expect": {
+    "handlers": [
+      "wenxinTaskModeAnswer"
+    ],
+    "contentContains": [
+      "更正一下"
+    ]
+  },
+  "sourceUrl": "https://chat.baidu.com/chat/api/agent/task_mode"
+}

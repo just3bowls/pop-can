@@ -1,0 +1,15 @@
+{
+  "provider": "wenxin",
+  "dialect": "classic-mode",
+  "comment": "经典端点：组件名从 markdown-yiyin 改成 markdown-yiyan（这次就是它让正文变 0 的）；value 是纯增量。",
+  "expect": {
+    "handlers": [
+      "wenxinConversationAnswer"
+    ],
+    "contentContains": "100 + 100 = 20",
+    "mustNotContain": [
+      "@@END:response@@"
+    ]
+  },
+  "sourceUrl": "https://chat.baidu.com/aichat/api/conversation"
+}

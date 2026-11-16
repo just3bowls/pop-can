@@ -1,0 +1,12 @@
+{
+  "provider": "longcat",
+  "dialect": "agent-preview",
+  "comment": "实测一轮（模型 LongCat-2.5-Preview-Agent）：event.type = create/content/finish，答案走 $.event.content；think 帧被规则忽略。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "answerDelta"
+    ],
+    "finishReason": "stop"
+  }
+}

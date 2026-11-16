@@ -1,0 +1,21 @@
+{
+  "provider": "yuanbao",
+  "dialect": "search-with-text",
+  "comment": "DeepSeek 快速档实测：speech_type 是**一串**（status → search_with_text → text → hint_v2_tip），答案仍是经典 text/msg（699 帧）。这条 fixture 就是 2026-10-14 那次\"插件页没记这轮\"的现场：当时用 mode 取第一个非 status 的标签锁成 search_with_text，handler 全被跳过、正文 0。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "answerDelta"
+    ],
+    "finishReason": "stop",
+    "mustNotContain": [
+      "正在搜索资料",
+      "[citation:",
+      "[](@"
+    ],
+    "streamedMustNotContain": [
+      "[citation:",
+      "[](@"
+    ]
+  }
+}

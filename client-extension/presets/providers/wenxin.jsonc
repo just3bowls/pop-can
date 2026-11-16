@@ -1,0 +1,247 @@
+{
+  // Wenxin 有两种聊天端点：经典 /aichat/api/conversation 与 agent /chat/api/agent/task_mode；不同模式的答案组件和增量语义不同，规则按 URL 明确分派。
+  "schemaVersion": 2,
+  "name": "wenxin",
+  "page": {
+    // Wenxin 使用 textarea 作为输入框，New Chat 在页面导航；fingerprints 用于定位编辑器和新建对话入口。
+    "url": "https://wenxin.baidu.com/?enter_type=wenxin_logo",
+    "selectors": {
+      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][4]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='textarea'][1]",
+      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='span'][1]"
+    },
+    "fingerprints": {
+      "input": {
+        "ancestorClasses": [
+          "ci-file-input-wrapper",
+          "ci-container"
+        ],
+        "ancestorTexts": [
+          "快速 👈 复杂问题文心助手回答更优"
+        ],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1788612759178,
+        "classes": [
+          "ci-textarea",
+          "ci-scroll-style"
+        ],
+        "clickable": false,
+        "dataTestId": "",
+        "docX": 845.2000122070312,
+        "docY": 239.58750915527344,
+        "editable": true,
+        "height": 56,
+        "id": "chat-textarea",
+        "innerHeight": 694,
+        "innerWidth": 1490,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "",
+        "parentClasses": [],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "帮我生成PPT，主题为民权运动的历史和重要性",
+        "role": "input",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [],
+        "tag": "textarea",
+        "text": "",
+        "width": 794.4000244140625,
+        "x": 845.2000122070312,
+        "y": 239.58750915527344
+      },
+      "new-chat": {
+        "ancestorClasses": [
+          "new-dialog-container-button",
+          "new-dialog-container-button-sample",
+          "new-dialog-container",
+          "_chat-aside-header-new-dialog_134i6_38",
+          "_btn-box_134i6_104"
+        ],
+        "ancestorTexts": [
+          "开启新对话",
+          "开启新对话",
+          "开启新对话"
+        ],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1788612756716,
+        "classes": [
+          "cos-line-clamp-1",
+          "new-dialog-container-text"
+        ],
+        "clickable": false,
+        "dataTestId": "",
+        "docX": 77.70000076293945,
+        "docY": 81,
+        "editable": false,
+        "height": 20,
+        "id": "",
+        "innerHeight": 740,
+        "innerWidth": 1490,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "",
+        "parentClasses": [
+          "new-dialog-container-button",
+          "new-dialog-container-button-sample"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "",
+        "role": "new-chat",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [],
+        "tag": "span",
+        "text": "开启新对话",
+        "width": 70,
+        "x": 77.70000076293945,
+        "y": 81
+      }
+    }
+  },
+  "network": {
+    // 监听经典 conversation 与 agent task_mode 两条端点；经典端还要接受 Search Lightning 的 officeWriting 正文形状。
+    "apiPatterns": [
+      "https://chat.baidu.com/aichat/api/conversation",
+      "https://chat.baidu.com/chat/api/agent/task_mode"
+    ],
+    "followUpPatterns": [],
+    "followUpIdentityPath": ""
+  },
+  "attachment": {
+    // file 模式通过 paste 把 .txt 交给编辑器，因为页面没有稳定的文件 input。
+    "strategy": "paste",
+    "selector": "#chat-textarea"
+  },
+  "parserRule": {
+    // Wenxin (百度文心助手) 有多条聊天端点，每个模式的答案组件不同：经典端点 /aichat/api/conversation 既会返回 `markdown-yiyin|yan`，也会在 Search Lightning 模式切到 `officeWriting.data.content`；新的 agent 端点 /chat/api/agent/task_mode 用 `markdown-yiyan`（另有 `agentProcess` 流承载 agent 的推理过程，目前不映射）。handler 用 `match.urlRegex` 按传输作用域，每个模式的形状显式可读，而不是用正则并集去猜。请求体带完整性校验字段，所以规则同时声明 `request.derive`。
+    "schemaVersion": 2,
+    "confidence": "high",
+    "missingInfo": [],
+    "memory": {},
+    "handlers": [
+      {
+        // Agent 端点（/chat/api/agent/task_mode）：答案是 `markdown-yiyan` generator 的 `data.value` 严格增量帧（实测 19 帧拼出完整 marker 块）。必须用 appendContent：增量里会出现合法重复片段（例如 `\n@@END:`），appendDelta 的「已包含就跳过」会误删 7 个字符。
+        "id": "wenxinTaskModeAnswer",
+        "match": {
+          // 限定 agent task_mode 端点，用 component=markdown-yiyan 识别最终答案，排除 agentProcess 推理流。
+          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+          "jsonGroup": 1,
+          "urlRegex": "chat\\.baidu\\.com/chat/api/agent/task_mode",
+          "path": "$.data.message.content.generator.component",
+          "regex": "^markdown-yiyan$"
+        },
+        "actions": [
+          {
+            // 严格增量，原样追加（不能用 appendDelta：合法重复片段会被当成重复帧丢掉）。
+            "op": "appendContent",
+            "path": "$.data.message.content.generator.data.value"
+          }
+        ]
+      },
+      {
+        // Agent 端点收尾：流里出现 `generate-complete`（endTurn=true）表示回答完成；显式声明完成，让规则而不是 socket 关闭来判定这一轮结束。
+        "id": "wenxinTaskModeDone",
+        "match": {
+          // 限定 agent task_mode 端点，用 metaData.state=generate-complete 判定本轮完成。
+          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+          "jsonGroup": 1,
+          "urlRegex": "chat\\.baidu\\.com/chat/api/agent/task_mode",
+          "path": "$.data.message.metaData.state",
+          "regex": "^generate-complete$"
+        },
+        "actions": [
+          {
+            // 将本轮标记为正常结束。
+            "op": "setFinishReason",
+            "value": "stop"
+          }
+        ]
+      },
+      {
+        // 经典端点：组件 `markdown-yiy(an|in)` 的 `data.value` 逐片追加（实测 `100 + ` + `100 =` + ` ` + `20`）。
+        "id": "wenxinConversationAnswer",
+        "match": {
+          // 经典端点 `/aichat/api/conversation` 现在也发 `markdown-yiyan`（旧捕获是 `markdown-yiyin`），所以按 `markdown-yiy(an|in)` 收；实测该端点的 value 是纯增量，用 appendContent。
+          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+          "jsonGroup": 1,
+          "urlRegex": "chat\\.baidu\\.com/aichat/api/conversation",
+          "path": "$.data.message.content.generator.component",
+          "regex": "^markdown-yiy(an|in)$"
+        },
+        "actions": [
+          {
+            // 增量语义（不是快照），appendContent；用 appendDelta 会把 `\n\n` 这类合法重复增量当重复帧丢掉。
+            "op": "appendContent",
+            "path": "$.data.message.content.generator.data.value"
+          }
+        ]
+      },
+      {
+        // Search Lightning 模式把正文放在 `officeWriting.data.content`，实测 175 个小增量拼出完整 marker（包括 `@@BEG:response@@` 也被拆成多个片段）。这段两套端点都可能出现，因此按组件形状统一接收。
+        "id": "wenxinOfficeWritingAnswer",
+        "match": {
+          // 两套端点都可能进入 Search Lightning，因此按 component=officeWriting 统一识别正文。
+          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+          "jsonGroup": 1,
+          "urlRegex": "chat\\.baidu\\.com/(?:aichat/api/conversation|chat/api/agent/task_mode)",
+          "path": "$.data.message.content.generator.component",
+          "regex": "^officeWriting$"
+        },
+        "actions": [
+          {
+            // 严格增量；marker 本身会被拆成 `@@`、`B`、`EG` 等片段，必须原样拼接。
+            "op": "appendContent",
+            "path": "$.data.message.content.generator.data.content"
+          }
+        ]
+      },
+      {
+        // 经典端点也会以 generate-complete + endTurn=true 收尾；显式设置 finishReason，避免 Search Lightning 等模式白等流关闭。
+        "id": "wenxinConversationDone",
+        "match": {
+          // 限定经典 conversation 端点，用 metaData.state=generate-complete 判定本轮完成。
+          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+          "jsonGroup": 1,
+          "urlRegex": "chat\\.baidu\\.com/aichat/api/conversation",
+          "path": "$.data.message.metaData.state",
+          "regex": "^generate-complete$"
+        },
+        "actions": [
+          {
+            // 将本轮标记为正常结束。
+            "op": "setFinishReason",
+            "value": "stop"
+          }
+        ]
+      }
+    ],
+    "final": [],
+    "request": {
+      // 以上路径对应经典端点 /aichat/api/conversation 的请求体形状；新 agent 端点 /chat/api/agent/task_mode 的 body 形状不同（message.inputMethod/content/searchInfo…），inline 模式（请求体改写）需要先对新端点请求体采样再补路径——file/typed 模式不受影响。
+      "userText": "$.message.query[?(@.type=='TEXT')][0].data.text.query",
+      "derive": [
+        {
+          // `chat_token` is `base64(...|md5(prompt)|...)` — slot 1 must be recomputed for the rewritten prompt.
+          "path": "$.message.searchInfo.chatParams.chat_token",
+          "op": "refreshMd5Slot",
+          "slot": 1
+        },
+        {
+          // `X-Chat-Message` carries `k:v,k:v` params; the `query` param holds (a prefix of) the prompt and must follow it.
+          "header": "X-Chat-Message",
+          "op": "refreshHeaderParam",
+          "param": "query",
+          "slice": 500,
+          "pairSep": ",",
+          "kvSep": ":"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,78 @@
+data: {"type":"text"}
+
+event: speech_type
+data: status
+
+event: speech_type
+data: deep_search_agent
+
+data: {"type":"agentCapabilities","capabilities":{"interruptHint":{"supported":false,"agentTaskId":"task-4059a84dba260dbe3833a1e5336dc1a6","icon":null},"directGenerateV2":{"supported":true,"agentTaskId":"task-4059a84dba260dbe3833a1e5336dc1a6","icon":{"iconId":"icon_flash"}}}}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"think","text":"The","status":0,"title":"正在思考","groupId":"db7h16e7u6bdrl78breg","cat":"think"}],"groups":[{"groupId":"db7h16e7u6bdrl78breg","title":"正在处理"}],"expConfig":{"schemaVersion":"1"}}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"think","text":" user","status":0,"title":"正在思考","groupId":"db7h16e7u6bdrl78breg","cat":"think"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"think","text":" is asking a","status":0,"title":"正在思考","groupId":"db7h16e7u6bdrl78breg","cat":"think"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"think","text":" simple arithmetic:","status":0,"title":"正在思考","groupId":"db7h16e7u6bdrl78breg","cat":"think"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"think","text":" 1+4","status":0,"title":"正在思考","groupId":"db7h16e7u6bdrl78breg","cat":"think"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"think","text":" = 5.","status":0,"title":"正在思考","groupId":"db7h16e7u6bdrl78breg","cat":"think"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"think","text":" No","status":0,"title":"正在思考","groupId":"db7h16e7u6bdrl78breg","cat":"think"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"think","text":" tool needed. Respond","status":0,"title":"正在思考","groupId":"db7h16e7u6bdrl78breg","cat":"think"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"think","text":" with marker","status":0,"title":"正在思考","groupId":"db7h16e7u6bdrl78breg","cat":"think"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"think","text":" protocol.","status":0,"title":"正在思考","groupId":"db7h16e7u6bdrl78breg","cat":"think"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"2","type":"think","status":2,"title":"已完成思考","groupId":"db7h16e7u6bdrl78breg","cat":"think"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":null,"groups":[{"groupId":"db7h16e7u6bdrl78breg","title":"已思考1次"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":"@@","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":"BEG:response","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":"@@\n@@B","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":"EG:reasoning","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":"_content@@\nSimple","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":" arithmetic: 1","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":"+4 = ","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":"5.\n@@","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":"END:reasoning","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":"_content@@\n@@","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":"BEG:content","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":"@@\n5\n","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":"@@END:content","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":"@@\n@@END","status":0,"title":"正在处理"}]}
+
+data: {"type":"deepSearchAgent","title":"","icon":null,"contents":[{"cmpid":"3","type":"text","text":":response@@","status":0,"title":"正在处理"}]}
+
+data: {"type":"tips","status":0,"internetFlag":0,"targetFunctionId":"autoInternetSearch"}
+
+data: {"type":"deepSearchAgent","title":"已处理","icon":null,"contents":null,"finished":true}
+
+data: [plugin: ]
+
+data: [MSGINDEX:8]
+
+data: {"type":"meta","messageId":"fixture-messageid","index":8,"replyId":"fixture-replyid","replyIndex":7,"traceId":"0123456789abcdef0123456789abcdef","guideId":0,"ic":0,"unSupportRepeat":false,"pluginID":"OneAgent","stopReason":"stop","endConv":false,"requireLogin":false,"requireLoginType":0,"loginTips":"","tipsType":0,"modelErrorCode":0,"modelErrorMsg":"","speechIndex":1,"tokenUsageInfo":{"promptTokens":9628,"completionTokens":82,"totalTokens":9710},"userId":"fixture-user","outputCheck":false,"chainID":"WorkingAgentDirect","sensitiveType":0,"aiSearchSource":"","performance":{"dataIndex":{"SearchStart":-1,"SearchEnd":-1,"ThinkingStart":3,"ThinkingEnd":15,"FirstWord":16},"timePoint":{"TpSearchStart":0,"TpSearchEnd":0,"TpThinkingStart":709,"TpThinkingEnd":2196,"TpFirstWord":2206}},"oneAgentId":"main_agent_with_agent_mode","deepOpsErrorInfo":"{\"code\":0}","isCharacter":false}
+
+data: [TRACEID:0123456789abcdef0123456789abcdef]
+
+data: [DONE]
+

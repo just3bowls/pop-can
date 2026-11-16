@@ -1,0 +1,12 @@
+{
+  "provider": "deepseek",
+  "dialect": "thinking",
+  "comment": "深度思考档：fragments[0].type=THINK，答案片段仍是 RESPONSE；正文里不得出现页面思考。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "responseStart",
+      "directAppend"
+    ]
+  }
+}

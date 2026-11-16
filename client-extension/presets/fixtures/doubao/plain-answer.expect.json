@@ -1,0 +1,14 @@
+{
+  "provider": "doubao",
+  "dialect": "plain-answer",
+  "comment": "普通档（无思考块）：STREAM_MSG_NOTIFY + STREAM_CHUNK + CHUNK_DELTA；答案块 block_type=10000 且没有 parent_id。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "answerNotifyDelta",
+      "answerPatchDelta",
+      "chunkDelta"
+    ],
+    "finishReason": "stop"
+  }
+}

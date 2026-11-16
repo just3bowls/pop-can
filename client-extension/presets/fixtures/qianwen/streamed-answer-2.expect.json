@@ -1,0 +1,12 @@
+{
+  "provider": "qianwen",
+  "dialect": "streamed-answer-2",
+  "comment": "流式（第二种事件排布）：同上，答案载体不变。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "qianwenAnswerText"
+    ],
+    "finishReason": "stop"
+  }
+}

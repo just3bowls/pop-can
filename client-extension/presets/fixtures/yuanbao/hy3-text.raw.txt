@@ -1,0 +1,74 @@
+event: speech_type
+data: status
+
+event: speech_type
+data: text
+
+data: {"type":"text","msg":"@@"}
+
+data: {"type":"text","msg":"BEG"}
+
+data: {"type":"text","msg":":response"}
+
+data: {"type":"text","msg":"@@\n"}
+
+data: {"type":"text","msg":"@@B"}
+
+data: {"type":"text","msg":"EG:"}
+
+data: {"type":"text","msg":"reasoning"}
+
+data: {"type":"text","msg":"_content@@"}
+
+data: {"type":"text","msg":"\nSimple"}
+
+data: {"type":"text","msg":" arithmetic:"}
+
+data: {"type":"text","msg":" 1"}
+
+data: {"type":"text","msg":"+2"}
+
+data: {"type":"text","msg":" ="}
+
+data: {"type":"text","msg":" 3"}
+
+data: {"type":"text","msg":".\n@@"}
+
+data: {"type":"text","msg":"END:"}
+
+data: {"type":"text","msg":"reasoning"}
+
+data: {"type":"text","msg":"_content@@"}
+
+data: {"type":"text","msg":"\n@@"}
+
+data: {"type":"text","msg":"BEG"}
+
+data: {"type":"text","msg":":content"}
+
+data: {"type":"text","msg":"@@\n"}
+
+data: {"type":"text","msg":"3\n"}
+
+data: {"type":"text","msg":"@@END"}
+
+data: {"type":"text","msg":":content"}
+
+data: {"type":"text","msg":"@@\n"}
+
+data: {"type":"text","msg":"@@END"}
+
+data: {"type":"text","msg":":response"}
+
+data: {"type":"text","msg":"@@"}
+
+data: [plugin: ]
+
+data: [MSGINDEX:4]
+
+data: {"type":"meta","messageId":"fixture-messageid","index":4,"replyId":"fixture-replyid","replyIndex":3,"traceId":"0123456789abcdef0123456789abcdef","guideId":0,"ic":0,"unSupportRepeat":false,"pluginID":"OneAgent","stopReason":"stop","endConv":false,"requireLogin":false,"requireLoginType":0,"loginTips":"","tipsType":0,"modelErrorCode":0,"modelErrorMsg":"","speechIndex":1,"tokenUsageInfo":{"promptTokens":1942,"completionTokens":57,"totalTokens":1999},"userId":"fixture-user","outputCheck":false,"chainID":"DeepSearch","sensitiveType":0,"aiSearchSource":"","performance":{"dataIndex":{"SearchStart":-1,"SearchEnd":-1,"ThinkingStart":-1,"ThinkingEnd":-1,"FirstWord":3},"timePoint":{"TpSearchStart":0,"TpSearchEnd":0,"TpThinkingStart":0,"TpThinkingEnd":0,"TpFirstWord":1163}},"oneAgentId":"edu_agent_thinking","deepOpsErrorInfo":"{\"code\":0}","isCharacter":false}
+
+data: [TRACEID:0123456789abcdef0123456789abcdef]
+
+data: [DONE]
+

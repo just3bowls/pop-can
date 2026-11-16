@@ -1,0 +1,16 @@
+{
+  "provider": "deepseek",
+  "dialect": "response-fragments-no-op",
+  "comment": "Current DeepSeek builds may omit o=APPEND on the response/fragments start frame.",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "responseStart",
+      "directAppend"
+    ],
+    "streamedContains": "Hello from DeepSeek",
+    "mustNotContain": [
+      "hidden reasoning"
+    ]
+  }
+}

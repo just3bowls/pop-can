@@ -1,0 +1,249 @@
+event: speech_type
+data: status
+
+event: speech_type
+data: deep_search
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"We"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" need"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" to respond using"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" the specified"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" marker protocol."}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" The user asked"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" \"1+"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"1\". No"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" tools"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" are provided"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" in the request"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" ("}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"no tools"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" array)."}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" So we"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" should provide"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" a final answer"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" with reasoning"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" and"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" content. No"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" tool"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" calls. The"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" reasoning"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" can"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" be simple"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"."}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" The content"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" is the"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" answer:"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" 2.\n\n"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"We must"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" follow the protocol"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" exactly:"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" wrap in"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" @@B"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"EG:response"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"@@ ..."}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" @@END:"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"response@@,"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" include @@"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"BEG:"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"reasoning_content"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"@@ ... @@"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"END:"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"reasoning_content"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"@@ with"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" some"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" reasoning summary,"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" then"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" @@BEG"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":":content@@"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" ... @@END"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":":content@@"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" with the answer"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":". No"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" extra"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" text outside"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":".\n\nAlso"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" note the"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" instruction: \""}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"Use your own"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" abilities to answer"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":", but keep"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" your own product"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" identity and built"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"-in tools out"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" of the response"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":".\" That"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"'s"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" fine;"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" we just answer"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" the"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" math question"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":".\n\nSo"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" final response"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":":\n\n"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"@@BEG"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":":response@@"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"\n@@B"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"EG:reason"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"ing_content@@"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"\nSimple arithmetic"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":": 1"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"+1 equals"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":" 2.\n"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"@@END:"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"reasoning_content"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"@@\n@@"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"BEG:"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"content@@\n"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"2\n@@"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"END:"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"content@@\n"}]}
+
+data: {"type":"deepSearch","title":"思考中","iconType":9,"contents":[{"type":"text","componentId":"0","msg":"@@END:"}]}
+
+data: {"type":"deepSearch","title":"已深度思考(用时2秒)","iconType":7,"contents":null}
+
+event: speech_type
+data: text
+
+data: {"type":"text","msg":"@@BEG"}
+
+data: {"type":"text","msg":":response@@"}
+
+data: {"type":"text","msg":"\n@@B"}
+
+data: {"type":"text","msg":"EG:reason"}
+
+data: {"type":"text","msg":"ing_content@@"}
+
+data: {"type":"text","msg":"\nSimple arithmetic"}
+
+data: {"type":"text","msg":": 1"}
+
+data: {"type":"text","msg":"+1 equals"}
+
+data: {"type":"text","msg":" 2.\n"}
+
+data: {"type":"text","msg":"@@END:"}
+
+data: {"type":"text","msg":"reasoning_content"}
+
+data: {"type":"text","msg":"@@\n"}
+
+data: {"type":"text","msg":"@@BEG"}
+
+data: {"type":"text","msg":":content@@"}
+
+data: {"type":"text","msg":"\n2\n"}
+
+data: {"type":"text","msg":"@@END"}
+
+data: {"type":"text","msg":":content@@"}
+
+data: {"type":"text","msg":"\n@@END"}
+
+data: {"type":"text","msg":":response@@"}
+
+data: {"type":"tips","status":0,"internetFlag":0,"targetFunctionId":"autoInternetSearch"}
+
+data: [plugin: ]
+
+data: [MSGINDEX:2]
+
+data: {"type":"meta","messageId":"fixture-messageid","index":2,"replyId":"fixture-replyid","replyIndex":1,"traceId":"0123456789abcdef0123456789abcdef","guideId":0,"ic":0,"unSupportRepeat":false,"pluginID":"OneAgent","stopReason":"stop","endConv":false,"requireLogin":false,"requireLoginType":0,"loginTips":"","tipsType":0,"modelErrorCode":0,"modelErrorMsg":"","speechIndex":1,"tokenUsageInfo":{"promptTokens":1143,"completionTokens":282,"totalTokens":1425},"userId":"fixture-user","outputCheck":false,"chainID":"DeepSeekR1","sensitiveType":0,"aiSearchSource":"","performance":{"dataIndex":{"SearchStart":-1,"SearchEnd":-1,"ThinkingStart":3,"ThinkingEnd":97,"FirstWord":99},"timePoint":{"TpSearchStart":0,"TpSearchEnd":0,"TpThinkingStart":974,"TpThinkingEnd":2700,"TpFirstWord":2720}},"oneAgentId":"main_agent_deepseek_thinking","deepOpsErrorInfo":"{\"code\":0}","isCharacter":false}
+
+data: [TRACEID:0123456789abcdef0123456789abcdef]
+
+data: [DONE]
+

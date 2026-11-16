@@ -1,0 +1,24 @@
+id:fixture
+event:message
+data:{"messageType":"assistant","reasoningContent":"page-side thinking must not leak"}
+
+id:fixture
+event:message
+data:{"messageType":"assistant","content":"@@BEG:response@@\n@@BEG:reasoning_content@@\nmodel reasoning\n"}
+
+id:fixture
+event:message
+data:{"messageType":"assistant","content":"@@END:reasoning_content@@\n\n@@BEG:content@@\nReact chat answer.\n"}
+
+id:fixture
+event:message
+data:{"messageType":"assistant","content":"@@END:content@@\n@@END:response@@"}
+
+id:fixture
+event:usage
+data:{"promptTokens":10,"completionTokens":20,"totalTokens":30}
+
+id:fixture
+event:finish
+data:{"content":"[DONE]"}
+

@@ -1,0 +1,237 @@
+{
+  // Qianwen 国内版有两类答案传输：/api/v2/chat SSE 增量快照，以及异步卡片时 /api/v1/chat/snap 轮询快照；规则用 eventsPath 同时覆盖两种形状。
+  "schemaVersion": 2,
+  "name": "qianwen",
+  "page": {
+    // Qianwen 使用 Slate/contenteditable 编辑器，New Chat 在侧栏；fingerprints 用于稳定定位该富文本输入区。
+    "url": "https://www.qianwen.com/",
+    "selectors": {
+      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]",
+      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='aside'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='span'][2]"
+    },
+    "fingerprints": {
+      "input": {
+        "ancestorClasses": [
+          "relative",
+          "w-full",
+          "flex",
+          "shrink-0",
+          "flex-col",
+          "overflow-hidden",
+          "relative",
+          "flex",
+          "flex-col",
+          "transition-[height,max-height,margin]",
+          "duration-300",
+          "ease-out",
+          "overflow-clip"
+        ],
+        "ancestorTexts": [],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1791685802297,
+        "classes": [
+          "relative",
+          "min-h-[24px]",
+          "w-full",
+          "whitespace-pre-wrap",
+          "break-words",
+          "text-left",
+          "[&::-webkit-scrollbar]:hidden",
+          "selection:bg-transparent",
+          "[&_*]:selection:bg-transparent",
+          "border-none",
+          "bg-transparent",
+          "text-16",
+          "leading-[26px]",
+          "text-primary",
+          "outline-none",
+          "placeholder:text-disabled",
+          "px-2"
+        ],
+        "clickable": false,
+        "dataTestId": "",
+        "docX": 773.7875061035156,
+        "docY": 341.0999946594238,
+        "editable": true,
+        "height": 49.400001525878906,
+        "id": "",
+        "innerHeight": 711,
+        "innerWidth": 1298,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "",
+        "parentClasses": [
+          "relative",
+          "w-full"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "",
+        "role": "input",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [],
+        "tag": "div",
+        "text": "",
+        "width": 734.4000244140625,
+        "x": 773.7875061035156,
+        "y": 341.0999946594238
+      },
+      "new-chat": {
+        "ancestorClasses": [
+          "flex",
+          "h-full",
+          "min-w-0",
+          "flex-1",
+          "items-center",
+          "gap-1.5",
+          "rounded-8",
+          "px-3",
+          "text-sm",
+          "text-primary",
+          "!transition-colors",
+          "!duration-300",
+          "hover:bg-option",
+          "cursor-pointer",
+          "flex",
+          "h-full",
+          "gap-0.5",
+          "h-9",
+          "px-3"
+        ],
+        "ancestorTexts": [
+          "新对话",
+          "新对话",
+          "新对话"
+        ],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1791685800504,
+        "classes": [
+          "truncate",
+          "font-400"
+        ],
+        "clickable": false,
+        "dataTestId": "",
+        "docX": 67,
+        "docY": 134,
+        "editable": false,
+        "height": 20,
+        "id": "",
+        "innerHeight": 711,
+        "innerWidth": 1298,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "",
+        "parentClasses": [
+          "flex",
+          "h-full",
+          "min-w-0",
+          "flex-1",
+          "items-center",
+          "gap-1.5",
+          "rounded-8",
+          "px-3",
+          "text-sm",
+          "text-primary",
+          "!transition-colors",
+          "!duration-300",
+          "hover:bg-option",
+          "cursor-pointer"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "",
+        "role": "new-chat",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [],
+        "tag": "span",
+        "text": "新对话",
+        "width": 42,
+        "x": 67,
+        "y": 134
+      }
+    }
+  },
+  "network": {
+    // 主响应监听 /api/v2/chat，异步卡片通过 follow-up 端点 /api/v1/chat/snap 补齐；进度条、推荐卡和意图信号都不是正文。
+    "apiPatterns": [
+      "https://chat2.qianwen.com/api/v2/chat"
+    ],
+    "followUpPatterns": [
+      "/api/v1/chat/snap"
+    ],
+    "followUpIdentityPath": "$.req_id"
+  },
+  "attachment": {
+    // file 模式使用 paste 向 contenteditable 注入 .txt，因为页面没有稳定的可写 file input。
+    "strategy": "paste",
+    "selector": "div[contenteditable=\"true\"]"
+  },
+  "parserRule": {
+    // qianwen (domestic, chat2.qianwen.com): the answer always arrives as `multi_load/iframe` messages, but over two transports — the streaming `/api/v2/chat` SSE (one message per `data:` frame, content is a cumulative snapshot) and, when the server switches the turn to an async card, the `/api/v1/chat/snap` snapshot polls (all messages inside one `data.messages[]` array; the complete answer lands in the snapshot whose `is_async_card` finally flips to 0). `eventsPath` fans the message array out so one handler set covers both shapes. Progress bars / follow-up cards / intent signals carry no answer text.
+    "schemaVersion": 2,
+    "confidence": "high",
+    "missingInfo": [],
+    "memory": {},
+    "handlers": [
+      {
+        // Answer text: only `multi_load/iframe` messages carry it; `bar/workflow` is the progress bar, `paa/iframe` / `survey/card` are follow-up cards, `signal/post` is the intent signal.
+        "id": "qianwenAnswerText",
+        "match": {
+          // 展开 messages[] 后只选 mime_type=multi_load/iframe 的答案消息，跳过进度条、推荐卡和意图信号。
+          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+          "jsonGroup": 1,
+          "eventsPath": "$.data.messages[*]",
+          "path": "$.mime_type",
+          "regex": "^multi_load/iframe$"
+        },
+        "actions": [
+          {
+            // appendDelta: content is a cumulative snapshot (SSE: each frame repeats everything so far; snapshot: the final array holds the whole answer), so only the new tail is appended.
+            "op": "appendDelta",
+            "path": "$.content"
+          }
+        ]
+      },
+      {
+        // The same message with status=complete: the answer is finished (later frames are only cards), so mark the turn done. On the async-card path this is what closes the follow-up window as soon as the final snapshot lands.
+        "id": "qianwenAnswerDone",
+        "match": {
+          // 在答案消息中再匹配 status=complete，只有终态消息才结束本轮。
+          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+          "jsonGroup": 1,
+          "eventsPath": "$.data.messages[*]",
+          "path": "$.mime_type",
+          "regex": "^multi_load/iframe$",
+          "allOf": [
+            {
+              // Only the terminal message.
+              "path": "$.status",
+              "regex": "^complete$"
+            }
+          ]
+        },
+        "actions": [
+          {
+            // Marks the rule complete; the engine uses it to stop following the follow-up sources.
+            "op": "setFinishReason",
+            "value": "stop"
+          }
+        ]
+      }
+    ],
+    "final": [],
+    "request": {
+      // Request body: {"req_id":..,"messages":[{"mime_type":"text/plain","content":"...","meta_data":{"ori_query":"..."}}]}. Both paths hold the user's prompt; rewriting the body keeps them consistent.
+      "userText": [
+        "$.messages[-1].content",
+        "$.messages[-1].meta_data.ori_query"
+      ]
+    }
+  }
+}

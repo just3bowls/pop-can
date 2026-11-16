@@ -1,0 +1,12 @@
+{
+  "provider": "qianwen",
+  "dialect": "streamed-answer",
+  "comment": "流式：event: message + signal/post + bar/progress 卡片，答案在 mime_type=multi_load/iframe。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "qianwenAnswerText"
+    ],
+    "finishReason": "stop"
+  }
+}

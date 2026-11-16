@@ -1,0 +1,6 @@
+{
+  "url": "https://www.kimi.com/apiv2/kimi.gateway.chat.v1.ChatService/Chat",
+  "bodyBase64": "AAAAAal7InNjZW5hcmlvIjoiU0NFTkFSSU9fQ0hBVCIsInRvb2xzIjpbeyJ0eXBlIjoiVE9PTF9UWVBFX1NFQVJDSCIsInNlYXJjaCI6e319LHsidHlwZSI6IlRPT0xfVFlQRV9DUk9OX0pPQiJ9XSwibWVzc2FnZSI6eyJyb2xlIjoidXNlciIsImJsb2NrcyI6W3sibWVzc2FnZV9pZCI6IjxyZWRhY3RlZD4iLCJ0ZXh0Ijp7ImNvbnRlbnQiOiJQb3AgQ2FuIHJ1bGUgZml4dHVyZSBjaGVjay4gUmVwbHkgd2l0aCBleGFjdGx5OiBmaXh0dXJlLW9rIn19XSwic2NlbmFyaW8iOiJTQ0VOQVJJT19DSEFUIiwiaXNfZ29hbCI6ZmFsc2V9LCJvcHRpb25zIjp7InRoaW5raW5nIjp0cnVlLCJlbmFibGVfcGx1Z2luIjp0cnVlLCJyZWFzb25pbmdfZWZmb3J0IjoiUkVBU09OSU5HX0VGRk9SVF9MT1ciLCJtb2RlbCI6ImsyOC1pbnN0YW50In0sInByb2plY3RfaWQiOiIifQ==",
+  "expectedUserText": "Pop Can rule fixture check. Reply with exactly: fixture-ok",
+  "notes": "Captured through the official INPUT_PROMPT path. Sensitive identifier fields and non-JSON gRPC frames were removed."
+}

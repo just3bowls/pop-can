@@ -1,0 +1,6 @@
+data: {"v":{"response":{"fragments":[{"type":"THINK","content":"hidden reasoning"},{"type":"RESPONSE","content":"@@BEG:response@@\n@@BEG:reasoning_content@@\n"}]}}}
+
+data: {"v":"ok\n@@END:reasoning_content@@\n\n@@BEG:content@@\nHello\n"}
+
+data: {"v":"@@END:content@@\n@@END:response@@"}
+

@@ -1,0 +1,223 @@
+{
+  // GLM 网页 SSE：正文按增量输出，但 status=finish 帧会重复完整答案；规则用 appendDelta 吸收最终快照，并过滤页面渲染用的 turn/citation token。
+  "schemaVersion": 2,
+  "name": "gml",
+  "page": {
+    // 输入框是 composer textarea，附件入口暴露 input.el-upload__input，New Chat 在页面主区域；fingerprints 用于校准文本框与新建对话入口。
+    "url": "https://chatglm.cn/main/alltoolsdetail?t=1788611652123&lang=zh",
+    "selectors": {
+      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='section'][1]/*[local-name()='main'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][5]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='textarea'][1]",
+      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='section'][1]/*[local-name()='aside'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]"
+    },
+    "fingerprints": {
+      "input": {
+        "ancestorClasses": [
+          "input-box-inner",
+          "input-wrap",
+          "flex",
+          "flex-col",
+          "input-box",
+          "noTopBorder"
+        ],
+        "ancestorTexts": [
+          "和我聊聊天吧",
+          "和我聊聊天吧GLM-Flash极致新对话",
+          "和我聊聊天吧GLM-Flash极致新对话"
+        ],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1788611790947,
+        "classes": [
+          "scroll-display-none"
+        ],
+        "clickable": false,
+        "dataTestId": "",
+        "docX": 875.2000122070312,
+        "docY": 307.7749938964844,
+        "editable": true,
+        "height": 68,
+        "id": "",
+        "innerHeight": 694,
+        "innerWidth": 1490,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "和我聊聊天吧",
+        "parentClasses": [
+          "input-box-inner"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "",
+        "role": "input",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [
+          "和我聊聊天吧"
+        ],
+        "tag": "textarea",
+        "text": "",
+        "width": 774.4000244140625,
+        "x": 875.2000122070312,
+        "y": 307.7749938964844
+      },
+      "new-chat": {
+        "ancestorClasses": [
+          "new-session",
+          "flex",
+          "flex-x-start",
+          "flex-y-center",
+          "el-tooltip__trigger",
+          "el-tooltip__trigger",
+          "aside-subjects",
+          "el-aside",
+          "aside-container",
+          "scroll-display-none"
+        ],
+        "ancestorTexts": [
+          "新对话",
+          "新对话学习搭子AI画图AI阅读AI生视频AgentMore云知识库智能体最近对话获取下一步请求数据批量操作重命名删除对话解析JSON请求内容批量操作重命名删除对话读取下一步请求数据批量操作重命名删除对话",
+          "新对话学习搭子AI画图AI阅读AI生视频AgentMore云知识库智能体最近对话获取下一步请求数据批量操作重命名删除对话解析JSON请求内容批量操作重命名删除对话读取下一步请求数据批量操作重命名删除对话只喝三碗吖积分 7666.00全选已选"
+        ],
+        "anchorDeltaX": 0,
+        "anchorDeltaY": 0,
+        "ariaLabel": "",
+        "capturedAt": 1788611786801,
+        "classes": [
+          "text"
+        ],
+        "clickable": false,
+        "dataTestId": "",
+        "docX": 69.79999923706055,
+        "docY": 74,
+        "editable": false,
+        "height": 20,
+        "id": "",
+        "innerHeight": 740,
+        "innerWidth": 1490,
+        "name": "",
+        "nearInput": false,
+        "nearestText": "",
+        "parentClasses": [
+          "new-session",
+          "flex",
+          "flex-x-start",
+          "flex-y-center",
+          "el-tooltip__trigger",
+          "el-tooltip__trigger"
+        ],
+        "parentTag": "div",
+        "parentText": "",
+        "placeholder": "",
+        "role": "new-chat",
+        "scrollX": 0,
+        "scrollY": 0,
+        "siblingTexts": [],
+        "tag": "div",
+        "text": "新对话",
+        "width": 42,
+        "x": 69.79999923706055,
+        "y": 74
+      }
+    }
+  },
+  "network": {
+    // 监听 /chatglm/backend-api/assistant/stream；这一家的引用和回合 token 只在页面渲染层有含义，没有额外 follow-up 网络源。
+    "apiPatterns": [
+      "https://chatglm.cn/chatglm/backend-api/assistant/stream"
+    ],
+    "followUpPatterns": [],
+    "followUpIdentityPath": ""
+  },
+  "attachment": {
+    // file 模式直接使用 el-upload 的隐藏 input；固定 selector 比自动择优更稳定，避免误选其他上传组件。
+    "strategy": "input",
+    "selector": "input.el-upload__input"
+  },
+  "parserRule": {
+    // GLM web SSE. Text streams as deltas, but the `status=finish` frame repeats the whole answer as a snapshot — and the deltas can stop early (dropping the closing markers), so that snapshot is the safety net. Provider-native turn and citation tokens are stripped because they are page-rendered chips with no URL metadata in the stream.
+    "schemaVersion": 2,
+    "confidence": "medium",
+    "missingInfo": [],
+    "contentTransforms": [
+      {
+        // The page renders this turn token as a source chip and the stream carries no URL mapping.
+        "id": "dropTurnChip",
+        "regex": "【turn\\d+(?:search|news|image)\\d+】",
+        "replacement": "",
+        "settle": {
+          "candidatePrefix": "【turn"
+        }
+      },
+      {
+        // The page renders this citation token as a source chip and the stream carries no URL mapping.
+        "id": "dropCitationChip",
+        "regex": "【citation:\\d+】",
+        "replacement": "",
+        "settle": {
+          "candidatePrefix": "【citation:"
+        }
+      }
+    ],
+    "memory": {},
+    "handlers": [
+      {
+        // Normal streaming frames: a text part that is not the finish snapshot.
+        "id": "gmlTextChunk",
+        "match": {
+          // Fan out parts and select the text content part by type; `status=finish` is handled below.
+          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+          "jsonGroup": 1,
+          "eventsPath": "$.parts[*]",
+          "path": "$.content[?(@.type=='text')][0].type",
+          "regex": "^text$",
+          "allOf": [
+            {
+              // 非 finish 帧按增量追加；finish 快照留给后面的 handler 去重结算。
+              "path": "$.status",
+              "regex": "^(?!finish$)"
+            }
+          ]
+        },
+        "actions": [
+          {
+            // Append the raw delta; provider display chips are normalized by contentTransforms.
+            "op": "appendContent",
+            "path": "$.content[?(@.type=='text')][0].text"
+          }
+        ]
+      },
+      {
+        // The finish frame repeats the whole text; appending it verbatim would duplicate the answer.
+        "id": "gmlFinishSnapshot",
+        "match": {
+          // Only the `status=finish` frame.
+          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+          "jsonGroup": 1,
+          "eventsPath": "$.parts[*]",
+          "path": "$.content[?(@.type=='text')][0].type",
+          "regex": "^text$",
+          "allOf": [
+            {
+              // 只让 status=finish 的最终快照进入这条结算路径。
+              "path": "$.status",
+              "regex": "^finish$"
+            }
+          ]
+        },
+        "actions": [
+          {
+            // appendDelta keeps only the tail beyond collected raw content; contentTransforms is the single normalization layer.
+            "op": "appendDelta",
+            "path": "$.content[?(@.type=='text')][0].text"
+          }
+        ]
+      }
+    ],
+    "final": [],
+    "request": {
+      // inline 模式改写最后一条消息中 type=text 的文本 part；只替换用户正文，不改其他多模态 part。
+      "userText": "$.messages[-1].content[?(@.type=='text')][0].text"
+    }
+  }
+}

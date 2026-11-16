@@ -1,0 +1,2075 @@
+{
+  "schemaVersion": 2,
+  "bundleVersion": 22,
+  "generatedAt": "2026-11-13T23:02:17.041Z",
+  "providers": [
+    {
+      "id": "deepseek",
+      "schemaVersion": 2,
+      "name": "deepseek",
+      "page": {
+        "url": "https://chat.deepseek.com/",
+        "selectors": {
+          "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='textarea'][1]",
+          "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='span'][1]"
+        },
+        "fingerprints": {
+          "input": {
+            "ancestorClasses": [
+              "_24fad49",
+              "_020ab5b",
+              "_77cefa5",
+              "_9996a53",
+              "focused"
+            ],
+            "ancestorTexts": [
+              "深度思考智能搜索",
+              "深度思考智能搜索"
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1791666774414,
+            "classes": [
+              "_27c9245",
+              "ds-scroll-area",
+              "ds-scroll-area--show-on-focus-within",
+              "ds-scroll-area--enabled",
+              "d96f2d2a"
+            ],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 779.3000183105469,
+            "docY": 326.1000061035156,
+            "editable": true,
+            "height": 60,
+            "id": "",
+            "innerHeight": 711,
+            "innerWidth": 1298,
+            "name": "search",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [
+              "_24fad49"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "给 DeepSeek 发送消息 ",
+            "role": "input",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "textarea",
+            "text": "",
+            "width": 774.4000244140625,
+            "x": 779.3000183105469,
+            "y": 326.1000061035156
+          },
+          "new-chat": {
+            "ancestorClasses": [
+              "_5a8ac7a",
+              "a084f19e",
+              "dc1f7bee",
+              "_4bcc731",
+              "_7b40dad"
+            ],
+            "ancestorTexts": [
+              "开启新对话",
+              "开启新对话",
+              "开启新对话"
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1791666772517,
+            "classes": [],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 141.0999984741211,
+            "docY": 90.00000476837158,
+            "editable": false,
+            "height": 17.600000381469727,
+            "id": "",
+            "innerHeight": 711,
+            "innerWidth": 1298,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [
+              "_5a8ac7a",
+              "a084f19e"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "new-chat",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "span",
+            "text": "开启新对话",
+            "width": 70,
+            "x": 141.0999984741211,
+            "y": 90.00000476837158
+          }
+        }
+      },
+      "network": {
+        "apiPatterns": [
+          "https://chat.deepseek.com/api/v0/chat/completion"
+        ],
+        "followUpPatterns": [],
+        "followUpIdentityPath": ""
+      },
+      "attachment": {
+        "strategy": "input",
+        "selector": ""
+      },
+      "parserRule": {
+        "schemaVersion": 2,
+        "confidence": "high",
+        "missingInfo": [],
+        "memory": {},
+        "handlers": [
+          {
+            "id": "responseFragmentStart",
+            "match": {
+              "rawRegex": "data: (\\{\"v\":\\{\"response\":\\{.*?\"type\":\"RESPONSE\".*?\\}\\}\\})",
+              "jsonGroup": 1,
+              "eventsPath": "$.v.response.fragments[*]",
+              "path": "$.type",
+              "regex": "RESPONSE"
+            },
+            "actions": [
+              {
+                "op": "setMemory",
+                "key": "inResponse",
+                "value": "true"
+              },
+              {
+                "op": "appendContent",
+                "path": "$.content"
+              }
+            ]
+          },
+          {
+            "id": "responseStart",
+            "match": {
+              "rawRegex": "data: (\\{\"p\":\"response/fragments\"(?:,\"o\":\"[^\"]+\")?,\"v\":\\[.*\\]\\})",
+              "jsonGroup": 1,
+              "eventsPath": "$.v[*]",
+              "path": "$.type",
+              "regex": "RESPONSE"
+            },
+            "actions": [
+              {
+                "op": "setMemory",
+                "key": "inResponse",
+                "value": "true"
+              },
+              {
+                "op": "appendContent",
+                "path": "$.content"
+              }
+            ]
+          },
+          {
+            "id": "batchedResponseFragmentStart",
+            "match": {
+              "rawRegex": "data: (\\{\"p\":\"response\",\"o\":\"BATCH\",\"v\":\\[.*\\]\\})",
+              "jsonGroup": 1,
+              "eventsPath": "$.v[*].v[*]",
+              "path": "$.type",
+              "regex": "RESPONSE"
+            },
+            "actions": [
+              {
+                "op": "setMemory",
+                "key": "inResponse",
+                "value": "true"
+              },
+              {
+                "op": "appendContent",
+                "path": "$.content"
+              }
+            ]
+          },
+          {
+            "id": "contentAppend",
+            "match": {
+              "rawRegex": "data: (\\{\"p\":\"response/fragments/-1/content\".*\\})",
+              "jsonGroup": 1,
+              "path": "$.v",
+              "regex": "^(?!\\[reference:).*",
+              "memoryKey": "inResponse",
+              "memoryEquals": "true",
+              "allOf": [
+                {
+                  "path": "$.p",
+                  "regex": "^response/fragments/-1/content$"
+                }
+              ]
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.v"
+              }
+            ]
+          },
+          {
+            "id": "directAppend",
+            "match": {
+              "rawRegex": "data: (\\{\"v\":\".*\"\\})",
+              "jsonGroup": 1,
+              "path": "$.v",
+              "regex": "^(?!\\[reference:).*",
+              "memoryKey": "inResponse",
+              "memoryEquals": "true"
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.v"
+              }
+            ]
+          }
+        ],
+        "contentTransforms": [
+          {
+            "id": "dropCitationToken",
+            "regex": "\\[citation:[^\\]]+\\]",
+            "replacement": "",
+            "settle": {
+              "candidatePrefix": "[citation:"
+            }
+          }
+        ],
+        "final": [],
+        "request": {
+          "userText": "$.prompt"
+        }
+      }
+    },
+    {
+      "id": "doubao",
+      "schemaVersion": 2,
+      "name": "doubao",
+      "page": {
+        "url": "https://www.doubao.com/chat",
+        "selectors": {
+          "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='main'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]",
+          "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='nav'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][1]"
+        },
+        "fingerprints": {
+          "input": {
+            "ancestorClasses": [
+              "w-full",
+              "text-16",
+              "flex",
+              "min-h-24",
+              "w-full",
+              "items-stretch",
+              "flex-1",
+              "w-0",
+              "min-w-0",
+              "!border-none",
+              "!bg-transparent",
+              "max-h-[calc(var(--input-guidance-input-container-max-height)-var(--custom-area-height,0px)-36px-16px-14px-10px)]",
+              "container-ObLj2X",
+              "w-full"
+            ],
+            "ancestorTexts": [],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1790673710133,
+            "classes": [
+              "tiptap",
+              "ProseMirror",
+              "ProseMirror-focused"
+            ],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 788.8000183105469,
+            "docY": 623.2000122070312,
+            "editable": true,
+            "height": 24,
+            "id": "",
+            "innerHeight": 711,
+            "innerWidth": 1298,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [
+              "w-full",
+              "text-16"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "input",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "div",
+            "text": "",
+            "width": 945.6000366210938,
+            "x": 788.8000183105469,
+            "y": 623.2000122070312
+          },
+          "new-chat": {
+            "ancestorClasses": [
+              "select-none",
+              "contents",
+              "relative",
+              "p-12",
+              "sm:fixed",
+              "overflow-hidden",
+              "pointer-events-auto",
+              "w-sidebar-width",
+              "flex",
+              "shrink-0",
+              "flex-col",
+              "bg-dbx-bg-base-web",
+              "border-r",
+              "border-[0.5px]",
+              "border-s-color-border-tertiary/80",
+              "transition-[transform]",
+              "duration-[var(--transition-duration-slow)]",
+              "ease-[var(--ease-in-out)]",
+              "transform",
+              "transform",
+              "[&_:is(a,button,[role=button]):focus-visible]:![outline:2px_solid_var(--dbx-fill-highlight)]",
+              "[&_:is(a,button,[role=button]):focus-visible]:!outline-offset-[-2px]",
+              "pt-g-sidebar-wrapper-padding-top",
+              "pl-g-sidebar-wrapper-padding-left",
+              "pr-g-sidebar-wrapper-padding-right",
+              "h-full"
+            ],
+            "ancestorTexts": [
+              "新对话Ctrl Shift K",
+              "豆包新工作任务Ctrl J新对话Ctrl Shift K",
+              "豆包新工作任务Ctrl J新对话Ctrl Shift K定时任务Ctrl Shift T插件 · 技能 · 伙伴Ctrl Shift S云盘Ctrl Shift DAPI 服务更多 To pick up a draggable item, "
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1790673707630,
+            "classes": [
+              "group/sidebar_nav_item",
+              "cursor-pointer",
+              "flex",
+              "items-center",
+              "px-8",
+              "rounded-dbx-lg",
+              "h-32",
+              "!text-dbx-text-primary",
+              "hover:bg-dbx-fill-trans-10-hover",
+              "nav-link-IkIer0",
+              "mb-2"
+            ],
+            "clickable": true,
+            "dataTestId": "",
+            "docX": 140.00000476837158,
+            "docY": 104.80000305175781,
+            "editable": false,
+            "height": 32,
+            "id": "",
+            "innerHeight": 767,
+            "innerWidth": 1298,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "new-chat",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "div",
+            "text": "新对话Ctrl Shift K",
+            "width": 254.40000915527344,
+            "x": 140.00000476837158,
+            "y": 104.80000305175781
+          }
+        }
+      },
+      "network": {
+        "apiPatterns": [
+          "https://www.doubao.com/chat/completion"
+        ],
+        "followUpPatterns": [],
+        "followUpIdentityPath": ""
+      },
+      "attachment": {
+        "strategy": "input",
+        "selector": ""
+      },
+      "parserRule": {
+        "schemaVersion": 2,
+        "confidence": "high",
+        "missingInfo": [],
+        "memory": {},
+        "handlers": [
+          {
+            "id": "thinkingStart",
+            "match": {
+              "rawRegex": "(?m)^event:\\s*STREAM_MSG_NOTIFY\\s*\\ndata:\\s*(\\{.*\"block_type\"\\s*:\\s*10040.*\\})\\s*$",
+              "jsonGroup": 1,
+              "eventsPath": "$.content.content_block[*]",
+              "path": "$.block_id",
+              "allOf": [
+                {
+                  "path": "$.block_type",
+                  "regex": "^10040$"
+                }
+              ]
+            },
+            "actions": [
+              {
+                "op": "setMemory",
+                "key": "thinkStart",
+                "path": "$.block_id"
+              }
+            ]
+          },
+          {
+            "id": "answerStartInThinking",
+            "match": {
+              "rawRegex": "(?m)^event:\\s*STREAM_CHUNK\\s*\\ndata:\\s*(\\{.*\"block_type\"\\s*:\\s*10000\\s*,\\s*\"block_id\"\\s*:\\s*\"[^\"]*\"\\s*,\\s*\"content\".*\\})\\s*$",
+              "jsonGroup": 1,
+              "eventsPath": "$.patch_op[*]",
+              "path": "$.patch_value.content_block[?(@.block_type=='10000')][0].content.text_block.text",
+              "memoryKey": "answerStart",
+              "memoryEquals": "",
+              "anyOf": [
+                {
+                  "memoryKey": "thinkStart",
+                  "memoryNotEquals": ""
+                }
+              ]
+            },
+            "actions": [
+              {
+                "op": "setMemory",
+                "key": "answerStart",
+                "path": "$.patch_value.content_block[?(@.block_type=='10000')][0].block_id"
+              },
+              {
+                "op": "appendContent",
+                "path": "$.patch_value.content_block[?(@.block_type=='10000')][0].content.text_block.text"
+              }
+            ]
+          },
+          {
+            "id": "answerStartNotifyInThinking",
+            "match": {
+              "rawRegex": "(?m)^event:\\s*STREAM_MSG_NOTIFY\\s*\\ndata:\\s*(\\{.*\"block_type\"\\s*:\\s*10000\\s*,\\s*\"block_id\"\\s*:\\s*\"[^\"]*\"\\s*,\\s*\"content\".*\\})\\s*$",
+              "jsonGroup": 1,
+              "path": "$.content.content_block[?(@.block_type=='10000')][0].content.text_block.text",
+              "memoryKey": "answerStart",
+              "memoryEquals": "",
+              "anyOf": [
+                {
+                  "memoryKey": "thinkStart",
+                  "memoryNotEquals": ""
+                }
+              ]
+            },
+            "actions": [
+              {
+                "op": "setMemory",
+                "key": "answerStart",
+                "path": "$.content.content_block[?(@.block_type=='10000')][0].block_id"
+              },
+              {
+                "op": "appendContent",
+                "path": "$.content.content_block[?(@.block_type=='10000')][0].content.text_block.text"
+              }
+            ]
+          },
+          {
+            "id": "answerPhaseMark",
+            "match": {
+              "rawRegex": "(?m)^data:\\s*(\\{.*answer_first_token.*\\})\\s*$",
+              "jsonGroup": 1
+            },
+            "actions": [
+              {
+                "op": "setMemory",
+                "key": "answerStart",
+                "path": "$.patch_op"
+              }
+            ]
+          },
+          {
+            "id": "answerPatchDelta",
+            "match": {
+              "rawRegex": "(?m)^event:\\s*STREAM_CHUNK\\s*\\ndata:\\s*(\\{.*\"block_type\"\\s*:\\s*10000.*\\})\\s*$",
+              "jsonGroup": 1,
+              "eventsPath": "$.patch_op[*]",
+              "path": "$.patch_value.content_block[?(@.block_type=='10000')][0].content.text_block.text",
+              "anyOf": [
+                {
+                  "memoryKey": "answerStart",
+                  "memoryNotEquals": ""
+                },
+                {
+                  "memoryKey": "thinkStart",
+                  "memoryEquals": ""
+                }
+              ]
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.patch_value.content_block[?(@.block_type=='10000')][0].content.text_block.text"
+              }
+            ]
+          },
+          {
+            "id": "answerNotifyDelta",
+            "match": {
+              "rawRegex": "(?m)^event:\\s*STREAM_MSG_NOTIFY\\s*\\ndata:\\s*(\\{.*\"block_type\"\\s*:\\s*10000.*\\})\\s*$",
+              "jsonGroup": 1,
+              "path": "$.content.content_block[?(@.block_type=='10000')][0].content.text_block.text",
+              "anyOf": [
+                {
+                  "memoryKey": "answerStart",
+                  "memoryNotEquals": ""
+                },
+                {
+                  "memoryKey": "thinkStart",
+                  "memoryEquals": ""
+                }
+              ]
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.content.content_block[?(@.block_type=='10000')][0].content.text_block.text"
+              }
+            ]
+          },
+          {
+            "id": "chunkDelta",
+            "match": {
+              "rawRegex": "(?m)^event:\\s*CHUNK_DELTA\\s*\\ndata:\\s*(\\{.*\"text\".*\\})\\s*$",
+              "jsonGroup": 1,
+              "path": "$.text",
+              "anyOf": [
+                {
+                  "memoryKey": "answerStart",
+                  "memoryNotEquals": ""
+                },
+                {
+                  "memoryKey": "thinkStart",
+                  "memoryEquals": ""
+                }
+              ]
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.text"
+              }
+            ]
+          },
+          {
+            "id": "replyEnd",
+            "match": {
+              "rawRegex": "event: SSE_REPLY_END\\ndata: (.+)\\n",
+              "jsonGroup": 1,
+              "path": "$.end_type",
+              "regex": "^1$"
+            },
+            "actions": [
+              {
+                "op": "setFinishReason",
+                "value": "stop"
+              }
+            ]
+          }
+        ],
+        "final": [],
+        "request": {
+          "userText": "$.messages[-1].content_block[?(@.block_type=='10000')][0].content.text_block.text"
+        }
+      }
+    },
+    {
+      "id": "gml",
+      "schemaVersion": 2,
+      "name": "gml",
+      "page": {
+        "url": "https://chatglm.cn/main/alltoolsdetail?t=1788611652123&lang=zh",
+        "selectors": {
+          "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='section'][1]/*[local-name()='main'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][5]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='textarea'][1]",
+          "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='section'][1]/*[local-name()='aside'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]"
+        },
+        "fingerprints": {
+          "input": {
+            "ancestorClasses": [
+              "input-box-inner",
+              "input-wrap",
+              "flex",
+              "flex-col",
+              "input-box",
+              "noTopBorder"
+            ],
+            "ancestorTexts": [
+              "和我聊聊天吧",
+              "和我聊聊天吧GLM-Flash极致新对话",
+              "和我聊聊天吧GLM-Flash极致新对话"
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1788611790947,
+            "classes": [
+              "scroll-display-none"
+            ],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 875.2000122070312,
+            "docY": 307.7749938964844,
+            "editable": true,
+            "height": 68,
+            "id": "",
+            "innerHeight": 694,
+            "innerWidth": 1490,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "和我聊聊天吧",
+            "parentClasses": [
+              "input-box-inner"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "input",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [
+              "和我聊聊天吧"
+            ],
+            "tag": "textarea",
+            "text": "",
+            "width": 774.4000244140625,
+            "x": 875.2000122070312,
+            "y": 307.7749938964844
+          },
+          "new-chat": {
+            "ancestorClasses": [
+              "new-session",
+              "flex",
+              "flex-x-start",
+              "flex-y-center",
+              "el-tooltip__trigger",
+              "el-tooltip__trigger",
+              "aside-subjects",
+              "el-aside",
+              "aside-container",
+              "scroll-display-none"
+            ],
+            "ancestorTexts": [
+              "新对话",
+              "新对话学习搭子AI画图AI阅读AI生视频AgentMore云知识库智能体最近对话获取下一步请求数据批量操作重命名删除对话解析JSON请求内容批量操作重命名删除对话读取下一步请求数据批量操作重命名删除对话",
+              "新对话学习搭子AI画图AI阅读AI生视频AgentMore云知识库智能体最近对话获取下一步请求数据批量操作重命名删除对话解析JSON请求内容批量操作重命名删除对话读取下一步请求数据批量操作重命名删除对话只喝三碗吖积分 7666.00全选已选"
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1788611786801,
+            "classes": [
+              "text"
+            ],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 69.79999923706055,
+            "docY": 74,
+            "editable": false,
+            "height": 20,
+            "id": "",
+            "innerHeight": 740,
+            "innerWidth": 1490,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [
+              "new-session",
+              "flex",
+              "flex-x-start",
+              "flex-y-center",
+              "el-tooltip__trigger",
+              "el-tooltip__trigger"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "new-chat",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "div",
+            "text": "新对话",
+            "width": 42,
+            "x": 69.79999923706055,
+            "y": 74
+          }
+        }
+      },
+      "network": {
+        "apiPatterns": [
+          "https://chatglm.cn/chatglm/backend-api/assistant/stream"
+        ],
+        "followUpPatterns": [],
+        "followUpIdentityPath": ""
+      },
+      "attachment": {
+        "strategy": "input",
+        "selector": "input.el-upload__input"
+      },
+      "parserRule": {
+        "schemaVersion": 2,
+        "confidence": "medium",
+        "missingInfo": [],
+        "contentTransforms": [
+          {
+            "id": "dropTurnChip",
+            "regex": "【turn\\d+(?:search|news|image)\\d+】",
+            "replacement": "",
+            "settle": {
+              "candidatePrefix": "【turn"
+            }
+          },
+          {
+            "id": "dropCitationChip",
+            "regex": "【citation:\\d+】",
+            "replacement": "",
+            "settle": {
+              "candidatePrefix": "【citation:"
+            }
+          }
+        ],
+        "memory": {},
+        "handlers": [
+          {
+            "id": "gmlTextChunk",
+            "match": {
+              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+              "jsonGroup": 1,
+              "eventsPath": "$.parts[*]",
+              "path": "$.content[?(@.type=='text')][0].type",
+              "regex": "^text$",
+              "allOf": [
+                {
+                  "path": "$.status",
+                  "regex": "^(?!finish$)"
+                }
+              ]
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.content[?(@.type=='text')][0].text"
+              }
+            ]
+          },
+          {
+            "id": "gmlFinishSnapshot",
+            "match": {
+              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+              "jsonGroup": 1,
+              "eventsPath": "$.parts[*]",
+              "path": "$.content[?(@.type=='text')][0].type",
+              "regex": "^text$",
+              "allOf": [
+                {
+                  "path": "$.status",
+                  "regex": "^finish$"
+                }
+              ]
+            },
+            "actions": [
+              {
+                "op": "appendDelta",
+                "path": "$.content[?(@.type=='text')][0].text"
+              }
+            ]
+          }
+        ],
+        "final": [],
+        "request": {
+          "userText": "$.messages[-1].content[?(@.type=='text')][0].text"
+        }
+      }
+    },
+    {
+      "id": "kimi",
+      "schemaVersion": 2,
+      "name": "kimi",
+      "page": {
+        "url": "https://www.kimi.com/",
+        "selectors": {
+          "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][2]",
+          "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='aside'][1]/*[local-name()='div'][2]/*[local-name()='a'][1]"
+        },
+        "fingerprints": {
+          "input": {
+            "ancestorClasses": [
+              "chat-input-editor-container",
+              "chat-input",
+              "chat-editor-input-wrap"
+            ],
+            "ancestorTexts": [
+              "输入 \"/\" 唤起插件和技能",
+              "输入 \"/\" 唤起插件和技能",
+              "输入 \"/\" 唤起插件和技能"
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1791509633882,
+            "classes": [
+              "chat-input-editor"
+            ],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 758.2000122070312,
+            "docY": 312.20001220703125,
+            "editable": true,
+            "height": 48,
+            "id": "",
+            "innerHeight": 711,
+            "innerWidth": 1298,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "输入 \"/\" 唤起插件和技能",
+            "parentClasses": [
+              "chat-input-editor-container"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "input",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [
+              "输入 \"/\" 唤起插件和技能"
+            ],
+            "tag": "div",
+            "text": "",
+            "width": 734.4000244140625,
+            "x": 758.2000122070312,
+            "y": 312.20001220703125
+          },
+          "new-chat": {
+            "ancestorClasses": [
+              "sidebar-new-chat",
+              "sidebar",
+              "next-sidebar",
+              "sidebar-shell",
+              "sidebar-shell--interactive"
+            ],
+            "ancestorTexts": [
+              "#NewChatAnimatedIcon-svg-rs-ew8n6j-p1{transform-box:view-box;transform-origin:0 0;animation:NewChatAnimatedIcon-svg-rs-e",
+              "#LeftBarAnimatedIcon-enter-rs-1sihg8c-mh2{transform-box:view-box;transform-origin:0 0;animation:LeftBarAnimatedIcon-ente",
+              "#LeftBarAnimatedIcon-enter-rs-1sihg8c-mh2{transform-box:view-box;transform-origin:0 0;animation:LeftBarAnimatedIcon-ente"
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1791509632154,
+            "classes": [
+              "new-chat-btn"
+            ],
+            "clickable": true,
+            "dataTestId": "sidebar-new-chat",
+            "docX": 120,
+            "docY": 82.80000114440918,
+            "editable": false,
+            "height": 41.60000228881836,
+            "id": "",
+            "innerHeight": 711,
+            "innerWidth": 1298,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [
+              "sidebar-new-chat"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "new-chat",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "a",
+            "text": "#NewChatAnimatedIcon-svg-rs-ew8n6j-p1{transform-box:view-box;transform-origin:0 0;animation:NewChatAnimatedIcon-svg-rs-ew8n6j-p1 0.4167s linear 1 forwards}@keyframes NewChatAnimatedIcon-svg-rs-ew8n6j-",
+            "width": 224,
+            "x": 120,
+            "y": 82.80000114440918
+          }
+        }
+      },
+      "network": {
+        "apiPatterns": [
+          "https://www.kimi.com/apiv2/kimi.gateway.chat.v1.ChatService/Chat"
+        ],
+        "followUpPatterns": [],
+        "followUpIdentityPath": ""
+      },
+      "attachment": {
+        "strategy": "input",
+        "selector": "input.hidden-input"
+      },
+      "parserRule": {
+        "schemaVersion": 2,
+        "confidence": "high",
+        "missingInfo": [],
+        "contentTransforms": [
+          {
+            "id": "dropReferenceBlock",
+            "regex": "<REF>[\\s\\S]*?</REF>",
+            "replacement": "",
+            "settle": {
+              "candidatePrefix": "<REF>"
+            }
+          }
+        ],
+        "memory": {},
+        "handlers": [
+          {
+            "id": "answerStart",
+            "match": {
+              "rawRegex": "\\{\"op\"\\s*:\\s*\"set\"\\s*,\\s*\"mask\"\\s*:\\s*\"block\\.text\"\\s*,\\s*\"eventOffset\"\\s*:\\s*\\d+\\s*,\\s*\"block\"\\s*:\\s*\\{[^{}]*?\"text\"\\s*:\\s*\\{\\s*\"content\"\\s*:\\s*\"(?:[^\"\\\\]|\\\\.)*\"\\s*\\}[^{}]*?\\}\\}",
+              "jsonGroup": 0,
+              "path": "$.block.text.content"
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.block.text.content"
+              }
+            ]
+          },
+          {
+            "id": "answerDelta",
+            "match": {
+              "rawRegex": "\\{\"op\"\\s*:\\s*\"append\"\\s*,\\s*\"mask\"\\s*:\\s*\"block\\.text\\.content\"\\s*,\\s*\"eventOffset\"\\s*:\\s*\\d+\\s*,\\s*\"block\"\\s*:\\s*\\{[^{}]*?\"text\"\\s*:\\s*\\{\\s*\"content\"\\s*:\\s*\"(?:[^\"\\\\]|\\\\.)*\"\\s*\\}[^{}]*?\\}\\}",
+              "jsonGroup": 0,
+              "path": "$.block.text.content"
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.block.text.content"
+              }
+            ]
+          },
+          {
+            "id": "messageCompleted",
+            "match": {
+              "rawRegex": "\\{\"op\"\\s*:\\s*\"set\"\\s*,\\s*\"mask\"\\s*:\\s*\"message\\.status\"\\s*,\\s*\"eventOffset\"\\s*:\\s*\\d+\\s*,\\s*\"message\"\\s*:\\s*\\{[^{}]*?\"status\"\\s*:\\s*\"MESSAGE_STATUS_COMPLETED\"\\s*[^{}]*?\\}\\}",
+              "jsonGroup": 0,
+              "path": "$.message.status",
+              "regex": "^MESSAGE_STATUS_COMPLETED$"
+            },
+            "actions": [
+              {
+                "op": "setFinishReason",
+                "value": "stop"
+              }
+            ]
+          },
+          {
+            "id": "turnDone",
+            "match": {
+              "rawRegex": "(\\{\"eventOffset\":\\d+,\"done\":\\{\\}\\})",
+              "jsonGroup": 1
+            },
+            "actions": [
+              {
+                "op": "setFinishReason",
+                "value": "stop"
+              }
+            ]
+          },
+          {
+            "id": "providerError",
+            "match": {
+              "rawRegex": "(\\{\"error\":\\{.*\\}\\})",
+              "jsonGroup": 1,
+              "path": "$.error.code",
+              "regex": "^[a-z_]+$"
+            },
+            "actions": [
+              {
+                "op": "setError",
+                "path": "$.error.code"
+              },
+              {
+                "op": "setError",
+                "path": "$.error.details[?(@.type=='common.error.v1.ErrorDetail')][0].debug.localizedMessage.message"
+              },
+              {
+                "op": "setFinishReason",
+                "value": "stop"
+              }
+            ]
+          }
+        ],
+        "final": [],
+        "request": {
+          "userText": "$.message.blocks[0].text.content"
+        }
+      }
+    },
+    {
+      "id": "longcat",
+      "schemaVersion": 2,
+      "name": "longcat",
+      "page": {
+        "url": "https://longcat.chat/",
+        "selectors": {
+          "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]",
+          "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]"
+        },
+        "fingerprints": {
+          "input": {
+            "ancestorClasses": [
+              "editor-wapper",
+              "my-mtd-textarea",
+              "textarea-wrap"
+            ],
+            "ancestorTexts": [],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1790644227853,
+            "classes": [
+              "tiptap",
+              "ProseMirror",
+              "ProseMirror-focused"
+            ],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 774.8000183105469,
+            "docY": 365.2437686920166,
+            "editable": true,
+            "height": 25.137500762939453,
+            "id": "",
+            "innerHeight": 711,
+            "innerWidth": 1298,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "input",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "div",
+            "text": "",
+            "width": 762.4000244140625,
+            "x": 774.8000183105469,
+            "y": 365.2437686920166
+          },
+          "new-chat": {
+            "ancestorClasses": [
+              "slider-header",
+              "v-slider-header",
+              "slider-menus-content"
+            ],
+            "ancestorTexts": [
+              "开启新对话",
+              "开启新对话",
+              "开启新对话下载手机应用请先登录简体中文"
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1790644226323,
+            "classes": [
+              "new-content"
+            ],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 80,
+            "docY": 111,
+            "editable": false,
+            "height": 46,
+            "id": "",
+            "innerHeight": 767,
+            "innerWidth": 1298,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [
+              "slider-header"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "new-chat",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "div",
+            "text": "开启新对话",
+            "width": 120,
+            "x": 80,
+            "y": 111
+          }
+        }
+      },
+      "network": {
+        "apiPatterns": [
+          "https://longcat.chat/api/v1/chat-completion-oversea-V2",
+          "https://longcat.chat/api/v1/chat-completion-V2"
+        ],
+        "followUpPatterns": [],
+        "followUpIdentityPath": ""
+      },
+      "attachment": {
+        "strategy": "input",
+        "selector": "#file-upload-default"
+      },
+      "parserRule": {
+        "schemaVersion": 2,
+        "confidence": "high",
+        "missingInfo": [],
+        "memory": {},
+        "handlers": [
+          {
+            "id": "answerDelta",
+            "match": {
+              "rawRegex": "data:(\\{.*\\})\\n",
+              "jsonGroup": 1,
+              "path": "$.event.type",
+              "regex": "^content$"
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.event.content"
+              }
+            ]
+          },
+          {
+            "id": "finish",
+            "match": {
+              "rawRegex": "data:(\\{.*\\})\\n",
+              "jsonGroup": 1,
+              "path": "$.event.type",
+              "regex": "^finish$"
+            },
+            "actions": [
+              {
+                "op": "setFinishReason",
+                "value": "stop"
+              }
+            ]
+          }
+        ],
+        "final": [],
+        "request": {
+          "userText": "$.content"
+        }
+      }
+    },
+    {
+      "id": "mimo",
+      "schemaVersion": 2,
+      "name": "mimo",
+      "page": {
+        "url": "https://aistudio.xiaomimimo.com/#/c",
+        "selectors": {
+          "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='textarea'][1]",
+          "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][4]/*[local-name()='button'][1]"
+        },
+        "fingerprints": {
+          "input": {
+            "ancestorClasses": [
+              "flex",
+              "gap-2",
+              "items-end",
+              "p-4",
+              "py-2.5",
+              "px-3",
+              "md:p-4",
+              "md:pb-2.5",
+              "relative",
+              "rounded-2xl",
+              "border",
+              "border-sem-border-default",
+              "shadow-[0_0.375rem_0.75rem_rgba(0,0,0,0.05)]",
+              "transition-none",
+              "bg-mimo-bg-outlined"
+            ],
+            "ancestorTexts": [
+              "翻译解题答疑智拍问答",
+              "翻译解题答疑智拍问答"
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1790590117672,
+            "classes": [
+              "relative",
+              "mb-1",
+              "max-h-[160px]",
+              "min-h-[32px]",
+              "w-full",
+              "resize-none",
+              "overflow-y-auto",
+              "bg-transparent",
+              "text-base",
+              "leading-6",
+              "text-gray-900",
+              "placeholder-gray-400",
+              "placeholder:font-light",
+              "focus:outline-none",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-50",
+              "dark:text-gray-50",
+              "dark:placeholder-gray-500",
+              "retina:placeholder:font-normal",
+              "md:text-sm"
+            ],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 776.8000183105469,
+            "docY": 610.4000244140625,
+            "editable": true,
+            "height": 32,
+            "id": "",
+            "innerHeight": 711,
+            "innerWidth": 1298,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [
+              "flex",
+              "gap-2",
+              "items-end"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "有问题，尽管问，Shift + Enter 换行",
+            "role": "input",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "textarea",
+            "text": "",
+            "width": 766.4000244140625,
+            "x": 776.8000183105469,
+            "y": 610.4000244140625
+          },
+          "new-chat": {
+            "ancestorClasses": [
+              "flex",
+              "h-9",
+              "shrink-0",
+              "select-none",
+              "items-center",
+              "justify-between",
+              "rounded-md",
+              "px-2",
+              "cursor-pointer",
+              "sticky",
+              "shadow-[0_-1px_0_0_var(--mimo-bg-body)]",
+              "bg-mimo-fill-neutral-active",
+              "flex",
+              "flex-col",
+              "hover-scrollbar",
+              "flex",
+              "min-h-0",
+              "flex-1",
+              "flex-col",
+              "overflow-y-auto",
+              "px-2",
+              "scrollbar-visible"
+            ],
+            "ancestorTexts": [
+              "MiMo Chat",
+              "UltraSpeedNewZIO函数式异步编程库介绍MiMo ClawMiMo V2.6MiMo ChatZIO框架趋势与热度分析",
+              "UltraSpeedNewZIO函数式异步编程库介绍MiMo ClawMiMo V2.6MiMo ChatZIO框架趋势与热度分析"
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "新对话",
+            "capturedAt": 1790590113506,
+            "classes": [
+              "ml-auto",
+              "flex",
+              "h-5",
+              "w-5",
+              "shrink-0",
+              "items-center",
+              "justify-center",
+              "rounded",
+              "text-mimo-icon-n3",
+              "hover:bg-mimo-fill-neutral-hover",
+              "hover:text-mimo-icon-n1"
+            ],
+            "clickable": true,
+            "dataTestId": "",
+            "docX": 231.1999969482422,
+            "docY": 156,
+            "editable": false,
+            "height": 20,
+            "id": "",
+            "innerHeight": 767,
+            "innerWidth": 1298,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "MiMo Chat",
+            "parentClasses": [
+              "flex",
+              "h-9",
+              "shrink-0",
+              "select-none",
+              "items-center",
+              "justify-between",
+              "rounded-md",
+              "px-2",
+              "cursor-pointer",
+              "sticky",
+              "shadow-[0_-1px_0_0_var(--mimo-bg-body)]",
+              "bg-mimo-fill-neutral-active"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "new-chat",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [
+              "MiMo Chat"
+            ],
+            "tag": "button",
+            "text": "",
+            "width": 20,
+            "x": 231.1999969482422,
+            "y": 156
+          }
+        }
+      },
+      "network": {
+        "apiPatterns": [
+          "https://aistudio.xiaomimimo.com/open-apis/react/chat"
+        ],
+        "followUpPatterns": [],
+        "followUpIdentityPath": ""
+      },
+      "attachment": {
+        "strategy": "input",
+        "selector": ""
+      },
+      "parserRule": {
+        "schemaVersion": 2,
+        "confidence": "high",
+        "missingInfo": [],
+        "contentTransforms": [],
+        "memory": {},
+        "handlers": [
+          {
+            "id": "answerDelta",
+            "match": {
+              "rawRegex": "event:message\\ndata:\\s*(.+)\\n",
+              "jsonGroup": 1,
+              "path": "$.messageType",
+              "regex": "^assistant$"
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.content"
+              }
+            ]
+          },
+          {
+            "id": "finish",
+            "match": {
+              "rawRegex": "event:finish\\ndata:\\s*(.+)\\n",
+              "jsonGroup": 1,
+              "path": "$.content",
+              "regex": "^\\[DONE\\]$"
+            },
+            "actions": [
+              {
+                "op": "setFinishReason",
+                "value": "stop"
+              }
+            ]
+          }
+        ],
+        "final": [],
+        "request": {
+          "userText": "$.query"
+        }
+      }
+    },
+    {
+      "id": "qianwen",
+      "schemaVersion": 2,
+      "name": "qianwen",
+      "page": {
+        "url": "https://www.qianwen.com/",
+        "selectors": {
+          "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]",
+          "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='aside'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='span'][2]"
+        },
+        "fingerprints": {
+          "input": {
+            "ancestorClasses": [
+              "relative",
+              "w-full",
+              "flex",
+              "shrink-0",
+              "flex-col",
+              "overflow-hidden",
+              "relative",
+              "flex",
+              "flex-col",
+              "transition-[height,max-height,margin]",
+              "duration-300",
+              "ease-out",
+              "overflow-clip"
+            ],
+            "ancestorTexts": [],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1791685802297,
+            "classes": [
+              "relative",
+              "min-h-[24px]",
+              "w-full",
+              "whitespace-pre-wrap",
+              "break-words",
+              "text-left",
+              "[&::-webkit-scrollbar]:hidden",
+              "selection:bg-transparent",
+              "[&_*]:selection:bg-transparent",
+              "border-none",
+              "bg-transparent",
+              "text-16",
+              "leading-[26px]",
+              "text-primary",
+              "outline-none",
+              "placeholder:text-disabled",
+              "px-2"
+            ],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 773.7875061035156,
+            "docY": 341.0999946594238,
+            "editable": true,
+            "height": 49.400001525878906,
+            "id": "",
+            "innerHeight": 711,
+            "innerWidth": 1298,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [
+              "relative",
+              "w-full"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "input",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "div",
+            "text": "",
+            "width": 734.4000244140625,
+            "x": 773.7875061035156,
+            "y": 341.0999946594238
+          },
+          "new-chat": {
+            "ancestorClasses": [
+              "flex",
+              "h-full",
+              "min-w-0",
+              "flex-1",
+              "items-center",
+              "gap-1.5",
+              "rounded-8",
+              "px-3",
+              "text-sm",
+              "text-primary",
+              "!transition-colors",
+              "!duration-300",
+              "hover:bg-option",
+              "cursor-pointer",
+              "flex",
+              "h-full",
+              "gap-0.5",
+              "h-9",
+              "px-3"
+            ],
+            "ancestorTexts": [
+              "新对话",
+              "新对话",
+              "新对话"
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1791685800504,
+            "classes": [
+              "truncate",
+              "font-400"
+            ],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 67,
+            "docY": 134,
+            "editable": false,
+            "height": 20,
+            "id": "",
+            "innerHeight": 711,
+            "innerWidth": 1298,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [
+              "flex",
+              "h-full",
+              "min-w-0",
+              "flex-1",
+              "items-center",
+              "gap-1.5",
+              "rounded-8",
+              "px-3",
+              "text-sm",
+              "text-primary",
+              "!transition-colors",
+              "!duration-300",
+              "hover:bg-option",
+              "cursor-pointer"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "new-chat",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "span",
+            "text": "新对话",
+            "width": 42,
+            "x": 67,
+            "y": 134
+          }
+        }
+      },
+      "network": {
+        "apiPatterns": [
+          "https://chat2.qianwen.com/api/v2/chat"
+        ],
+        "followUpPatterns": [
+          "/api/v1/chat/snap"
+        ],
+        "followUpIdentityPath": "$.req_id"
+      },
+      "attachment": {
+        "strategy": "paste",
+        "selector": "div[contenteditable=\"true\"]"
+      },
+      "parserRule": {
+        "schemaVersion": 2,
+        "confidence": "high",
+        "missingInfo": [],
+        "memory": {},
+        "handlers": [
+          {
+            "id": "qianwenAnswerText",
+            "match": {
+              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+              "jsonGroup": 1,
+              "eventsPath": "$.data.messages[*]",
+              "path": "$.mime_type",
+              "regex": "^multi_load/iframe$"
+            },
+            "actions": [
+              {
+                "op": "appendDelta",
+                "path": "$.content"
+              }
+            ]
+          },
+          {
+            "id": "qianwenAnswerDone",
+            "match": {
+              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+              "jsonGroup": 1,
+              "eventsPath": "$.data.messages[*]",
+              "path": "$.mime_type",
+              "regex": "^multi_load/iframe$",
+              "allOf": [
+                {
+                  "path": "$.status",
+                  "regex": "^complete$"
+                }
+              ]
+            },
+            "actions": [
+              {
+                "op": "setFinishReason",
+                "value": "stop"
+              }
+            ]
+          }
+        ],
+        "final": [],
+        "request": {
+          "userText": [
+            "$.messages[-1].content",
+            "$.messages[-1].meta_data.ori_query"
+          ]
+        }
+      }
+    },
+    {
+      "id": "wenxin",
+      "schemaVersion": 2,
+      "name": "wenxin",
+      "page": {
+        "url": "https://wenxin.baidu.com/?enter_type=wenxin_logo",
+        "selectors": {
+          "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][4]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='textarea'][1]",
+          "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='span'][1]"
+        },
+        "fingerprints": {
+          "input": {
+            "ancestorClasses": [
+              "ci-file-input-wrapper",
+              "ci-container"
+            ],
+            "ancestorTexts": [
+              "快速 👈 复杂问题文心助手回答更优"
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1788612759178,
+            "classes": [
+              "ci-textarea",
+              "ci-scroll-style"
+            ],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 845.2000122070312,
+            "docY": 239.58750915527344,
+            "editable": true,
+            "height": 56,
+            "id": "chat-textarea",
+            "innerHeight": 694,
+            "innerWidth": 1490,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "帮我生成PPT，主题为民权运动的历史和重要性",
+            "role": "input",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "textarea",
+            "text": "",
+            "width": 794.4000244140625,
+            "x": 845.2000122070312,
+            "y": 239.58750915527344
+          },
+          "new-chat": {
+            "ancestorClasses": [
+              "new-dialog-container-button",
+              "new-dialog-container-button-sample",
+              "new-dialog-container",
+              "_chat-aside-header-new-dialog_134i6_38",
+              "_btn-box_134i6_104"
+            ],
+            "ancestorTexts": [
+              "开启新对话",
+              "开启新对话",
+              "开启新对话"
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1788612756716,
+            "classes": [
+              "cos-line-clamp-1",
+              "new-dialog-container-text"
+            ],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 77.70000076293945,
+            "docY": 81,
+            "editable": false,
+            "height": 20,
+            "id": "",
+            "innerHeight": 740,
+            "innerWidth": 1490,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [
+              "new-dialog-container-button",
+              "new-dialog-container-button-sample"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "new-chat",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "span",
+            "text": "开启新对话",
+            "width": 70,
+            "x": 77.70000076293945,
+            "y": 81
+          }
+        }
+      },
+      "network": {
+        "apiPatterns": [
+          "https://chat.baidu.com/aichat/api/conversation",
+          "https://chat.baidu.com/chat/api/agent/task_mode"
+        ],
+        "followUpPatterns": [],
+        "followUpIdentityPath": ""
+      },
+      "attachment": {
+        "strategy": "paste",
+        "selector": "#chat-textarea"
+      },
+      "parserRule": {
+        "schemaVersion": 2,
+        "confidence": "high",
+        "missingInfo": [],
+        "memory": {},
+        "handlers": [
+          {
+            "id": "wenxinTaskModeAnswer",
+            "match": {
+              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+              "jsonGroup": 1,
+              "urlRegex": "chat\\.baidu\\.com/chat/api/agent/task_mode",
+              "path": "$.data.message.content.generator.component",
+              "regex": "^markdown-yiyan$"
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.data.message.content.generator.data.value"
+              }
+            ]
+          },
+          {
+            "id": "wenxinTaskModeDone",
+            "match": {
+              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+              "jsonGroup": 1,
+              "urlRegex": "chat\\.baidu\\.com/chat/api/agent/task_mode",
+              "path": "$.data.message.metaData.state",
+              "regex": "^generate-complete$"
+            },
+            "actions": [
+              {
+                "op": "setFinishReason",
+                "value": "stop"
+              }
+            ]
+          },
+          {
+            "id": "wenxinConversationAnswer",
+            "match": {
+              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+              "jsonGroup": 1,
+              "urlRegex": "chat\\.baidu\\.com/aichat/api/conversation",
+              "path": "$.data.message.content.generator.component",
+              "regex": "^markdown-yiy(an|in)$"
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.data.message.content.generator.data.value"
+              }
+            ]
+          },
+          {
+            "id": "wenxinOfficeWritingAnswer",
+            "match": {
+              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+              "jsonGroup": 1,
+              "urlRegex": "chat\\.baidu\\.com/(?:aichat/api/conversation|chat/api/agent/task_mode)",
+              "path": "$.data.message.content.generator.component",
+              "regex": "^officeWriting$"
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.data.message.content.generator.data.content"
+              }
+            ]
+          },
+          {
+            "id": "wenxinConversationDone",
+            "match": {
+              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+              "jsonGroup": 1,
+              "urlRegex": "chat\\.baidu\\.com/aichat/api/conversation",
+              "path": "$.data.message.metaData.state",
+              "regex": "^generate-complete$"
+            },
+            "actions": [
+              {
+                "op": "setFinishReason",
+                "value": "stop"
+              }
+            ]
+          }
+        ],
+        "final": [],
+        "request": {
+          "userText": "$.message.query[?(@.type=='TEXT')][0].data.text.query",
+          "derive": [
+            {
+              "path": "$.message.searchInfo.chatParams.chat_token",
+              "op": "refreshMd5Slot",
+              "slot": 1
+            },
+            {
+              "header": "X-Chat-Message",
+              "op": "refreshHeaderParam",
+              "param": "query",
+              "slice": 500,
+              "pairSep": ",",
+              "kvSep": ":"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "yuanbao",
+      "schemaVersion": 2,
+      "name": "yuanbao",
+      "page": {
+        "url": "https://yuanbao.tencent.com/chat/naQivTmsDa",
+        "selectors": {
+          "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][5]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='section'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]",
+          "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][2]/*[local-name()='div'][4]/*[local-name()='div'][2]/*[local-name()='div'][1]"
+        },
+        "fingerprints": {
+          "input": {
+            "ancestorClasses": [
+              "chat-command-editor-specail",
+              "InputTextArea_hightLightTextAreaNew__aKxTD",
+              "ql-container",
+              "flex",
+              "min-h-5",
+              "w-full",
+              "items-start",
+              "px-[6px]",
+              "[&>#search-bar]:!pl-0"
+            ],
+            "ancestorTexts": [],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "",
+            "capturedAt": 1790592417441,
+            "classes": [
+              "ql-editor",
+              "ql-blank"
+            ],
+            "clickable": false,
+            "dataTestId": "",
+            "docX": 775.8000183105469,
+            "docY": 594.4000244140625,
+            "editable": true,
+            "height": 20,
+            "id": "",
+            "innerHeight": 711,
+            "innerWidth": 1298,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [
+              "chat-command-editor-specail",
+              "InputTextArea_hightLightTextAreaNew__aKxTD",
+              "ql-container"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "input",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "div",
+            "text": "",
+            "width": 914.4000244140625,
+            "x": 775.8000183105469,
+            "y": 594.4000244140625
+          },
+          "new-chat": {
+            "ancestorClasses": [
+              "yb-new-chat-entry",
+              "yb-nav__content",
+              "yb-nav__content-wrapper"
+            ],
+            "ancestorTexts": [
+              "新建对话",
+              "新建对话AI 创作分组分组示例最近Flink 作业流生产问题及解决OpenClaw记忆系统设计解析Hermes与OpenClaw的区别Flink Doris 面试核心问题解析Doris索引类型及底层原理Debezium底层实现及CDC原理大",
+              "元宝新建对话AI 创作分组分组示例最近Flink 作业流生产问题及解决OpenClaw记忆系统设计解析Hermes与OpenClaw的区别Flink Doris 面试核心问题解析Doris索引类型及底层原理Debezium底层实现及CDC原"
+            ],
+            "anchorDeltaX": 0,
+            "anchorDeltaY": 0,
+            "ariaLabel": "新建对话",
+            "capturedAt": 1790592411169,
+            "classes": [
+              "yb-new-chat-entry__item"
+            ],
+            "clickable": true,
+            "dataTestId": "",
+            "docX": 130,
+            "docY": 118,
+            "editable": false,
+            "height": 32,
+            "id": "",
+            "innerHeight": 767,
+            "innerWidth": 1298,
+            "name": "",
+            "nearInput": false,
+            "nearestText": "",
+            "parentClasses": [
+              "yb-new-chat-entry"
+            ],
+            "parentTag": "div",
+            "parentText": "",
+            "placeholder": "",
+            "role": "new-chat",
+            "scrollX": 0,
+            "scrollY": 0,
+            "siblingTexts": [],
+            "tag": "div",
+            "text": "新建对话",
+            "width": 232,
+            "x": 130,
+            "y": 118
+          }
+        }
+      },
+      "network": {
+        "apiPatterns": [
+          "https://yuanbao.tencent.com/api/chat"
+        ],
+        "followUpPatterns": [],
+        "followUpIdentityPath": ""
+      },
+      "attachment": {
+        "strategy": "paste",
+        "selector": "div.ql-editor"
+      },
+      "parserRule": {
+        "schemaVersion": 2,
+        "confidence": "high",
+        "missingInfo": [],
+        "contentTransforms": [
+          {
+            "id": "dropCitationToken",
+            "regex": "\\[citation:\\d+\\]",
+            "replacement": "",
+            "settle": {
+              "candidatePrefix": "[citation:"
+            }
+          },
+          {
+            "id": "dropUnderlineToken",
+            "regex": "\\[\\]\\(@[a-zA-Z_]+=[^)]+\\)",
+            "replacement": "",
+            "settle": {
+              "candidatePrefix": "[](@"
+            }
+          }
+        ],
+        "memory": {},
+        "handlers": [
+          {
+            "id": "answerDelta",
+            "match": {
+              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
+              "jsonGroup": 1,
+              "path": "$.type",
+              "regex": "^text$"
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.msg"
+              }
+            ]
+          },
+          {
+            "id": "agentContent",
+            "match": {
+              "rawRegex": "(?m)^data:\\s*(\\{.*\"type\"\\s*:\\s*\"deepSearchAgent\".*\\})\\s*$",
+              "jsonGroup": 1,
+              "eventsPath": "$.contents[*]",
+              "path": "$.type",
+              "regex": "^text$"
+            },
+            "actions": [
+              {
+                "op": "appendContent",
+                "path": "$.text"
+              }
+            ]
+          },
+          {
+            "id": "messageMeta",
+            "match": {
+              "rawRegex": "data: (\\{\"type\":\"meta\".*\\})\\n",
+              "jsonGroup": 1,
+              "path": "$.stopReason",
+              "regex": "^stop$"
+            },
+            "actions": [
+              {
+                "op": "setFinishReason",
+                "value": "stop"
+              }
+            ]
+          }
+        ],
+        "final": [],
+        "request": {
+          "userText": [
+            "$.prompt",
+            "$.displayPrompt"
+          ]
+        }
+      }
+    }
+  ]
+}

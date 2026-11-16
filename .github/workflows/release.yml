@@ -1,0 +1,256 @@
+name: Draft Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  RELEASE_TAG: ${{ github.ref_name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Java
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: sbt
+
+      - name: Set up sbt
+        uses: sbt/setup-sbt@67d461eba2c4753196c230e02da850757ba4775e # v1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: client-extension/package-lock.json
+
+      - name: Install extension dependencies
+        run: npm ci --prefix client-extension
+
+      - name: Audit extension dependencies
+        run: npm audit --prefix client-extension --audit-level=high
+
+      - name: Verify repository
+        run: |
+          node release/check-version.mjs --tag "$RELEASE_TAG"
+          node release/check-extension-id.mjs
+          npm run presets:check:strict --prefix client-extension
+          npm run fixtures:privacy --prefix client-extension
+          node client-extension/scripts/check-architecture.mjs
+          node release/check-deprecated-paths.mjs
+          sbt -batch server/test
+          sbt -batch extension/test
+          sbt -batch scalafmtCheckAll
+
+      - name: Build server jar
+        run: sbt -batch server/assembly
+
+      - name: Build extension
+        run: |
+          sbt -batch extension/fullLinkJS
+          node client-extension/scripts/check-linked-js.mjs
+          npm run build --prefix client-extension
+
+      - name: Upload server jar
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: build-server-jar
+          path: server/target/scala-3.7.1/pop-can-server.jar
+          if-no-files-found: error
+
+      - name: Upload extension build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: build-extension
+          path: client-extension/dist
+          if-no-files-found: error
+
+  package-linux:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Java
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Download server jar
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: build-server-jar
+          path: server/target/scala-3.7.1
+
+      - name: Download extension
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: build-extension
+          path: client-extension/dist
+
+      - name: Package Linux release
+        env:
+          POP_CAN_SKIP_ASSEMBLY: "1"
+          POP_CAN_REQUIRE_CLEAN_SOURCE: "1"
+        run: bash release/package.sh --prepare-model
+
+      - name: Upload Linux release
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-linux
+          path: release/artifacts/pop-can-v*-linux.tar.gz*
+          if-no-files-found: error
+
+  package-windows:
+    needs: build
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Java
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Download server jar
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: build-server-jar
+          path: server/target/scala-3.7.1
+
+      - name: Download extension
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: build-extension
+          path: client-extension/dist
+
+      - name: Package Windows release
+        shell: pwsh
+        env:
+          POP_CAN_REQUIRE_CLEAN_SOURCE: "1"
+        run: powershell -ExecutionPolicy Bypass -File release/package.ps1 -PrepareModel
+
+      - name: Upload Windows release
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-windows
+          path: release/artifacts/pop-can-v*-windows.zip*
+          if-no-files-found: error
+
+  package-macos:
+    needs: build
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Java
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Download server jar
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: build-server-jar
+          path: server/target/scala-3.7.1
+
+      - name: Download extension
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: build-extension
+          path: client-extension/dist
+
+      - name: Package macOS release
+        env:
+          POP_CAN_SKIP_ASSEMBLY: "1"
+          POP_CAN_REQUIRE_CLEAN_SOURCE: "1"
+        run: bash release/package.sh --prepare-model
+
+      - name: Upload macOS release
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-macos
+          path: release/artifacts/pop-can-v*-macos.tar.gz*
+          if-no-files-found: error
+
+  create-draft-release:
+    needs:
+      - package-linux
+      - package-windows
+      - package-macos
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+      attestations: write
+      id-token: write
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: release-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Generate aggregate checksums
+        run: |
+          cd release-assets
+          find . -maxdepth 1 -type f \
+            ! -name '*.sha256' \
+            ! -name 'SHA256SUMS' \
+            -printf '%f\n' |
+            sort |
+            xargs sha256sum > SHA256SUMS
+
+      - name: Attest Linux and macOS archives
+        if: ${{ !github.event.repository.private }}
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4
+        with:
+          subject-path: release-assets/*.tar.gz
+
+      - name: Attest Windows archive
+        if: ${{ !github.event.repository.private }}
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4
+        with:
+          subject-path: release-assets/*.zip
+
+      - name: Create or update draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            is_draft="$(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft)"
+            if [[ "$is_draft" != "true" ]]; then
+              echo "release $RELEASE_TAG is already published; refusing to overwrite assets" >&2
+              exit 1
+            fi
+            gh release upload "$RELEASE_TAG" release-assets/* --clobber
+          else
+            gh release create "$RELEASE_TAG" release-assets/* \
+              --draft \
+              --title "Pop Can $RELEASE_TAG" \
+              --generate-notes
+          fi

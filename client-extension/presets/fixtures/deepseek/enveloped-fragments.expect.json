@@ -1,0 +1,15 @@
+{
+  "provider": "deepseek",
+  "dialect": "enveloped-fragments",
+  "comment": "The response envelope has THINK before RESPONSE. Selection must use fragment type rather than fragments[0].",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "responseFragmentStart",
+      "directAppend"
+    ],
+    "mustNotContain": [
+      "hidden reasoning"
+    ]
+  }
+}

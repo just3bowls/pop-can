@@ -1,0 +1,16 @@
+event: update_session
+data: {"updated_at":1792989239.917697}
+
+data: {"v":{"response":{"message_id":1000000000000000000,"status":"WIP","fragments":[{"id":2,"type":"SEARCH","status":"WIP","queries":["2026年10月人工智能领域新闻"],"results":[]}],"search_triggered":true}}}
+
+data: {"p":"response","o":"BATCH","v":[{"p":"fragments","o":"APPEND","v":[{"id":3,"type":"RESPONSE","content":"@@","references":[],"stage_id":2}]},{"p":"has_pending_fragment","o":"SET","v":false}]}
+
+data: {"p":"response/fragments/-1/content","o":"APPEND","v":"BEG:response@@\n@@BEG:reasoning_content@@\n"}
+
+data: {"v":"search complete\n@@END:reasoning_content@@\n\n@@BEG:content@@\n"}
+
+data: {"v":"Batch response parsed[citation:"}
+
+data: {"v":"1], with citations[citation:4].\n@@END:content@@\n@@END:response@@"}
+
+data: {"p":"response/status","o":"SET","v":"FINISHED"}

@@ -1,0 +1,408 @@
+id: 0
+event: SSE_ACK
+data: {"query_list":[{"question_id":"1000000000000000000","local_message_id":"ade482b0-c793-11f1-bfff-a75dabe95f2f","message_index":6}],"ack_client_meta":{"conversation_id":"1000000000000000000","conversation_type":3,"section_id":"38446305862563330"},"modify_conversation_status_code":0,"timeout_conf":{"answer_first_pending_time":180000,"packet_interval_time":120000,"max_retry_count":10,"max_retry_duration_ms":21600000,"retry_interval_ms":1000}}
+
+id: 1
+event: FULL_MSG_NOTIFY
+data: {"message":{"conversation_id":"1000000000000000000","message_id":"1000000000000000000","message_body_version":1,"sender_id":"3213247615901491","user_type":1,"content_type":9999,"content":"[{\"block_type\":10000,\"block_id\":\"0ae4e9fc-4c64-4e34-8b00-687093829e67\",\"content\":{\"text_block\":{\"text\":\"1+2\"}}}]","index_in_conv":6,"create_time":1791957263,"biz_content_type":"","sec_sender":"MS4wLjABAAAASwZFDkreH1wP5hk0_l1pB6-YvTV7Gq6S6ccLE3PCI1Xx6Li4kc4BvgELWVnrLE6V","content_block":[{"block_type":10000,"block_id":"0ae4e9fc-4c64-4e34-8b00-687093829e67","content":{"text_block":{"text":"1+2"}},"is_finish":false}],"tts_content":"","update_time":1791957263,"ext":{"inner_region":"CN","llm_model_type":"38","is_finish":"1","read_conv_version":"1791957263054426","chat_ability":"{}","pre_read_conv_version":"1791957263054426","general_task_param":"{\"runtime_type\":0,\"agent_task_param\":{},\"project_id\":\"\",\"server_do_compare\":true}","model_type":"38","inner_app_id":"497858","chat_next":"1","chat_id":"1000000000000000000","bot_source":"BotStudio","is_ai_playground":"false","update_version_code":"0","bot_id":"7338286299411103781","brief":"1+2","attachment_scene":"1","agent_mode":"2","use_content_block":"1","input_skill":"{\"skill_id\":\"0\",\"skill_type\":0}","inner_did":"7690512347311949354","use_deep_think":"3","group":"1791957251","client_report_scene":"gui","message_from":"InputBox","collection_id":"","search_engine_type":"4","commerce_credit_config_enable":"0","inner_user_ip":"192.0.2.10","section_tag_1h":"38446305862563330_2026101413","inner_bot_id":"7338286299411103781","ugc_voice_id":"104","cot_switch":"3","inner_platform":"web","speaker_id":"zh_female_wenroutaozi_uranus_bigtts","inner_log_id":"20261014135422BCB31223A9D488F1B5B3","inner_ttwid":"7690512347311949354","reply_unique_key":"fba4774e-a755-4735-a8dd-36629faf6a2d"},"local_message_id":"ade482b0-c793-11f1-bfff-a75dabe95f2f","section_id":"38446305862563330","bot_reply_message_id":"0","fetch_token":"1000000000000000000"},"message_attr":{"badge_count":6,"read_badge_count":6,"read_conv_version":1791957263054426,"pre_read_conv_version":1791957263054426}}
+
+id: 4
+event: STREAM_MSG_NOTIFY
+data: {"content":{"content_block":[{"block_type":10040,"block_id":"10468224510704898","content":{"thinking_block":{"finish_title":"已完成思考","streaming_title":"正在思考","icon_url":"https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsm/ljhwZthlaukjlkulzlp/tool_icon/Deep_Think.png","icon_url_dark":"https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsm/ljhwZthlaukjlkulzlp/tool_icon/Deep_Think-1.png","unfold_streaming_title":"深度思考中"}},"is_finish":false,"patch_type":2}],"content_status":100,"ext":{"inner_region":"CN","model_id":"38","cot_switch":"3","is_deep_thinking_show":"1","is_general_task":"0","client_report_scene":"gui","chat_ability":"{}","mode_downgrade_reason":"success","review_scenario_id":"200000000178","fold_think_on_end":"1","detailed_model_name":"","hide_top_reference":"1","attachment_scene":"1","tts":"","is_pro":"1","llm_intention":"seed_main","inner_app_id":"497858","before_content_type":"1","llm_model_type":"38","agent_id":"19457456070409730","z_intervene_id":"","section_tag_1h":"38446305862563330_2026101413","model_type":"38","agent_name":"豆包","use_content_block":"1","z_intervene_result":"","update_version_code":"0","inner_platform":"web","hide_skip_think":"1","agent_hub_model_family_name":"","seed_intention":"seed_main","inner_log_id":"20261014135422BCB31223A9D488F1B5B3","tea_tags_time_cost":"{\"ack_cost_time\":\"191\",\"agent_id\":\"19457456070409730\",\"agent_name\":\"豆包\",\"first_packet_cost_time\":\"2249\",\"llm_intention\":\"seed_main\",\"llm_intention_detail\":\"default\"}","is_deep_thinking":"1","reply_unique_key":"fba4774e-a755-4735-a8dd-36629faf6a2d","llm_intention_detail":"default","agent_intention":"seed_main","chat_next":"1","input_skill":"{\"skill_id\":\"0\",\"skill_type\":0}","cot_ui_style":"summary","inner_did":"7690512347311949354","mode_downgrade_scene":"pro_mode","need_deep_think":"3","inner_user_ip":"192.0.2.10","general_task_param":"{\"runtime_type\":0,\"agent_task_param\":{},\"project_id\":\"\",\"server_do_compare\":true}","chat_id":"1000000000000000000","bot_state":"{\"bot_id\":\"7338286299411103781\",\"bot_name\":\"豆包\",\"agent_name\":\"豆包\",\"agent_id\":\"19457456070409730\",\"agent_psm\":\"flow.agent.shell\",\"intent_agent_name\":\"Agent-Chat\"}","use_floating_think":"1","agent_mode":"2"},"content_type":9999},"meta":{"message_id":"1000000000000000000","conversation_id":"1000000000000000000","section_id":"38446305862563330","sender_id":"7338286299411103781","user_type":2,"create_time":1791957265,"index_in_conv":7,"bot_reply_message_id":"1000000000000000000","local_conversation_id":""},"attr":{"reply_unique_key":"fba4774e-a755-4735-a8dd-36629faf6a2d"}}
+
+id: 23
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":1,"patch_type":1,"patch_value":{"content_block":[{"block_type":10000,"block_id":"10468224510816002","parent_id":"10468224510704898","content":{"text_block":{"icon_url":"https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsm/ljhwZthlaukjlkulzlp/tool_icon/Deep_Think.png","icon_url_dark":"https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsm/ljhwZthlaukjlkulzlp/tool_icon/Deep_Think-1.png","summary":"确定回复格式与内容"}},"is_finish":false,"patch_type":1}]}},{"patch_object":50,"patch_type":1,"patch_value":{"ext":{"msg_scene":"rv_two_col","perf_mark":"{\"marks\":[{\"ev_name\":\"cot_first_token\",\"ev_type\":\"query_duration\"}]}"}}}]}
+
+id: 24
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":1,"patch_type":1,"patch_value":{"content_block":[{"block_type":10000,"block_id":"10468224510816002","parent_id":"10468224510704898","content":{"text_block":{"text":"用户","icon_url":"https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsm/ljhwZthlaukjlkulzlp/tool_icon/Deep_Think.png","icon_url_dark":"https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsm/ljhwZthlaukjlkulzlp/tool_icon/Deep_Think-1.png","summary":"确定回复格式与内容"}},"is_finish":false,"patch_type":1}]}}]}
+
+id: 25
+event: CHUNK_DELTA
+data: {"text":"询问"}
+
+id: 26
+event: CHUNK_DELTA
+data: {"text":"1"}
+
+id: 27
+event: CHUNK_DELTA
+data: {"text":"+"}
+
+id: 28
+event: CHUNK_DELTA
+data: {"text":"2"}
+
+id: 29
+event: CHUNK_DELTA
+data: {"text":"的"}
+
+id: 30
+event: CHUNK_DELTA
+data: {"text":"结果"}
+
+id: 31
+event: CHUNK_DELTA
+data: {"text":"，"}
+
+id: 32
+event: CHUNK_DELTA
+data: {"text":"我"}
+
+id: 33
+event: CHUNK_DELTA
+data: {"text":"需"}
+
+id: 34
+event: CHUNK_DELTA
+data: {"text":"按"}
+
+id: 35
+event: CHUNK_DELTA
+data: {"text":"指定"}
+
+id: 36
+event: CHUNK_DELTA
+data: {"text":"格式"}
+
+id: 37
+event: CHUNK_DELTA
+data: {"text":"回复"}
+
+id: 38
+event: CHUNK_DELTA
+data: {"text":"。"}
+
+id: 39
+event: CHUNK_DELTA
+data: {"text":"先"}
+
+id: 40
+event: CHUNK_DELTA
+data: {"text":"在"}
+
+id: 41
+event: CHUNK_DELTA
+data: {"text":"reason"}
+
+id: 42
+event: CHUNK_DELTA
+data: {"text":"ing"}
+
+id: 43
+event: CHUNK_DELTA
+data: {"text":"_content"}
+
+id: 44
+event: CHUNK_DELTA
+data: {"text":"写"}
+
+id: 45
+event: CHUNK_DELTA
+data: {"text":"“"}
+
+id: 46
+event: CHUNK_DELTA
+data: {"text":"计算"}
+
+id: 47
+event: CHUNK_DELTA
+data: {"text":"1"}
+
+id: 48
+event: CHUNK_DELTA
+data: {"text":"加"}
+
+id: 49
+event: CHUNK_DELTA
+data: {"text":"2"}
+
+id: 50
+event: CHUNK_DELTA
+data: {"text":"，"}
+
+id: 51
+event: CHUNK_DELTA
+data: {"text":"结果"}
+
+id: 52
+event: CHUNK_DELTA
+data: {"text":"是"}
+
+id: 53
+event: CHUNK_DELTA
+data: {"text":"3"}
+
+id: 54
+event: CHUNK_DELTA
+data: {"text":"”"}
+
+id: 55
+event: CHUNK_DELTA
+data: {"text":"，"}
+
+id: 56
+event: CHUNK_DELTA
+data: {"text":"再"}
+
+id: 57
+event: CHUNK_DELTA
+data: {"text":"在"}
+
+id: 58
+event: CHUNK_DELTA
+data: {"text":"content"}
+
+id: 59
+event: CHUNK_DELTA
+data: {"text":"写"}
+
+id: 60
+event: CHUNK_DELTA
+data: {"text":"3"}
+
+id: 61
+event: CHUNK_DELTA
+data: {"text":"。"}
+
+id: 62
+event: CHUNK_DELTA
+data: {"text":"最后"}
+
+id: 63
+event: CHUNK_DELTA
+data: {"text":"检查"}
+
+id: 64
+event: CHUNK_DELTA
+data: {"text":"格式"}
+
+id: 65
+event: CHUNK_DELTA
+data: {"text":"，"}
+
+id: 66
+event: CHUNK_DELTA
+data: {"text":"确保"}
+
+id: 67
+event: CHUNK_DELTA
+data: {"text":"整个"}
+
+id: 68
+event: CHUNK_DELTA
+data: {"text":"回复"}
+
+id: 69
+event: CHUNK_DELTA
+data: {"text":"包裹"}
+
+id: 70
+event: CHUNK_DELTA
+data: {"text":"在"}
+
+id: 71
+event: CHUNK_DELTA
+data: {"text":"@@"}
+
+id: 72
+event: CHUNK_DELTA
+data: {"text":"B"}
+
+id: 73
+event: CHUNK_DELTA
+data: {"text":"EG"}
+
+id: 74
+event: CHUNK_DELTA
+data: {"text":":"}
+
+id: 75
+event: CHUNK_DELTA
+data: {"text":"response"}
+
+id: 76
+event: CHUNK_DELTA
+data: {"text":"@@"}
+
+id: 77
+event: CHUNK_DELTA
+data: {"text":"里"}
+
+id: 78
+event: CHUNK_DELTA
+data: {"text":"，"}
+
+id: 79
+event: CHUNK_DELTA
+data: {"text":"且"}
+
+id: 80
+event: CHUNK_DELTA
+data: {"text":"无"}
+
+id: 80
+event: SSE_HEARTBEAT
+data: {}
+
+id: 81
+event: CHUNK_DELTA
+data: {"text":"工具"}
+
+id: 82
+event: CHUNK_DELTA
+data: {"text":"调用"}
+
+id: 83
+event: CHUNK_DELTA
+data: {"text":"，"}
+
+id: 84
+event: CHUNK_DELTA
+data: {"text":"无需"}
+
+id: 85
+event: CHUNK_DELTA
+data: {"text":"填写"}
+
+id: 86
+event: CHUNK_DELTA
+data: {"text":"tool"}
+
+id: 87
+event: CHUNK_DELTA
+data: {"text":"_c"}
+
+id: 88
+event: CHUNK_DELTA
+data: {"text":"alls"}
+
+id: 89
+event: CHUNK_DELTA
+data: {"text":"。"}
+
+id: 90
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":1,"patch_type":1,"patch_value":{"content_block":[{"block_type":10000,"block_id":"10468224510816002","parent_id":"10468224510704898","content":{"text_block":{"text":"\n\n","icon_url":"https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsm/ljhwZthlaukjlkulzlp/tool_icon/Deep_Think.png","icon_url_dark":"https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsm/ljhwZthlaukjlkulzlp/tool_icon/Deep_Think-1.png","summary":"确定回复格式与内容"}},"is_finish":true,"patch_type":1}]}}]}
+
+id: 105
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":1,"patch_type":1,"patch_value":{"content_block":[{"block_type":10000,"block_id":"10468224510816002","parent_id":"10468224510704898","content":{"text_block":{"icon_url":"https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsm/ljhwZthlaukjlkulzlp/tool_icon/Deep_Think.png","icon_url_dark":"https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsm/ljhwZthlaukjlkulzlp/tool_icon/Deep_Think-1.png","summary":"确定回复格式与内容"}},"is_finish":true,"patch_type":1}]}}]}
+
+id: 107
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":1,"patch_type":1,"patch_value":{"content_block":[{"block_type":10040,"block_id":"10468224510704898","content":{"thinking_block":{"finish_title":"已完成思考","streaming_title":"正在思考","icon_url":"https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsm/ljhwZthlaukjlkulzlp/tool_icon/Deep_Think.png","icon_url_dark":"https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsm/ljhwZthlaukjlkulzlp/tool_icon/Deep_Think-1.png","unfold_streaming_title":"深度思考中"}},"is_finish":true,"patch_type":2}]}}]}
+
+id: 108
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":1,"patch_type":1,"patch_value":{"content_block":[{"block_type":10000,"block_id":"10468224510886914","content":{"text_block":{"text":"@@BEG:response@@"}},"is_finish":false,"patch_type":1}]}},{"patch_object":50,"patch_type":1,"patch_value":{"ext":{"perf_mark":"{\"marks\":[{\"ev_name\":\"answer_first_token\",\"ev_type\":\"query_duration\"}]}","review_scenario_id":"4085066754"}}}]}
+
+id: 109
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":111,"patch_type":1,"patch_value":{"tts_content":"@@BEG:response@@"}}]}
+
+id: 111
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":1,"patch_type":1,"patch_value":{"content_block":[{"block_type":10000,"block_id":"10468224510886914","content":{"text_block":{"text":"\n@@BEG:reason"}},"is_finish":false,"patch_type":1}]}}]}
+
+id: 112
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":111,"patch_type":1,"patch_value":{"tts_content":"\n@@BEG:reason"}}]}
+
+id: 114
+event: CHUNK_DELTA
+data: {"text":"ing_content@@\nCalculate "}
+
+id: 115
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":111,"patch_type":1,"patch_value":{"tts_content":"ing_content@@\nCalculate "}}]}
+
+id: 117
+event: CHUNK_DELTA
+data: {"text":"1 plus 2, the"}
+
+id: 118
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":111,"patch_type":1,"patch_value":{"tts_content":"1 plus 2, the"}}]}
+
+id: 120
+event: CHUNK_DELTA
+data: {"text":" result is 3.\n"}
+
+id: 121
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":111,"patch_type":1,"patch_value":{"tts_content":" result is 3.\n"}}]}
+
+id: 123
+event: CHUNK_DELTA
+data: {"text":"@@END:reasoning_content"}
+
+id: 124
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":111,"patch_type":1,"patch_value":{"tts_content":"@@END:reasoning_content"}}]}
+
+id: 126
+event: CHUNK_DELTA
+data: {"text":"@@\n\n@@BEG:"}
+
+id: 127
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":111,"patch_type":1,"patch_value":{"tts_content":"@@\n\n@@BEG:"}}]}
+
+id: 129
+event: CHUNK_DELTA
+data: {"text":"content@@\n3\n@@"}
+
+id: 130
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":111,"patch_type":1,"patch_value":{"tts_content":"content@@\n3\n@@"}}]}
+
+id: 132
+event: CHUNK_DELTA
+data: {"text":"END:content@@\n@@"}
+
+id: 133
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":111,"patch_type":1,"patch_value":{"tts_content":"END:content@@\n@@"}}]}
+
+id: 135
+event: CHUNK_DELTA
+data: {"text":"END:response@@"}
+
+id: 136
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":111,"patch_type":1,"patch_value":{"tts_content":"END:response@@"}}]}
+
+id: 139
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":1,"patch_type":1,"patch_value":{"content_block":[{"block_type":10000,"block_id":"10468224510886914","content":{"text_block":{}},"is_finish":true,"patch_type":1}]}}]}
+
+id: 140
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":3,"patch_type":2,"patch_value":{}},{"patch_object":50,"patch_type":1,"patch_value":{"ext":{"is_finish":"1","perf_mark":"{\"marks\":[{\"ev_name\":\"task_finish\",\"ev_type\":\"query_duration\"}]}"}}}]}
+
+id: 141
+event: SSE_REPLY_END
+data: {"end_type":1,"msg_finish_attr":{"msgid":"1000000000000000000","badge_count":7,"read_badge_count":6,"read_conv_version":1791957265111043,"pre_read_conv_version":1791957265111043,"brief":"@@BEG:response@@@@BEG:reasoning_content@@Calculate 1 plus 2, the result is 3.@@END:reasoning_cont @@BEG:"}}
+
+id: 142
+event: SSE_REPLY_END
+data: {"end_type":2,"answer_finish_attr":{"has_suggest":true}}
+
+id: 143
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":50,"patch_type":1,"patch_value":{"ext":{"sp_v2":"[{\"suggest_type\":1,\"content\":\" 1+2+3\",\"icon_url\":\"\",\"icon_uri\":\"\",\"click_url\":\"\",\"bot_id\":\"\",\"dark_icon_url\":\"\"}]","tea_tags_time_cost":"{\"agent_id\":\"\",\"agent_name\":\"\",\"llm_intention\":\"seed_main\",\"llm_intention_detail\":\"default\"}","has_suggest":"1"}}}]}
+
+id: 144
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":50,"patch_type":1,"patch_value":{"ext":{"has_suggest":"1","sp_v2":"[{\"suggest_type\":1,\"content\":\" 1+2+3\",\"icon_url\":\"\",\"icon_uri\":\"\",\"click_url\":\"\",\"bot_id\":\"\",\"dark_icon_url\":\"\"},{\"suggest_type\":1,\"content\":\" 2+3\",\"icon_url\":\"\",\"icon_uri\":\"\",\"click_url\":\"\",\"bot_id\":\"\",\"dark_icon_url\":\"\"}]"}}}]}
+
+id: 145
+event: STREAM_CHUNK
+data: {"message_id":"1000000000000000000","patch_op":[{"patch_object":50,"patch_type":1,"patch_value":{"ext":{"has_suggest":"1","sp_v2":"[{\"suggest_type\":1,\"content\":\" 1+2+3\",\"icon_url\":\"\",\"icon_uri\":\"\",\"click_url\":\"\",\"bot_id\":\"\",\"dark_icon_url\":\"\"},{\"suggest_type\":1,\"content\":\" 2+3\",\"icon_url\":\"\",\"icon_uri\":\"\",\"click_url\":\"\",\"bot_id\":\"\",\"dark_icon_url\":\"\"},{\"suggest_type\":1,\"content\":\" 1+3\",\"icon_url\":\"\",\"icon_uri\":\"\",\"click_url\":\"\",\"bot_id\":\"\",\"dark_icon_url\":\"\"}]"}}}]}
+
+id: 146
+event: SSE_REPLY_END
+data: {"end_type":3}
+

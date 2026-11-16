@@ -1,0 +1,16 @@
+{
+  "provider": "wenxin",
+  "dialect": "office-writing",
+  "comment": "Search Lightning 模式：正文在 officeWriting.data.content，175 个小片段拼出 marker；完成后 generate-complete 显式收尾。",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "wenxinOfficeWritingAnswer"
+    ],
+    "contentContains": [
+      "browser_search"
+    ],
+    "finishReason": "stop"
+  },
+  "sourceUrl": "https://chat.baidu.com/aichat/api/conversation"
+}

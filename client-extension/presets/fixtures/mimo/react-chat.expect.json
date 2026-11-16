@@ -1,0 +1,20 @@
+{
+  "provider": "mimo",
+  "dialect": "react-chat",
+  "comment": "React chat separates page reasoningContent from the marker-bearing answer content.",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "answerDelta"
+    ],
+    "contentContains": [
+      "React chat answer."
+    ],
+    "mustNotContain": [
+      "page-side thinking"
+    ],
+    "streamedMustNotContain": [
+      "page-side thinking"
+    ]
+  }
+}

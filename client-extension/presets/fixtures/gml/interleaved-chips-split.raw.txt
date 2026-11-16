@@ -1,0 +1,10 @@
+data:  {"id":"interleaved-chips-split","conversation_id":"fixture","assistant_id":"fixture","parts":[{"role":"assistant","content":[{"type":"text","text":"@@BEG:response@@\n@@BEG:content@@\n答案一"}],"status":"init"}],"status":"init"}
+
+data:  {"id":"interleaved-chips-split","conversation_id":"fixture","assistant_id":"fixture","parts":[{"role":"assistant","content":[{"type":"text","text":"【tur"}],"status":"init"}],"status":"init"}
+
+data:  {"id":"interleaved-chips-split","conversation_id":"fixture","assistant_id":"fixture","parts":[{"role":"assistant","content":[{"type":"text","text":"n0search2】【cita"}],"status":"init"}],"status":"init"}
+
+data:  {"id":"interleaved-chips-split","conversation_id":"fixture","assistant_id":"fixture","parts":[{"role":"assistant","content":[{"type":"text","text":"tion:2】答案二\n@@END:content@@\n@@END:response@@"}],"status":"init"}],"status":"init"}
+
+data:  {"id":"interleaved-chips-split","conversation_id":"fixture","assistant_id":"fixture","parts":[{"role":"assistant","content":[{"type":"text","text":"@@BEG:response@@\n@@BEG:content@@\n答案一【turn0search2】【citation:2】答案二\n@@END:content@@\n@@END:response@@"}],"status":"finish"}],"status":"finish"}
+
