@@ -2,7 +2,7 @@ package com.just3bowls.ui.content.webchat
 
 import com.just3bowls.facade.JsBridge
 import com.just3bowls.facade.BrowserEvents
-import com.just3bowls.ui.components.BrowserToolsIndicator
+import com.just3bowls.ui.components.{BrowserToolsIndicator, InlineDeleteConfirmation, NeutralIconButton}
 
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.nodes.CommentNode
@@ -219,18 +219,10 @@ object WebChatView {
     val expanded = state.expandedSessionIds.contains(session.id)
     if (state.confirmingDelete == session.id)
       div(
-        div(
-          margin       := "4px 0 2px 0",
-          color        := "#b91c1c",
-          fontSize     := "10px",
-          s"""Delete "${session.title}"?"""
-        ),
-        div(
-          display.flex,
-          gap          := "4px",
-          marginBottom := "4px",
-          actionButton("Delete", destructive = true, cb.deleteSession(session.id)),
-          actionButton("Cancel", destructive = false, cb.cancelDelete())
+        margin := "4px 0",
+        InlineDeleteConfirmation.render(
+          onConfirm = () => cb.deleteSession(session.id),
+          onCancel = () => cb.cancelDelete()
         )
       )
     else if (state.renamingId == session.id)
@@ -280,8 +272,8 @@ object WebChatView {
             if (editor == null || next == null || !editor.contains(next)) cb.cancelRename()
           }
         ),
-        renameActionIcon("✓", "Save session name", "#15803d", "#bbf7d0", cb.saveRename()),
-        renameActionIcon("×", "Cancel session rename", "#b91c1c", "#fecaca", cb.cancelRename())
+        NeutralIconButton.render("✓", "Save session name", () => cb.saveRename()),
+        NeutralIconButton.render("×", "Cancel session rename", () => cb.cancelRename())
       )
     else
       div(
@@ -499,51 +491,6 @@ object WebChatView {
           )
         )
       }
-    )
-
-  private def renameActionIcon(
-      label: String,
-      tooltip: String,
-      textColor: String,
-      borderColor: String,
-      onClickAction: => Unit
-  ): HtmlElement         =
-    button(
-      label,
-      `type`         := "button",
-      display        := "inline-flex",
-      alignItems     := "center",
-      justifyContent := "center",
-      width          := "22px",
-      height         := "22px",
-      padding        := "0",
-      fontSize       := "11px",
-      lineHeight     := "1",
-      color          := textColor,
-      background     := "transparent",
-      border         := s"1px solid $borderColor",
-      borderRadius   := "4px",
-      cursor.pointer,
-      title          := tooltip,
-      onClick --> { event =>
-        event.stopPropagation()
-        onClickAction
-      }
-    )
-
-  private def actionButton(label: String, destructive: Boolean, onClickAction: => Unit): HtmlElement =
-    button(
-      label,
-      flex            := "1",
-      margin          := "0",
-      padding         := "5px 8px",
-      fontSize        := "11px",
-      borderRadius    := "4px",
-      cursor.pointer,
-      backgroundColor := (if (destructive) "#fef2f2" else "#f9fafb"),
-      color           := (if (destructive) "#b91c1c" else "#111827"),
-      border          := (if (destructive) "1px solid #fecaca" else "1px solid #e5e7eb"),
-      onClick --> { _ => onClickAction }
     )
 
   private def badge(label: String, fg: String, bg: String): HtmlElement =
