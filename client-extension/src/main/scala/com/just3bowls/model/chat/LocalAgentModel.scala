@@ -3,6 +3,7 @@ package com.just3bowls.model.chat
 import com.just3bowls.facade.JsBridge
 import com.just3bowls.model.provider.*
 import com.just3bowls.model.localapi.*
+import com.just3bowls.model.diagnostics.PopCanLog
 
 import com.just3bowls.facade.{AIMessage, LangChainBaseMessage, LangChainTools, RunnableLambda, Zod, ZodSchema}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
@@ -40,6 +41,42 @@ object LocalAgentModel {
       current
     }
   }
+
+  final case class ProviderCall(
+      round: Int,
+      contextMode: String,
+      conversation: String,
+      toolProfileId: String
+  )
+
+  /**
+   * Conversation identity for one outer Agent Run.
+   *
+   * The first provider call may open a new Provider chat or continue the bound one. Every later model call is a
+   * tool-result round inside that same run, so it must reuse the conversation and only send the new messages.
+   */
+  final class ConversationState(val toolProfileId: String) {
+    private var providerCalls = 0
+
+    def next(requestedContextMode: String, requestedConversation: String): ProviderCall = {
+      providerCalls += 1
+      if (providerCalls == 1)
+        ProviderCall(
+          round = providerCalls,
+          contextMode = requestedContextMode,
+          conversation = requestedConversation,
+          toolProfileId = toolProfileId
+        )
+      else
+        ProviderCall(
+          round = providerCalls,
+          contextMode = ProviderChatSettings.Delta,
+          conversation = "reuse",
+          toolProfileId = toolProfileId
+        )
+    }
+  }
+
   def createLangChainTool(
       toolDef: AgentToolSpec,
       callTool: (String, String) => Future[js.Any],
@@ -142,6 +179,8 @@ object LocalAgentModel {
       hostTabId: Int = 0,
       /** 这一轮用过的对话要不要绑给会话：插件页 Chat / Retry 为 true；网页原生 host 轮为 false。 */
       bindConversation: Boolean = false,
+      /** Shared across every model invocation and bindTools instance in one Agent Run. */
+      conversationState: ConversationState,
       seed: Option[SeedState] = None,
       repair: Option[RepairState] = None
   ): js.Object = {
@@ -161,14 +200,16 @@ object LocalAgentModel {
           promptMode,
           hostTabId,
           bindConversation,
+          conversationState,
           seed,
           repair
         ).toJSPromise
     val bindFn: js.Function1[js.Any, js.Object]                                =
-      (tools: js.Any) =>
+      (tools: js.Any) => {
+        val nextTools = boundToolDefsFromJs(tools, boundToolDefs)
         create(
           provider,
-          boundToolDefsFromJs(tools, boundToolDefs),
+          nextTools,
           onEvent,
           cancellation,
           keyId,
@@ -180,9 +221,11 @@ object LocalAgentModel {
           promptMode,
           hostTabId,
           bindConversation,
+          conversationState,
           seed,
           repair
         )
+      }
     val runnable                                                               = JsBridge.asObject(RunnableLambda.from(
       invokeFn.asInstanceOf[js.Function1[js.Any, js.Any]]
     ))
@@ -206,6 +249,7 @@ object LocalAgentModel {
       promptMode: String,
       hostTabId: Int,
       bindConversation: Boolean,
+      conversationState: ConversationState,
       seed: Option[SeedState],
       repair: Option[RepairState]
   ): Future[AIMessage] = {
@@ -214,6 +258,13 @@ object LocalAgentModel {
       case Some(round) => Future.successful(seededAIMessage(round, onEvent))
       case None        =>
         val initialRepair = repair.flatMap(_.take())
+        val providerCall  = conversationState.next(contextMode, conversation)
+        PopCanLog.debug(
+          "agent",
+          s"provider call round=${providerCall.round} requested=${contextMode}/${conversation} " +
+            s"effective=${providerCall.contextMode}/${providerCall.conversation} " +
+            s"toolProfile=${PopCanLog.short(providerCall.toolProfileId, 32)}"
+        )
         invokeProvider(
           provider,
           toolDefs,
@@ -223,11 +274,12 @@ object LocalAgentModel {
           keyId,
           sessionId,
           contextIds,
-          contextMode,
-          conversation,
+          providerCall.contextMode,
+          providerCall.conversation,
           promptMode,
           hostTabId,
           bindConversation,
+          providerCall.toolProfileId,
           initialRepair
         )
     }
@@ -246,6 +298,7 @@ object LocalAgentModel {
       promptMode: String,
       hostTabId: Int,
       bindConversation: Boolean,
+      toolProfileId: String,
       initialProtocolRepair: Option[String]
   ): Future[AIMessage] = {
     val messageJson = messagesAsOpenAi(messages)
@@ -264,7 +317,8 @@ object LocalAgentModel {
           promptMode = promptMode,
           inject = true,
           hostTabId = hostTabId,
-          bindConversation = bindConversation
+          bindConversation = bindConversation,
+          toolProfileId = toolProfileId
         ),
         onEvent,
         cancellation,

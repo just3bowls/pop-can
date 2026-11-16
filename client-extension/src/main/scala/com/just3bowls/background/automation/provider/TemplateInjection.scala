@@ -6,7 +6,7 @@ import com.just3bowls.background.webchat.*
 import com.just3bowls.api.protocol.Bytes
 import com.just3bowls.api.marker.PromptArtifact
 import com.just3bowls.facade.{ChromeAPI, LastWebRequestBody}
-import com.just3bowls.model.chat.{AgentCapabilitySnapshot, AgentToolSpec, ChatMessage, ChatScenario}
+import com.just3bowls.model.chat.{AgentToolSurface, ChatMessage}
 import com.just3bowls.model.provider.ParserProviderInfo
 import com.just3bowls.model.chat.AgentBody
 import com.just3bowls.model.chat.OpenAiRequestPreview
@@ -82,13 +82,11 @@ private[background] object TemplateInjection {
   /**
    * 全量形态：把这一段消息当成一份 API 请求体，套完整 `ThinOpenAi` 模版。
    *
-   * `useBrowserTools` 时补上场景 system + 工具声明，让它和插件页 agent 的首轮 body 完全同构 —— 网页原生第一轮因此也能合法地发起工具调用。
+   * 工具声明来自同一个 `AgentToolSurface`，让网页原生首轮和插件页 agent 的请求同构。
    */
-  def fullPayloadOf(provider: String, messages: List[js.Any], toolDefs: List[AgentToolSpec]): String = {
-    val tools      = AgentBody.toolsJson(toolDefs)
-    val capability = ChatScenario.capabilityPolicy(AgentCapabilitySnapshot(toolDefs))
-    val withRole   = AgentBody.systemMessage(capability) :: messages
-    ThinOpenAi.buildPrompt(AgentBody.body(provider, js.Array(withRole*), tools))
+  def fullPayloadOf(provider: String, messages: List[js.Any], surface: AgentToolSurface): String = {
+    val tools = AgentBody.toolsJson(surface.tools)
+    ThinOpenAi.buildPrompt(AgentBody.body(provider, js.Array(messages*), tools))
   }
 
   /**
@@ -101,7 +99,7 @@ private[background] object TemplateInjection {
       provider: String,
       delta: List[ChatMessage],
       userText: String,
-      toolDefs: List[AgentToolSpec],
+      surface: AgentToolSurface,
       memoryContext: String = ""
   ): String = {
     val semanticUser = PromptArtifact.userTextOrOriginal(userText)
@@ -115,10 +113,10 @@ private[background] object TemplateInjection {
     val messages     = memory ++ history ++ pending
     if (form == ModeDelta)
       deltaPayload(
-        AgentBody.systemMessage(ChatScenario.capabilityPolicy(AgentCapabilitySnapshot(toolDefs))) :: messages,
-        Option.when(toolDefs.nonEmpty)(AgentBody.toolsJson(toolDefs))
+        messages,
+        Option.when(surface.tools.nonEmpty)(AgentBody.toolsJson(surface.tools))
       )
-    else fullPayloadOf(provider, messages, toolDefs)
+    else fullPayloadOf(provider, messages, surface)
   }
 
   /** 页面给的上下文 id 数不对（LangGraph 改过消息数组）时不切片，直接全量。 */
@@ -134,7 +132,8 @@ private[background] object TemplateInjection {
       protocolRepair: Option[String],
       inject: Boolean,
       /** 正文怎么送：`inline` = 改写进请求体（全量那一投套整份模版、增量轮只投 messages）；`file` = 造成 `.txt` 附件（全量装整份 body，`continue` 装增量）。 */
-      promptMode: String = PromptSettings.Inline
+      promptMode: String = PromptSettings.Inline,
+      toolProfileId: String = ""
   ): Future[InjectionPlan] = {
     val isFile = PromptSettings.normalize(promptMode) == PromptSettings.File
     val typed  = InjectionPlan(typedPrompt, None, "", "typed", None)
@@ -154,7 +153,15 @@ private[background] object TemplateInjection {
             bodyJson = bodyJson,
             protocolRepair = protocolRepair,
             commit =
-              commitTip(provider, sessionId, messageIds, messageCount(bodyJson), tabId, lastUserTextOf(bodyJson)),
+              commitTip(
+                provider,
+                sessionId,
+                messageIds,
+                messageCount(bodyJson),
+                tabId,
+                lastUserTextOf(bodyJson),
+                toolProfileId
+              ),
             reason = ""
           )
         )
@@ -174,7 +181,8 @@ private[background] object TemplateInjection {
           messageIds = messageIds,
           bodyCount = messageCount(bodyJson),
           tabId = tabId,
-          reason = "no usable http apiPattern / request.userText rule"
+          reason = "no usable http apiPattern / request.userText rule",
+          toolProfileId = toolProfileId
         )
       else
         for {
@@ -194,7 +202,8 @@ private[background] object TemplateInjection {
               messageIds = messageIds,
               bodyCount = messageCount(bodyJson),
               tabId = tabId,
-              reason = reason
+              reason = reason,
+              toolProfileId = toolProfileId
             )
           if (blocked)
             if (isFile) typedFallback("request injection is disabled for this provider")
@@ -233,7 +242,15 @@ private[background] object TemplateInjection {
                   typedPrompt = typedPrompt,
                   bodyJson = item._1,
                   protocolRepair = protocolRepair,
-                  commit = commitTip(provider, sessionId, item._2, total, tabId, lastUserTextOf(bodyJson)),
+                  commit = commitTip(
+                    provider,
+                    sessionId,
+                    item._2,
+                    total,
+                    tabId,
+                    lastUserTextOf(bodyJson),
+                    toolProfileId
+                  ),
                   reason = ""
                 )
               case Some(item)           =>
@@ -246,7 +263,16 @@ private[background] object TemplateInjection {
                   modeTag = if (repair.nonEmpty) "hijack/repair" else "hijack/delta",
                   commit =
                     if (repair.nonEmpty) None
-                    else commitTip(provider, sessionId, item._2, total, tabId, lastUserTextOf(bodyJson)),
+                    else
+                      commitTip(
+                        provider,
+                        sessionId,
+                        item._2,
+                        total,
+                        tabId,
+                        lastUserTextOf(bodyJson),
+                        toolProfileId
+                      ),
                   detail = s"delta messages=${item._3} skippedOwn=${item._4}"
                 )
               case None if isFile       =>
@@ -257,7 +283,15 @@ private[background] object TemplateInjection {
                   typedPrompt = typedPrompt,
                   bodyJson = bodyJson,
                   protocolRepair = protocolRepair,
-                  commit = commitTip(provider, sessionId, ids, total, tabId, lastUserTextOf(bodyJson)),
+                  commit = commitTip(
+                    provider,
+                    sessionId,
+                    ids,
+                    total,
+                    tabId,
+                    lastUserTextOf(bodyJson),
+                    toolProfileId
+                  ),
                   reason = ""
                 )
               case None                 =>
@@ -268,7 +302,16 @@ private[background] object TemplateInjection {
                   modeTag = if (repair.nonEmpty) "hijack/repair" else "hijack/full",
                   commit =
                     if (repair.nonEmpty) None
-                    else commitTip(provider, sessionId, ids, total, tabId, lastUserTextOf(bodyJson))
+                    else
+                      commitTip(
+                        provider,
+                        sessionId,
+                        ids,
+                        total,
+                        tabId,
+                        lastUserTextOf(bodyJson),
+                        toolProfileId
+                      )
                 )
             }
           }
@@ -332,7 +375,8 @@ private[background] object TemplateInjection {
       messageIds: List[String],
       bodyCount: Int,
       tabId: Int,
-      reason: String
+      reason: String,
+      toolProfileId: String
   ): InjectionPlan =
     typedDelivery(
       provider = provider,
@@ -340,7 +384,15 @@ private[background] object TemplateInjection {
       typedPrompt = typedPrompt,
       bodyJson = bodyJson,
       protocolRepair = protocolRepair,
-      commit = commitTip(provider, sessionId, messageIds, bodyCount, tabId, lastUserTextOf(bodyJson)),
+      commit = commitTip(
+        provider,
+        sessionId,
+        messageIds,
+        bodyCount,
+        tabId,
+        lastUserTextOf(bodyJson),
+        toolProfileId
+      ),
       reason = reason
     )
   private def fileFallbackOrInlineFailure(
@@ -353,7 +405,8 @@ private[background] object TemplateInjection {
       messageIds: List[String],
       bodyCount: Int,
       tabId: Int,
-      reason: String
+      reason: String,
+      toolProfileId: String
   ): Future[InjectionPlan] =
     if (PromptSettings.normalize(promptMode) == PromptSettings.File)
       Future.successful(
@@ -367,7 +420,8 @@ private[background] object TemplateInjection {
           messageIds = messageIds,
           bodyCount = bodyCount,
           tabId = tabId,
-          reason = s"$reason (the request body was uploaded as a file)"
+          reason = s"$reason (the request body was uploaded as a file)",
+          toolProfileId = toolProfileId
         )
       )
     else inlineUnavailable(s"$reason. Fix the provider rule or choose file mode.")
@@ -389,7 +443,8 @@ private[background] object TemplateInjection {
       ids: List[String],
       bodyCount: Int,
       tabId: Int,
-      userText: String
+      userText: String,
+      toolProfileId: String
   ): Option[() => Unit] =
     // 只要这次真投了东西（body 非空）就提交：payload 没有真实 id 时 seedToMessageId 留空，由 host 表保留旧值。
     if (sessionId.isEmpty || bodyCount <= 0) None
@@ -410,6 +465,7 @@ private[background] object TemplateInjection {
                     sessionId = sessionId,
                     provider = provider,
                     lastTabId = tabId,
+                    toolProfileId = toolProfileId,
                     seedToMessageId = tipId,
                     seedToBodyCount = bodyCount,
                     // 插件页 task 轮也要把"上一轮用户文本"同步过去，否则之后在页面点"重新生成"会匹配失败、多出一对重复问答。

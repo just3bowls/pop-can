@@ -162,7 +162,7 @@ object PopCanPage {
     val rememberDraftScopeVar = Var(Option.empty[String])
 
     /** Current session's browser-tools policy; before the first send it is the pending value for the next session. */
-    val browserToolsVar = Var(true)
+    val browserToolsVar = Var(false)
 
     /**
      * 固定值（pin）的内存缓存：`{ providerId: { thread, prompt } }`（用户词汇 `new|continue` / `inline|file`）。
@@ -220,7 +220,8 @@ object PopCanPage {
         SessionUrlInfo(
           tabId = t.tabId.getOrElse(0),
           url = t.url.getOrElse(""),
-          provider = t.provider.getOrElse("")
+          provider = t.provider.getOrElse(""),
+          toolProfileId = t.toolProfileId.getOrElse("")
         )
       })
 
@@ -481,20 +482,23 @@ object PopCanPage {
       pendingSendVar.set(None)
       refreshSessionUrls()
     }
-    def applyBrowserTools(enabled: Boolean, persist: Boolean): Unit = {
-      val previous  = browserToolsVar.now()
-      val sessionId = currentSessionIdVar.now()
-      browserToolsVar.set(enabled)
-      if (persist && sessionId.nonEmpty)
-        SessionSettingsStore
-          .saveBrowserTools(sessionId, enabled)
-          .recover { case e =>
-            if (currentSessionIdVar.now() == sessionId && browserToolsVar.now() == enabled)
-              browserToolsVar.set(previous)
-            showError(s"Save browser tools failed: ${Option(e.getMessage).getOrElse("unknown error")}")
-          }
-          .foreach(_ => ())
-    }
+    def applyBrowserTools(enabled: Boolean, persist: Boolean): Unit =
+      if (chatRunningVar.now())
+        showError("Browser tools cannot change while this chat is running. Stop it first.")
+      else {
+        val previous  = browserToolsVar.now()
+        val sessionId = currentSessionIdVar.now()
+        browserToolsVar.set(enabled)
+        if (persist && sessionId.nonEmpty)
+          SessionSettingsStore
+            .saveBrowserTools(sessionId, enabled)
+            .recover { case e =>
+              if (currentSessionIdVar.now() == sessionId && browserToolsVar.now() == enabled)
+                browserToolsVar.set(previous)
+              showError(s"Save browser tools failed: ${Option(e.getMessage).getOrElse("unknown error")}")
+            }
+            .foreach(_ => ())
+      }
 
     /** 固定值全表读进内存缓存（启动一次 + `thProviderPinnedSettings` 变更时刷新）。 */
     def refreshPinnedSettings(): Unit =
@@ -505,13 +509,29 @@ object PopCanPage {
     def pinnedOf(provider: String): Option[ChatSendPolicy.Settings] =
       pinnedSettingsVar.now().get(provider)
 
-    /**
-     * "这条会话在这个 provider 上用过" = 会话 URL 列表里有这一家的行 —— 那段原生对话已经拿到了本会话的历史。
-     *
-     * 没用过就不能只发增量（对方上下文里没有本会话），所以默认必须是"新开一段"。
-     */
+    def toolProfileForRun(browserTools: Boolean, referencedTabCount: Int): String =
+      AgentToolSurface(
+        AgentToolRegistry.chatToolsFor(BrowserToolsPolicy.effectiveForRun(browserTools, referencedTabCount))
+      ).revision
+
+    def providerConversationCompatible(
+        provider: String,
+        urls: List[SessionUrlInfo],
+        browserTools: Boolean,
+        referencedTabCount: Int
+    ): Boolean = {
+      val expected = toolProfileForRun(browserTools, referencedTabCount)
+      provider.nonEmpty && urls.exists(url => url.provider == provider && url.toolProfileId == expected)
+    }
+
+    /** A provider is reusable only when its bound Host uses the current turn's exact tool profile. */
     def sessionUsedProvider(provider: String): Boolean =
-      provider.nonEmpty && sessionUrlsVar.now().exists(_.provider == provider)
+      providerConversationCompatible(
+        provider,
+        sessionUrlsVar.now(),
+        browserToolsVar.now(),
+        pendingTabRefsVar.now().size
+      )
 
     /** 会话推导默认：用过 → `continue + inline`；没用过 → `new + inline`。 */
     def baselineSendSettings(provider: String): ChatSendPolicy.Settings =
@@ -554,9 +574,11 @@ object PopCanPage {
         provider: String,
         urls: List[SessionUrlInfo],
         sessionId: String,
-        undoSessions: Set[String]
+        undoSessions: Set[String],
+        browserTools: Boolean,
+        referencedTabCount: Int
     ): ChatSendPolicy.Settings = {
-      val used = provider.nonEmpty && urls.exists(_.provider == provider)
+      val used = providerConversationCompatible(provider, urls, browserTools, referencedTabCount)
       if (sessionId.nonEmpty && undoSessions.contains(sessionId)) ChatSendPolicy.afterUndo(used)
       else ChatSendPolicy.baseline(used)
     }
@@ -574,13 +596,15 @@ object PopCanPage {
           pinnedSettingsVar.signal,
           pendingSendVar.signal,
           currentSessionIdVar.signal,
-          undoForcesNewSessions.signal
+          undoForcesNewSessions.signal,
+          browserToolsVar.signal,
+          pendingTabRefsVar.signal
         )
-        .map { case (provider, urls, pinned, pending, sessionId, undoSessions) =>
+        .map { case (provider, urls, pinned, pending, sessionId, undoSessions, browserTools, tabRefs) =>
           if (provider.isEmpty) None
           else {
             val settings = ChatSendPolicy.resolve(
-              effectiveBaseline(provider, urls, sessionId, undoSessions),
+              effectiveBaseline(provider, urls, sessionId, undoSessions, browserTools, tabRefs.size),
               pinned.get(provider),
               pending.filter(_.provider == provider).map(_.settings)
             )
@@ -593,8 +617,12 @@ object PopCanPage {
         }
     val currentBaselineSettingsSignal: Signal[ChatSendPolicy.Settings]     =
       Signal
-        .combine(providerVar.signal, sessionUrlsVar.signal)
-        .map { case (provider, urls) => ChatSendPolicy.baseline(urls.exists(_.provider == provider)) }
+        .combine(providerVar.signal, sessionUrlsVar.signal, browserToolsVar.signal, pendingTabRefsVar.signal)
+        .map { case (provider, urls, browserTools, tabRefs) =>
+          ChatSendPolicy.baseline(
+            providerConversationCompatible(provider, urls, browserTools, tabRefs.size)
+          )
+        }
     val chatSettingsVisible: Signal[Boolean]                               =
       providerVar.signal.map(_.nonEmpty)
 
@@ -1403,7 +1431,7 @@ object PopCanPage {
     def syncAgentModeForSession(sessionId: String): Unit                                         =
       if (sessionId.trim.isEmpty) {
         agentModeVar.set(AgentModePolicy.React)
-        browserToolsVar.set(true)
+        browserToolsVar.set(false)
       } else
         SessionSettingsStore.load(sessionId).foreach { settings =>
           if (currentSessionIdVar.now() == sessionId) {
@@ -1440,7 +1468,7 @@ object PopCanPage {
       if (currentSessionIdVar.now() == deleted) {
         cancelCurrentSessionTitleEdit()
         agentModeVar.set(AgentModePolicy.React)
-        browserToolsVar.set(true)
+        browserToolsVar.set(false)
         pendingTabRefsVar.set(Nil)
         tabCandidatesVar.set(Nil)
         currentSessionIdVar.set("")
@@ -1475,7 +1503,7 @@ object PopCanPage {
           if (currentSessionIdVar.now() == id) {
             cancelCurrentSessionTitleEdit()
             agentModeVar.set(AgentModePolicy.React)
-            browserToolsVar.set(true)
+            browserToolsVar.set(false)
             pendingAgentPlanVar.set(None)
             AgentPlanApproval.cancelAll("Session deleted")
             pendingTabRefsVar.set(Nil)
@@ -1551,7 +1579,7 @@ object PopCanPage {
       sessionMessagesVar.set(Nil)
       chatMessagesVar.set(Nil)
       agentModeVar.set(AgentModePolicy.React)
-      browserToolsVar.set(true)
+      browserToolsVar.set(false)
       pendingAgentPlanVar.set(None)
       AgentPlanApproval.cancelAll("New session")
       undoDepthVar.set(0)
@@ -3288,6 +3316,10 @@ object PopCanPage {
                 gap            := "6px",
                 overflow.hidden,
                 whiteSpace.nowrap,
+                BrowserToolsIndicator.render(
+                  enabledSignal = browserToolsVar.signal,
+                  onToggle = () => applyBrowserTools(!browserToolsVar.now(), persist = true)
+                ),
                 memoryLibrary.renderTrigger,
                 span(
                   display <-- footerNoticeVar.signal.map(notice =>
@@ -3406,10 +3438,6 @@ object PopCanPage {
                   ),
                   clickable = chatSettingsVisible,
                   visible = chatSettingsVisible
-                ),
-                BrowserToolsIndicator.render(
-                  enabledSignal = browserToolsVar.signal,
-                  onToggle = () => applyBrowserTools(!browserToolsVar.now(), persist = true)
                 )
               )
             ),

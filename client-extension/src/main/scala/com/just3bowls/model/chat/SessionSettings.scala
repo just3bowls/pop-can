@@ -10,7 +10,7 @@ import scala.scalajs.js
 /** Agent settings owned by one chat session. */
 final case class SessionSettings(
     agentMode: String = AgentModePolicy.React,
-    browserTools: Boolean = true
+    browserTools: Boolean = false
 )
 
 object SessionSettings {
@@ -35,12 +35,12 @@ object BrowserToolsPolicy {
  * The legacy global browser-tools value and agent-mode map are read only while migrating an older installation.
  */
 object SessionSettingsStore {
-  val KeyPrefix                   = "thSessionSettings:v1:"
-  val CurrentSchemaVersion        = 1
-  val LegacyBrowserToolsKey       = "popCanChatBrowserTools"
-  val LegacyAgentModesKey         = "thSessionAgentModes"
-  val MigrationMarkerKey          = "thSessionSettingsMigration:v1"
-  private val LegacyDisabledValue = "off"
+  val KeyPrefix                  = "thSessionSettings:v1:"
+  val CurrentSchemaVersion       = 1
+  val LegacyBrowserToolsKey      = "popCanChatBrowserTools"
+  val LegacyAgentModesKey        = "thSessionAgentModes"
+  val MigrationMarkerKey         = "thSessionSettingsMigration:v1"
+  private val LegacyEnabledValue = "on"
 
   def key(sessionId: String): String            = s"$KeyPrefix$sessionId"
   def isSessionKey(storageKey: String): Boolean =
@@ -65,7 +65,7 @@ object SessionSettingsStore {
               .normalize(
                 SessionSettings(
                   agentMode = JsBridge.stringField(raw, "agentMode").getOrElse(AgentModePolicy.React),
-                  browserTools = JsBridge.booleanField(raw, "browserTools").getOrElse(true)
+                  browserTools = JsBridge.booleanField(raw, "browserTools").getOrElse(false)
                 )
               )
           )
@@ -213,7 +213,7 @@ object SessionSettingsStore {
   private def readLegacyBrowserTools(value: Option[js.Any]): Boolean =
     value
       .map(_.toString.trim.toLowerCase)
-      .forall(_ != LegacyDisabledValue)
+      .exists(_ == LegacyEnabledValue)
 
   private def readLegacyModes(value: Option[js.Any]): Map[String, String] =
     value

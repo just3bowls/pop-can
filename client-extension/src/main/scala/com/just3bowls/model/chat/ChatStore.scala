@@ -421,7 +421,7 @@ object ChatStore {
        * 以前失败也写成 success（正文是模型原文），于是气泡上看不出失败、也没有 Retry 入口；现在由自动重试接手替换。
        */
       failed: Boolean = false,
-      browserTools: Boolean = true
+      browserTools: Boolean = false
   ): Future[Unit] =
     if (sessionId.isEmpty) Future.successful(())
     else
@@ -645,7 +645,7 @@ object ChatStore {
       effectiveMode = JsBridge.stringField(item, "effectiveMode").getOrElse(""),
       modePath = JsBridge.stringField(item, "modePath").getOrElse(""),
       agentRunId = JsBridge.stringField(item, "agentRunId").getOrElse(""),
-      browserTools = JsBridge.booleanField(item, "browserTools").getOrElse(true),
+      browserTools = JsBridge.booleanField(item, "browserTools").getOrElse(false),
       tabRefs = parseBrowserTabRefs(JsBridge.asObject(JsBridge.field(item, "tabRefs")))
     ))
   private def sessionToJs(s: ChatSession): js.Any                               =
@@ -760,7 +760,7 @@ object ChatStore {
       effectiveMode = JsBridge.undefinedString(m.effectiveMode).getOrElse(""),
       modePath = JsBridge.undefinedString(m.modePath).getOrElse(""),
       agentRunId = JsBridge.undefinedString(m.agentRunId).getOrElse(""),
-      browserTools = JsBridge.undefinedBoolean(m.browserTools).getOrElse(true)
+      browserTools = JsBridge.undefinedBoolean(m.browserTools).getOrElse(false)
     )
   }
   private def attemptToJs(attempt: ChatAttempt): js.Any                         =

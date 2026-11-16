@@ -35,7 +35,8 @@ object Msg {
       attachmentName: String = "",
       attachmentBody: String = "",
       promptMode: String = "",
-      bindConversation: Boolean = false
+      bindConversation: Boolean = false,
+      toolProfileId: String = ""
   ): InputPromptMessage =
     RuntimeMessageFactory.inputPrompt(
       provider = provider,
@@ -56,7 +57,8 @@ object Msg {
       attachmentName = attachmentName,
       attachmentBody = attachmentBody,
       promptMode = promptMode,
-      bindConversation = bindConversation
+      bindConversation = bindConversation,
+      toolProfileId = toolProfileId
     )
   def tabAiNotice(generationId: String, text: String): TabAiNoticeMessage =
     RuntimeMessageFactory.tabAiNotice(generationId, text)

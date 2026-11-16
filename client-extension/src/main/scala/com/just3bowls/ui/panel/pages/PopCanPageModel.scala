@@ -5,7 +5,8 @@ import com.just3bowls.api.chat.ChatSendPolicy
 final case class SessionUrlInfo(
     tabId: Int,
     url: String,
-    provider: String
+    provider: String,
+    toolProfileId: String
 )
 
 final private[pages] case class PendingAgentPlan(planId: String, plan: String)

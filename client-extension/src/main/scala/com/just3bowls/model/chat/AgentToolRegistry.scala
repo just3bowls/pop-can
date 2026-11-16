@@ -65,13 +65,44 @@ final case class AgentToolSpec(
   }
 }
 
-/** Exact tools visible to one agent turn. Browser tools are one optional group, not the whole tool set. */
-final case class AgentCapabilitySnapshot(toolDefs: List[AgentToolSpec]) {
-  val toolNames: Set[String]            = toolDefs.map(_.name).toSet
-  val browserTools: List[AgentToolSpec] = toolDefs.filter(_.kind == ToolKind.BrowserUse)
+/** Exact tools visible to one agent turn. Provider-native tools are deliberately not represented here. */
+final case class AgentToolSurface(tools: List[AgentToolSpec]) {
+  val toolNames: Set[String]            = tools.map(_.name).toSet
+  val browserTools: List[AgentToolSpec] = tools.filter(_.kind == ToolKind.BrowserUse)
   val browserToolsEnabled: Boolean      = browserTools.nonEmpty
-  val nonBrowserToolNames: List[String] =
-    toolDefs.filterNot(_.kind == ToolKind.BrowserUse).map(_.name).distinct.sorted
+  val revision: String                  = AgentToolSurface.revisionOf(tools)
+}
+
+object AgentToolSurface {
+
+  /**
+   * Stable content revision for Provider-conversation isolation.
+   *
+   * Tool order is irrelevant, but changing a name, description, schema or execution metadata creates a new revision.
+   * FNV-1a is sufficient here: this is an equality token for local conversation binding, not a security hash.
+   */
+  def revisionOf(tools: List[AgentToolSpec]): String = {
+    def kindName(kind: ToolKind): String       =
+      kind match {
+        case ToolKind.BrowserUse => "browser"
+        case ToolKind.Local      => "local"
+      }
+    def canonical(tool: AgentToolSpec): String =
+      List(
+        tool.name,
+        tool.description,
+        kindName(tool.kind),
+        tool.terminal.toString,
+        tool.parametersJson
+      ).map(value => s"${value.length}:$value").mkString("|")
+    val input                                  = tools.map(canonical).sorted.mkString("\n")
+    var hash                                   = -3750763034362895579L
+    input.foreach { char =>
+      hash ^= char.toLong
+      hash *= 1099511628211L
+    }
+    s"${java.lang.Long.toHexString(hash)}-${input.length}"
+  }
 }
 
 /** 全部浏览器工具的唯一声明处。 */

@@ -57,6 +57,9 @@ trait InputPromptMessage extends RuntimeMessage:
    */
   def bindConversation: js.UndefOr[Boolean] = js.native
 
+  /** Exact LangChain tool-surface revision used by this provider conversation. */
+  def toolProfileId: js.UndefOr[String] = js.native
+
 /** 后台给插件页的一次性提示（例如"这家 provider 不支持注入，本轮按整段模版发送"）。 */
 @js.native
 trait TabAiNoticeMessage extends RuntimeMessage:
@@ -172,10 +175,6 @@ trait WebChatFocusUrlMessage extends RuntimeMessage:
   def url: js.UndefOr[String] = js.native
 
 @js.native
-trait WebChatBrowserToolsMessage extends RuntimeMessage:
-  def on: js.UndefOr[Boolean] = js.native
-
-@js.native
 trait WebChatStateMessage extends RuntimeMessage:
   def state: js.UndefOr[WebChatCapsuleState] = js.native
 
@@ -224,11 +223,12 @@ trait BrowserTabsReleaseMessage extends WebChatSessionMessage
 
 @js.native
 trait SessionUrlRowMessage extends js.Object:
-  def tabId: js.UndefOr[Int]         = js.native
-  def url: js.UndefOr[String]        = js.native
-  def provider: js.UndefOr[String]   = js.native
-  def isCurrent: js.UndefOr[Boolean] = js.native
-  def isLast: js.UndefOr[Boolean]    = js.native
+  def tabId: js.UndefOr[Int]            = js.native
+  def url: js.UndefOr[String]           = js.native
+  def provider: js.UndefOr[String]      = js.native
+  def toolProfileId: js.UndefOr[String] = js.native
+  def isCurrent: js.UndefOr[Boolean]    = js.native
+  def isLast: js.UndefOr[Boolean]       = js.native
 
 @js.native
 trait SessionUrlsMessage extends WebChatSessionMessage:
@@ -278,7 +278,6 @@ trait WebChatCapsuleState extends js.Object:
   def sessionId: js.UndefOr[String]       = js.native
   def canTakeover: js.UndefOr[Boolean]    = js.native
   def agentRunning: js.UndefOr[Boolean]   = js.native
-  def browserTools: js.UndefOr[Boolean]   = js.native
 
 @js.native
 trait WebChatSessionSummary extends js.Object:

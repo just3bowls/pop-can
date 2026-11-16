@@ -21,7 +21,8 @@ final case class ModelRunRequest(
     promptMode: String = ProviderChatSettings.Inline,
     inject: Boolean = true,
     hostTabId: Int = 0,
-    bindConversation: Boolean = false
+    bindConversation: Boolean = false,
+    toolProfileId: String = ""
 )
 
 /**
@@ -83,6 +84,7 @@ object ValidatedModelRuntime {
             hostTabId = request.hostTabId,
             promptMode = request.promptMode,
             bindConversation = request.bindConversation,
+            toolProfileId = request.toolProfileId,
             onTaskStarted = onTaskStarted
           )
           .recover { case e =>

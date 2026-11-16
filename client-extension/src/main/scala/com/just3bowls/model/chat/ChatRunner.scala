@@ -31,7 +31,7 @@ object ChatRunner {
       onEvent: TabAiEvent => Unit,
       registerCancel: (() => Unit) => Unit,
       maxSteps: Int,
-      useBrowserTools: Boolean = true,
+      useBrowserTools: Boolean = false,
       contextMode: String = ProviderChatSettings.Delta,
       conversation: String = "",
       /** 正文投递方式（`inline` / `file`）：由插件页按 `/provider` 的本次设置给出。 */
@@ -140,7 +140,7 @@ object ChatRunner {
       registerCancel: (() => Unit) => Unit = _ => (),
       mode: String = "chat",
       maxSteps: Int = 10,
-      useBrowserTools: Boolean = true,
+      useBrowserTools: Boolean = false,
       contextMode: String = ProviderChatSettings.Delta,
       conversation: String = "",
       /** 正文投递方式（`inline` / `file`）：由插件页按 `/provider` 的本次设置给出。 */

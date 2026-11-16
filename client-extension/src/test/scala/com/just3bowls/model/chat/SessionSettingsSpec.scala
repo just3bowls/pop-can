@@ -41,11 +41,12 @@ class SessionSettingsSpec extends munit.FunSuite {
     )
   }
 
-  test("missing legacy values preserve the previous default behavior") {
+  test("missing legacy values default browser tools off") {
     assertEquals(
       SessionSettingsStore.legacySettingsFor("session-1", None, None),
       SessionSettings.Default
     )
+    assertEquals(SessionSettings.Default.browserTools, false)
   }
 
   test("legacy chat attempts inherit the message browser-tools snapshot") {
@@ -71,6 +72,7 @@ class SessionSettingsSpec extends munit.FunSuite {
   }
 
   test("@tab enables browser tools for one run without changing the session default") {
+    assertEquals(BrowserToolsPolicy.effectiveForRun(sessionEnabled = false, referencedTabCount = 0), false)
     assertEquals(BrowserToolsPolicy.effectiveForRun(sessionEnabled = false, referencedTabCount = 1), true)
     assertEquals(BrowserToolsPolicy.isOneTurnOverride(sessionEnabled = false, referencedTabCount = 1), true)
     assertEquals(BrowserToolsPolicy.effectiveForRun(sessionEnabled = true, referencedTabCount = 0), true)

@@ -5,14 +5,14 @@ import com.just3bowls.facade.JsBridge
 import scala.scalajs.js
 
 /**
- * 一轮 agent 请求体的**唯一构造入口**：messages + 场景 system + tools → OpenAI body JSON。
+ * 一轮 agent 请求体的**唯一构造入口**：messages + tools → OpenAI body JSON。
  *
  * 插件页 / 研究页的模型调用（`LocalAgentModel`）和网页原生首轮注入（`TemplateInjection`）都从这里拿 body，保证两条链路给网页 AI 的载荷完全同构 ——
- * 原生那一轮也声明同一套工具、带同一条场景提示词，模型回工具轮后由插件页 agent 接着跑。
+ * 原生那一轮也声明同一套工具，模型回工具轮后由插件页 agent 接着跑。
  */
 object AgentBody {
 
-  /** Transient capability system message; it does not correspond to a persisted chat message. */
+  /** Transient system context; it does not correspond to a persisted chat message. */
   def systemMessage(content: String): js.Any =
     JsBridge.obj("role" -> ("system"), "content" -> (content))
 

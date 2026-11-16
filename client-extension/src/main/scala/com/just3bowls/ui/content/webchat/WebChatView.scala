@@ -2,12 +2,7 @@ package com.just3bowls.ui.content.webchat
 
 import com.just3bowls.facade.JsBridge
 import com.just3bowls.facade.BrowserEvents
-import com.just3bowls.ui.components.{
-  BrowserToolsIndicator,
-  InlineDeleteConfirmation,
-  NeutralActionButton,
-  NeutralIconButton
-}
+import com.just3bowls.ui.components.{InlineDeleteConfirmation, NeutralActionButton, NeutralIconButton}
 
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.nodes.CommentNode
@@ -47,7 +42,6 @@ final case class WebChatViewState(
     sessionId: String,
     canTakeover: Boolean,
     agentRunning: Boolean,
-    browserTools: Boolean,
     sessionsLoaded: Boolean,
     sessions: List[WebChatSessionView],
     listError: String,
@@ -75,7 +69,6 @@ final case class WebChatViewCallbacks(
     toggleUrls: String => Unit,
     openUrl: String => Unit,
     stopAgent: () => Unit,
-    toggleBrowserTools: () => Unit,
     copyToast: WebChatToastView => Unit,
     dismissToast: String => Unit
 )
@@ -174,22 +167,6 @@ object WebChatView {
       fontSize        := "11px",
       color           := "#111827",
       fontFamily      := font,
-      div(
-        display.flex,
-        alignItems.center,
-        justifyContent := "flex-end",
-        gap            := "6px",
-        marginBottom   := "2px",
-        borderTop      := "1px solid #e5e7eb",
-        paddingTop     := "6px",
-        NeutralActionButton.render(
-          span("+ Session"),
-          () => cb.newSession(),
-          textSize = "11px",
-          spacing = "4px 9px",
-          titleText = Some("New session")
-        )
-      ),
       if (state.actionError.nonEmpty)
         div(margin := "2px 0 4px 0", color := "#dc2626", fontSize := "10px", lineHeight := "1.5", state.actionError)
       else new CommentNode(""),
@@ -439,9 +416,12 @@ object WebChatView {
           onClick --> { _ => cb.stopAgent() }
         )
       else new CommentNode(""),
-      BrowserToolsIndicator.render(
-        enabledSignal = Val(state.browserTools),
-        onToggle = () => cb.toggleBrowserTools()
+      NeutralActionButton.render(
+        span("+ Session"),
+        () => cb.newSession(),
+        textSize = "11px",
+        spacing = "4px 9px",
+        titleText = Some("New session")
       )
     )
 

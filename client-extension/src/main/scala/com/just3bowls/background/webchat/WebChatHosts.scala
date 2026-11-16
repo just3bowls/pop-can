@@ -33,6 +33,8 @@ final private[background] case class WebChatHost(
     seedToBodyCount: Int = 0,
     /** 观测到的上一轮用户文本，用于判断"重新生成"（文本没变）。 */
     lastUserText: String = "",
+    /** AgentToolSurface revision used when this provider conversation was created/bound (empty = legacy). */
+    toolProfileId: String = "",
     /**
      * 这段对话最近一次出现在哪个 tab 上（0 = 未知 / 老记录）。
      *
@@ -139,6 +141,8 @@ private[background] object WebChatHosts {
       seedToBodyCount = math.max(host.seedToBodyCount, previous.map(_.seedToBodyCount).getOrElse(0)),
       lastUserText = if (host.lastUserText.nonEmpty) host.lastUserText
       else previous.map(_.lastUserText).getOrElse(""),
+      toolProfileId = if (host.toolProfileId.nonEmpty) host.toolProfileId
+      else previous.map(_.toolProfileId).getOrElse(""),
       // 写入方通常知道更准的 tab（绑定/细化跟随/记完一轮）；没带就保留旧值。
       lastTabId = if (host.lastTabId > 0) host.lastTabId else previous.map(_.lastTabId).getOrElse(0),
       // 只有"记完一轮"的写入会带上 lastTurnAt；绑定类写入取 max 保留旧值，绝不被刷掉。
@@ -206,6 +210,7 @@ private[background] object WebChatHosts {
         "seedToMessageId" -> (host.seedToMessageId),
         "seedToBodyCount" -> (host.seedToBodyCount),
         "lastUserText"    -> (host.lastUserText),
+        "toolProfileId"   -> (host.toolProfileId),
         "lastTabId"       -> (host.lastTabId),
         "lastTurnAt"      -> (host.lastTurnAt),
         "updatedAt"       -> (host.updatedAt)
@@ -227,6 +232,7 @@ private[background] object WebChatHosts {
           seedToBodyCount =
             JsBridge.intField(entry, "seedToBodyCount").getOrElse(0),
           lastUserText = JsBridge.stringField(entry, "lastUserText").getOrElse(""),
+          toolProfileId = JsBridge.stringField(entry, "toolProfileId").getOrElse(""),
           lastTabId = JsBridge.intField(entry, "lastTabId").getOrElse(0),
           lastTurnAt = JsBridge.doubleField(entry, "lastTurnAt").getOrElse(0.0),
           updatedAt = JsBridge.doubleField(entry, "updatedAt").getOrElse(0.0)

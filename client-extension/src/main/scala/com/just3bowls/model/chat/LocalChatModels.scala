@@ -39,7 +39,7 @@ final case class ChatAttempt(
     effectiveMode: String = "",
     modePath: String = "",
     agentRunId: String = "",
-    browserTools: Boolean = true
+    browserTools: Boolean = false
 )
 object ChatAttempt     {
   val Initial: String                                = "initial"
@@ -103,7 +103,7 @@ final case class ChatMessage(
     /** 跨页面重载定位 AgentRun / checkpoint 的 id。 */
     agentRunId: String = "",
     /** Actual browser-tools decision used by this run, including a one-turn @tab override. */
-    browserTools: Boolean = true,
+    browserTools: Boolean = false,
     /** User-selected tabs referenced by this question turn. */
     tabRefs: List[BrowserTabRef] = Nil
 ) {

@@ -8,7 +8,6 @@ import com.just3bowls.facade.{
   LocationMarkersReadyMessage,
   MessageSender,
   OkResponse,
-  WebChatBrowserToolsMessage,
   WebChatFocusUrlMessage,
   WebChatNativeRunMessage,
   WebChatRenameSessionMessage,
@@ -25,7 +24,6 @@ private[background] object WebChatMessageHandler {
     "WEBCHAT_QUERY_STATE",
     "WEBCHAT_LIST_SESSIONS",
     "WEBCHAT_FOCUS_URL",
-    "WEBCHAT_SET_BROWSER_TOOLS",
     "NATIVE_RUN_PROGRESS",
     "NATIVE_RUN_DONE",
     "WEBCHAT_STOP_RUN",
@@ -69,17 +67,6 @@ private[background] object WebChatMessageHandler {
         WebChatService
           .focusConversation(url, fromTab)
           .map(_ => JsBridge.obj("ok" -> (true)))
-          .recover { case e =>
-            JsBridge.obj("ok" -> (false), "error" -> (e.getMessage))
-          }
-          .toJSPromise
-
-      case "WEBCHAT_SET_BROWSER_TOOLS" =>
-        val tabId = sender.tab.toOption.flatMap(_.id.toOption).getOrElse(-1)
-        val on    = message.asInstanceOf[WebChatBrowserToolsMessage].on.getOrElse(true)
-        WebChatService
-          .setBrowserTools(tabId, on)
-          .map(state => JsBridge.obj("ok" -> (true), "state" -> (state)))
           .recover { case e =>
             JsBridge.obj("ok" -> (false), "error" -> (e.getMessage))
           }

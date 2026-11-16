@@ -12,7 +12,6 @@ private[background] object WebChatStateView {
       runtime: Option[Runtime],
       sessionTitles: collection.Map[String, String],
       cdpError: Option[String],
-      browserTools: Boolean,
       activeRun: Option[NativeRun],
       canTakeover: Boolean
   ): js.Object = {
@@ -40,7 +39,6 @@ private[background] object WebChatStateView {
       "provider"       -> (provider),
       "behind"         -> (runtime.exists(_.hijacking)),
       "canTakeover"    -> (canTakeover),
-      "browserTools"   -> (browserTools),
       "agentRunning"   -> (activeRun.isDefined),
       "agentRunId"     -> (activeRun.map(_.runId).getOrElse("")),
       "error"          -> (errorSummary),
