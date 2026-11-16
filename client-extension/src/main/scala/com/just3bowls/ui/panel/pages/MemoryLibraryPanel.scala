@@ -94,9 +94,23 @@ final private[ui] class MemoryLibraryPanel(
         svg.strokeLineCap  := "round",
         svg.strokeLineJoin := "round",
         aria.hidden        := true,
-        svg.path(svg.d := "M3 4.5L8 2l5 2.5L8 7 3 4.5z"),
-        svg.path(svg.d := "M3 8l5 2.5L13 8"),
-        svg.path(svg.d := "M3 11.5L8 14l5-2.5"),
+        svg.path(
+          svg.d        :=
+            "M8 3.2C6.9 2.4 5.3 2.7 4.7 4c-1.1.1-1.9 1-1.8 2.1-.9.6-1.1 1.8-.4 2.6" +
+              "-.4.9 0 2 .9 2.4.1 1 .9 1.8 1.9 1.8.4.8 1.3 1.1 2.1.8.2.7.7 1.2 1.4 1.4"
+        ),
+        svg.path(
+          svg.d        :=
+            "M8 3.2c1.1-.8 2.7-.5 3.3.8 1.1.1 1.9 1 1.8 2.1.9.6 1.1 1.8.4 2.6" +
+              ".4.9 0 2-.9 2.4-.1 1-.9 1.8-1.9 1.8-.4.8-1.3 1.1-2.1.8-.2.7-.7 1.2-1.4 1.4"
+        ),
+        svg.path(svg.d := "M8 3.2v10.9"),
+        svg.path(svg.d := "M4.7 5.5c.9.1 1.4.9 1.1 1.7"),
+        svg.path(svg.d := "M3.3 9.2c.8-.3 1.6.1 1.9.9"),
+        svg.path(svg.d := "M5 12.5c.2-.7.9-1.1 1.6-1"),
+        svg.path(svg.d := "M11.3 5.5c-.9.1-1.4.9-1.1 1.7"),
+        svg.path(svg.d := "M12.7 9.2c-.8-.3-1.6.1-1.9.9"),
+        svg.path(svg.d := "M11 12.5c-.2-.7-.9-1.1-1.6-1"),
         child <-- tone.map {
           case MemoryTriggerTone.Off =>
             svg.path(
