@@ -9,11 +9,20 @@ object MemoryTriggerState {
   final case class Unavailable(message: String) extends MemoryTriggerState
 }
 
+sealed trait MemoryTriggerTone
+object MemoryTriggerTone {
+  case object Ready       extends MemoryTriggerTone
+  case object Checking    extends MemoryTriggerTone
+  case object Off         extends MemoryTriggerTone
+  case object Unavailable extends MemoryTriggerTone
+}
+
 final case class MemoryTriggerSegment(text: String, color: String)
 final case class MemoryTriggerView(
     segments: List[MemoryTriggerSegment],
     tooltip: String,
-    ariaLabel: String
+    ariaLabel: String,
+    tone: MemoryTriggerTone
 ) {
   def text: String = segments.map(_.text).mkString(" ")
 }
@@ -31,19 +40,22 @@ object MemoryTriggerPresentation {
         view(
           List(MemoryTriggerSegment("checking…", Blue)),
           "Connecting to the Memory runtime. Click to inspect.",
-          "Memory checking. Open stored memories"
+          "Memory checking. Open stored memories",
+          MemoryTriggerTone.Checking
         )
       case MemoryTriggerState.Unavailable(message)             =>
         view(
           List(MemoryTriggerSegment("unavailable", Red)),
           s"Memory unavailable: $message",
-          "Memory unavailable. Open stored memories"
+          "Memory unavailable. Open stored memories",
+          MemoryTriggerTone.Unavailable
         )
       case MemoryTriggerState.Ready(status) if !status.enabled =>
         view(
           List(MemoryTriggerSegment("off", Muted)),
           "Memory is disabled in Config. Click to inspect.",
-          "Memory off. Open stored memories"
+          "Memory off. Open stored memories",
+          MemoryTriggerTone.Off
         )
       case MemoryTriggerState.Ready(status)                    =>
         val counts = List(
@@ -56,14 +68,16 @@ object MemoryTriggerPresentation {
           s"${status.activeCount} active, ${status.pendingCount} pending, ${status.queuedJobs} queued. " +
             "Click to inspect.",
           s"Memory ${status.activeCount} active, ${status.pendingCount} pending, " +
-            s"${status.queuedJobs} queued. Open stored memories"
+            s"${status.queuedJobs} queued. Open stored memories",
+          MemoryTriggerTone.Ready
         )
     }
 
   private def view(
       body: List[MemoryTriggerSegment],
       tooltip: String,
-      ariaLabel: String
+      ariaLabel: String,
+      tone: MemoryTriggerTone
   ): MemoryTriggerView =
-    MemoryTriggerView(MemoryTriggerSegment("memory:", Muted) :: body, tooltip, ariaLabel)
+    MemoryTriggerView(body, tooltip, ariaLabel, tone)
 }

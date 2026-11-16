@@ -61,6 +61,53 @@ final private[ui] class MemoryLibraryPanel(
   def externalChange(): Unit                                               =
     if (open.now()) refresh()
     else probeStatus(showChecking = triggerState.now() == MemoryTriggerState.Checking, retryOnce = false)
+  private def renderTriggerIcon: HtmlElement                               = {
+    val tone    = triggerView.map(_.tone)
+    span(
+      display    := "inline-flex",
+      alignItems.center,
+      justifyContent.center,
+      flexShrink := "0",
+      width      := "16px",
+      height     := "16px",
+      color <-- tone.map {
+        case MemoryTriggerTone.Ready       => "#6b7280"
+        case MemoryTriggerTone.Checking    => "#2563eb"
+        case MemoryTriggerTone.Off         => "#9ca3af"
+        case MemoryTriggerTone.Unavailable => "#b91c1c"
+      },
+      opacity <-- tone.map {
+        case MemoryTriggerTone.Off => 0.72
+        case _                     => 1.0
+      },
+      animation <-- tone.map {
+        case MemoryTriggerTone.Checking => "popcan-api-pulse 1.2s ease-in-out infinite"
+        case _                          => "none"
+      },
+      svg.svg(
+        svg.width          := "16",
+        svg.height         := "16",
+        svg.viewBox        := "0 0 16 16",
+        svg.fill           := "none",
+        svg.stroke         := "currentColor",
+        svg.strokeWidth    := "1.35",
+        svg.strokeLineCap  := "round",
+        svg.strokeLineJoin := "round",
+        aria.hidden        := true,
+        svg.path(svg.d := "M3 4.5L8 2l5 2.5L8 7 3 4.5z"),
+        svg.path(svg.d := "M3 8l5 2.5L13 8"),
+        svg.path(svg.d := "M3 11.5L8 14l5-2.5"),
+        child <-- tone.map {
+          case MemoryTriggerTone.Off =>
+            svg.path(
+              svg.d           := "M2.6 13.4L13.4 2.6",
+              svg.strokeWidth := "1.5"
+            )
+          case _                     => emptyNode
+        }
+      )
+    )
+  }
   def renderTrigger: HtmlElement                                           =
     button(
       idAttr          := TriggerId,
@@ -79,6 +126,7 @@ final private[ui] class MemoryLibraryPanel(
       fontWeight      := "500",
       lineHeight      := "1.4",
       title <-- triggerView.map(_.tooltip),
+      renderTriggerIcon,
       children <-- triggerView.map(_.segments.map(segment =>
         span(segment.text, color := segment.color)
       )),

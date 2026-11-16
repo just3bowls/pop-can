@@ -18,7 +18,8 @@ class MemoryTriggerPresentationSpec extends munit.FunSuite {
 
   test("checking is visibly distinct from off") {
     val view = MemoryTriggerPresentation.view(MemoryTriggerState.Checking)
-    assertEquals(view.text, "memory: checking…")
+    assertEquals(view.text, "checking…")
+    assertEquals(view.tone, MemoryTriggerTone.Checking)
     assert(view.segments.last.color != "#b91c1c")
   }
 
@@ -26,7 +27,8 @@ class MemoryTriggerPresentationSpec extends munit.FunSuite {
     val view = MemoryTriggerPresentation.view(
       MemoryTriggerState.Ready(status(active = 4, pending = 2, queued = 3))
     )
-    assertEquals(view.text, "memory: ● 4 ◐ 2 ↻ 3")
+    assertEquals(view.text, "● 4 ◐ 2 ↻ 3")
+    assertEquals(view.tone, MemoryTriggerTone.Ready)
     assertEquals(view.tooltip, "4 active, 2 pending, 3 queued. Click to inspect.")
   }
 
@@ -34,7 +36,7 @@ class MemoryTriggerPresentationSpec extends munit.FunSuite {
     val view = MemoryTriggerPresentation.view(
       MemoryTriggerState.Ready(status(active = 1))
     )
-    assertEquals(view.text, "memory: ● 1")
+    assertEquals(view.text, "● 1")
   }
 
   test("active, pending, and queued use their semantic colors") {
@@ -50,7 +52,7 @@ class MemoryTriggerPresentationSpec extends munit.FunSuite {
     val view = MemoryTriggerPresentation.view(
       MemoryTriggerState.Ready(status())
     )
-    assertEquals(view.text, "memory: idle")
+    assertEquals(view.text, "idle")
     assertEquals(view.segments.last.color, "#6b7280")
   }
 
@@ -58,7 +60,8 @@ class MemoryTriggerPresentationSpec extends munit.FunSuite {
     val view = MemoryTriggerPresentation.view(
       MemoryTriggerState.Ready(status(enabled = false))
     )
-    assertEquals(view.text, "memory: off")
+    assertEquals(view.text, "off")
+    assertEquals(view.tone, MemoryTriggerTone.Off)
     assertEquals(view.tooltip, "Memory is disabled in Config. Click to inspect.")
   }
 
@@ -66,7 +69,8 @@ class MemoryTriggerPresentationSpec extends munit.FunSuite {
     val view = MemoryTriggerPresentation.view(
       MemoryTriggerState.Unavailable("Memory request timed out: status")
     )
-    assertEquals(view.text, "memory: unavailable")
+    assertEquals(view.text, "unavailable")
+    assertEquals(view.tone, MemoryTriggerTone.Unavailable)
     assert(view.tooltip.contains("Memory request timed out: status"))
   }
 }
