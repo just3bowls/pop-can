@@ -38,12 +38,13 @@ private[ui] object LocalApiStatusIndicator {
   def render(
       statusSignal: Signal[String],
       activeSignal: Signal[Boolean],
-      onOpen: () => Unit
+      onToggle: () => Unit
   ): HtmlElement = {
     val hover           = Var(false)
     val visual          = statusSignal.combineWith(activeSignal).map { case (status, active) =>
       (
         status,
+        active,
         LocalApiStatus.indicatorColor(status, active),
         LocalApiStatus.indicatorHollow(status, active),
         LocalApiStatus.isProgress(status)
@@ -52,8 +53,8 @@ private[ui] object LocalApiStatusIndicator {
     button(
       cls          := "th-config-focus",
       `type`       := "button",
-      aria.label <-- visual.map { case (status, _, _, _) =>
-        s"Local API $status. Open API settings"
+      aria.label <-- visual.map { case (status, active, _, _, _) =>
+        s"Local API $status. ${if (active) "Stop" else "Start"} Local API"
       },
       display      := "inline-flex",
       alignItems.center,
@@ -68,8 +69,9 @@ private[ui] object LocalApiStatusIndicator {
       backgroundColor <-- hover.signal.map(value => if (value) "#f3f4f6" else "transparent"),
       color <-- hover.signal.map(value => if (value) "#111827" else "#6b7280"),
       transition   := "color 120ms ease, background-color 120ms ease",
-      title <-- visual.map { case (status, _, _, _) =>
-        s"Local API · $status\n${LocalApiStatus.Endpoint}\nClick to open API settings"
+      title <-- visual.map { case (status, active, _, _, _) =>
+        val action = if (active) "stop" else "start"
+        s"Local API · $status\n${LocalApiStatus.Endpoint}\nClick to $action"
       },
       svg.svg(
         svg.width          := "15",
@@ -95,19 +97,19 @@ private[ui] object LocalApiStatusIndicator {
         flexShrink         := "0",
         borderRadius       := "999px",
         boxShadow          := "0 0 0 1px #ffffff",
-        backgroundColor <-- visual.map { case (_, color, hollow, _) =>
+        backgroundColor <-- visual.map { case (_, _, color, hollow, _) =>
           if (hollow) "transparent" else color
         },
-        border <-- visual.map { case (_, color, hollow, _) =>
+        border <-- visual.map { case (_, _, color, hollow, _) =>
           if (hollow) s"1px solid $color" else "none"
         },
-        animation <-- visual.map { case (_, _, _, progress) =>
+        animation <-- visual.map { case (_, _, _, _, progress) =>
           if (progress) "popcan-api-pulse 1.2s ease-in-out infinite" else "none"
         }
       ),
       onMouseEnter --> { _ => hover.set(true) },
       onMouseLeave --> { _ => hover.set(false) },
-      onClick --> { _ => onOpen() }
+      onClick --> { _ => onToggle() }
     )
   }
 }

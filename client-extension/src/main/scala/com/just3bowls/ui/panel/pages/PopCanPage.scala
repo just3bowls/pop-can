@@ -2485,12 +2485,6 @@ object PopCanPage {
       configDrawerMountedVar.set(true)
       configDrawerOpenVar.set(true)
     }
-    def openApiKeySettings(): Unit                   = {
-      prepareConfigOpen()
-      configSectionVar.set("apiKeys")
-      configDrawerMountedVar.set(true)
-      configDrawerOpenVar.set(true)
-    }
     val currentSessionTitleEditorId                  = "popcan-current-session-title-editor"
     def currentSessionTitleNow(): String             =
       chatSessionsVar
@@ -2695,7 +2689,10 @@ object PopCanPage {
             activeSignal = serverRunningVar.signal
               .combineWith(serverStatusVar.signal)
               .map { case (running, status) => LocalApiStatus.isActive(status, running) },
-            onOpen = () => openApiKeySettings()
+            onToggle = () => {
+              if (serverWorkerClient.isServerActive(serverStatusVar.now())) serverWorkerClient.stopServerWorker()
+              else serverWorkerClient.startServerWorker()
+            }
           )
         ),
         // Sticky bottom controls: provider + tab list + task input
