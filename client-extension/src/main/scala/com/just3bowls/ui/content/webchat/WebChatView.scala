@@ -281,84 +281,46 @@ object WebChatView {
             else cb.clickSessionTitle(session.id)
           },
           button(
-            `type`          := "button",
-            role            := "radio",
-            aria.checked    := current.toString,
-            aria.label      := (
-              if (current) s"${session.title} is bound. Click to bind it again."
-              else s"Bind ${session.title} to the current native conversation."
-            ),
-            title           := (
-              if (current) "Currently bound to this native conversation. Click to bind again."
-              else "Bind this session to the current native conversation."
-            ),
-            width           := "14px",
-            height          := "14px",
-            padding         := "0",
-            flexShrink      := 0,
-            display         := "inline-flex",
-            alignItems      := "center",
-            justifyContent  := "center",
-            cursor.pointer,
-            backgroundColor := "#ffffff",
-            border          := (
-              if (current) "1px solid #2563eb"
-              else "1px solid #cbd5e1"
-            ),
-            borderRadius    := "50%",
-            onClick --> { event =>
-              event.stopPropagation()
-              cb.bindSession(session.id)
-            },
-            if (current)
-              span(
-                width           := "8px",
-                height          := "8px",
-                borderRadius    := "50%",
-                backgroundColor := "#2563eb"
-              )
-            else emptyNode
-          ),
-          button(
             if (expanded) "▾" else "▸",
-            title           := (if (expanded) "Collapse session details" else "Expand session details"),
-            padding         := "0",
-            width           := "18px",
-            height          := "20px",
-            flexShrink      := 0,
+            title        := (if (expanded) "Collapse session details" else "Expand session details"),
+            padding      := "0",
+            width        := "18px",
+            height       := "20px",
+            flexShrink   := 0,
             cursor.pointer,
-            background      := "transparent",
-            color           := "#6b7280",
-            border          := "0",
+            background   := "transparent",
+            color        := "#6b7280",
+            border       := "0",
             onClick --> { event =>
               event.stopPropagation()
               cb.toggleUrls(session.id)
             }
           ),
           div(
-            flex            := "1",
-            minWidth        := "0",
-            fontSize        := "12px",
+            flex         := "1",
+            minWidth     := "0",
+            fontSize     := "12px",
             fontWeight.bold,
             whiteSpace.nowrap,
             overflow.hidden,
-            textOverflow    := "ellipsis",
+            textOverflow := "ellipsis",
             cursor.pointer,
-            title           := (
+            title        := (
               "Click to show or hide session details. Double-click to rename."
             ),
             session.title
           ),
+          bindAction(current, session.title, () => cb.bindSession(session.id)),
           button(
             "×",
-            title           := "Delete this session (native chats stay)",
-            padding         := "0",
-            width           := "18px",
-            height          := "20px",
+            title        := "Delete this session (native chats stay)",
+            padding      := "0",
+            width        := "18px",
+            height       := "20px",
             cursor.pointer,
-            background      := "transparent",
-            color           := "#9ca3af",
-            border          := "0",
+            background   := "transparent",
+            color        := "#9ca3af",
+            border       := "0",
             onClick --> { event =>
               event.stopPropagation()
               cb.requestDelete(session.id)
@@ -377,6 +339,57 @@ object WebChatView {
           )
         else new CommentNode("")
       )
+
+  private def bindAction(current: Boolean, sessionTitle: String, onBind: () => Unit): HtmlElement =
+    button(
+      `type`          := "button",
+      width           := "22px",
+      height          := "20px",
+      padding         := "0",
+      flexShrink      := 0,
+      display         := "inline-flex",
+      alignItems      := "center",
+      justifyContent  := "center",
+      cursor.pointer,
+      color           := (if (current) "#2563eb" else "#94a3b8"),
+      backgroundColor := (if (current) "#eff6ff" else "transparent"),
+      border          := "none",
+      borderRadius    := "4px",
+      aria.pressed    := current.toString,
+      aria.label      := (
+        if (current) s"$sessionTitle is bound. Click to bind it again."
+        else s"Bind $sessionTitle to the current native conversation."
+      ),
+      title           := (
+        if (current) "Currently bound to this native conversation. Click to bind again."
+        else "Bind this session to the current native conversation."
+      ),
+      onMouseEnter --> { event =>
+        event.currentTarget.asInstanceOf[org.scalajs.dom.HTMLElement].style.backgroundColor = "#f3f4f6"
+      },
+      onMouseLeave --> { event =>
+        event.currentTarget.asInstanceOf[org.scalajs.dom.HTMLElement].style.backgroundColor =
+          if (current) "#eff6ff" else "transparent"
+      },
+      svg.svg(
+        svg.width          := "15",
+        svg.height         := "15",
+        svg.viewBox        := "0 0 16 16",
+        svg.fill           := "none",
+        svg.stroke         := "currentColor",
+        svg.strokeWidth    := "1.45",
+        svg.strokeLineCap  := "round",
+        svg.strokeLineJoin := "round",
+        aria.hidden        := true,
+        svg.path(svg.d := "M6.7 9.3l2.6-2.6"),
+        svg.path(svg.d := "M7.3 4.5l1.1-1.1a2.75 2.75 0 0 1 3.9 3.9l-1.1 1.1"),
+        svg.path(svg.d := "M8.7 11.5l-1.1 1.1a2.75 2.75 0 0 1-3.9-3.9l1.1-1.1")
+      ),
+      onClick --> { event =>
+        event.stopPropagation()
+        onBind()
+      }
+    )
 
   private def renderUrl(url: WebChatUrlView, cb: WebChatViewCallbacks): HtmlElement =
     div(
