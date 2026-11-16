@@ -48,7 +48,7 @@ object ChatCommandSpec  {
       "/agent",
       "Choose ReAct or Plan for this session"
     ),
-    ChatCommandSpec("browser-tools", "/browser-tools [on|off]", "Toggle built-in browser tools")
+    ChatCommandSpec("browser-tools", "/browser-tools [on|off]", "Toggle built-in browser tools for this session")
   )
   def filter(query: String): List[ChatCommandSpec] = {
     val q = query.trim.toLowerCase

@@ -94,7 +94,8 @@ object ChatRunner {
               requestedMode = AgentModePolicy.normalize(requestedMode),
               effectiveMode = AgentModePolicy.normalize(agentMode),
               modePath = routePathJson(requestedMode, agentMode, modeReason),
-              agentRunId = s"agent-${user.id}"
+              agentRunId = s"agent-${user.id}",
+              browserTools = useBrowserTools
             )
             ChatStore.addMessage(assistant).map(_ => assistant)
           }
@@ -120,7 +121,8 @@ object ChatRunner {
               requestedMode = AgentModePolicy.normalize(requestedMode),
               effectiveMode = AgentModePolicy.normalize(agentMode),
               modePath = routePathJson(requestedMode, agentMode, modeReason),
-              agentRunId = s"agent-${user.id}"
+              agentRunId = s"agent-${user.id}",
+              browserTools = useBrowserTools
             )
             ChatStore.addMessage(errorAssistant).flatMap(_ => Future.failed(e))
           }
@@ -181,7 +183,8 @@ object ChatRunner {
       requestedMode = AgentModePolicy.normalize(requestedMode),
       effectiveMode = AgentModePolicy.normalize(agentMode),
       modePath = routePathJson(requestedMode, agentMode, modeReason),
-      tabRefs = tabRefs
+      tabRefs = tabRefs,
+      browserTools = useBrowserTools
     )
     val contextF =
       parentId match {
@@ -298,7 +301,8 @@ object ChatRunner {
             requestedMode = AgentModePolicy.normalize(requestedMode),
             effectiveMode = AgentModePolicy.normalize(agentMode),
             modePath = routePathJson(requestedMode, agentMode, modeReason),
-            agentRunId = s"agent-${user.id}"
+            agentRunId = s"agent-${user.id}",
+            browserTools = useBrowserTools
           )
           ChatStore.addMessage(errorAssistant).flatMap(_ => Future.failed(e))
         }
@@ -324,7 +328,8 @@ object ChatRunner {
         requestedMode = AgentModePolicy.normalize(requestedMode),
         effectiveMode = assistantMode,
         modePath = routePathJson(requestedMode, assistantMode, modeReason, outcome.handoffs),
-        agentRunId = s"agent-${user.id}"
+        agentRunId = s"agent-${user.id}",
+        browserTools = useBrowserTools
       )
       _ <- ChatStore.addMessage(assistant)
     } yield assistant
@@ -368,6 +373,7 @@ object ChatRunner {
               steps = "",
               provider = spec.provider,
               origin = spec.origin,
+              browserTools = spec.useBrowserTools,
               updatedAt = now
             )
             (before, userMsg, running)
@@ -387,7 +393,8 @@ object ChatRunner {
               mergedFrom = Nil,
               createdAt = now,
               updatedAt = now,
-              origin = spec.origin
+              origin = spec.origin,
+              browserTools = spec.useBrowserTools
             )
             val assistant = ChatMessage(
               id = ChatStore.nextId(),
@@ -404,7 +411,8 @@ object ChatRunner {
               mergedFrom = Nil,
               createdAt = ChatStore.childCreatedAt(Some(now)),
               updatedAt = now,
-              origin = spec.origin
+              origin = spec.origin,
+              browserTools = spec.useBrowserTools
             )
             (path :+ userMsg, Some(userMsg), assistant)
         }

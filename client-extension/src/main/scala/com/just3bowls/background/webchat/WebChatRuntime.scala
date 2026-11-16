@@ -18,6 +18,9 @@ final private[background] class Runtime(val tabId: Int) {
   /** 当前这段对话的归属（按 URL 查出来的）；None = 未归属。 */
   var assoc: Option[WebChatHost] = None
 
+  /** Browser-tools preference used only until this unassigned conversation is bound to a session. */
+  var pendingBrowserTools: Boolean = true
+
   /** 这个 tab 上一次解析到的归属，用来在导航中间态后继续跟随同一段对话。 */
   var lastBinding: Option[WebChatHost] = None
 

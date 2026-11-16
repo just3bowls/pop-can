@@ -2,6 +2,7 @@ package com.just3bowls.ui.content.webchat
 
 import com.just3bowls.facade.JsBridge
 import com.just3bowls.facade.BrowserEvents
+import com.just3bowls.ui.components.BrowserToolsIndicator
 
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.nodes.CommentNode
@@ -440,30 +441,9 @@ object WebChatView {
           onClick --> { _ => cb.stopAgent() }
         )
       else new CommentNode(""),
-      div(
-        display.inlineFlex,
-        alignItems.center,
-        gap   := "5px",
-        cursor.pointer,
-        title := (
-          if (state.browserTools)
-            "On: this session's turns declare the built-in browser tools. Click to turn off."
-          else "Off: answers use the page AI's own abilities only. Click to turn on."
-        ),
-        onClick --> { _ => cb.toggleBrowserTools() },
-        span(
-          display         := "inline-block",
-          width           := "7px",
-          height          := "7px",
-          borderRadius    := "50%",
-          backgroundColor := (if (state.browserTools) "#9ca3af" else "#b45309")
-        ),
-        span(
-          fontSize        := "10px",
-          color           := (if (state.browserTools) "#6b7280" else "#b45309"),
-          textDecoration  := (if (state.browserTools) "none" else "line-through"),
-          "browser tools"
-        )
+      BrowserToolsIndicator.render(
+        enabledSignal = Val(state.browserTools),
+        onToggle = () => cb.toggleBrowserTools()
       )
     )
 

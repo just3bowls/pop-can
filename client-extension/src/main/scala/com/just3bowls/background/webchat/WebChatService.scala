@@ -17,7 +17,7 @@ import com.just3bowls.model.chat.ChatMessage
 import com.just3bowls.model.chat.ChatStore
 import com.just3bowls.model.provider.ParserProviderInfo
 import com.just3bowls.model.localapi.ApiKeyStore
-import com.just3bowls.model.chat.ChatToolSettings
+import com.just3bowls.model.chat.SessionSettingsStore
 import com.just3bowls.model.chat.FinalSseProducer
 import com.just3bowls.model.provider.ProviderRequestRule
 import com.just3bowls.model.chat.RawChunkStreamDecoder
@@ -68,7 +68,7 @@ private[background] object WebChatService {
 
   /** 内容脚本每次都问这个：当前 tab 的对话属于哪条 session、要不要补上下文。 */
   def stateFor(tabId: Int): Future[js.Object] =
-    refreshTitles().flatMap(_ => refreshBrowserTools()).flatMap(_ => refreshTab(tabId)).map(_ => stateJson(tabId))
+    refreshTitles().flatMap(_ => refreshTab(tabId)).map(_ => stateJson(tabId))
 
   /**
    * 会话摘要列表（面板用）：每条 session 带上它在 `<session, provider>` 上的原生对话 URL。
@@ -141,6 +141,10 @@ private[background] object WebChatService {
                     )
                   )
               runtime <- Future.successful(runtimes.getOrElseUpdate(tabId, new Runtime(tabId)))
+              _       <- SessionSettingsStore.ensure(session.id, runtime.pendingBrowserTools)
+              _       <- Future.successful {
+                sessionBrowserTools.update(session.id, runtime.pendingBrowserTools)
+              }
               _       <- Future.successful {
                 // 兜底：URL 稍晚才变（或变了但事件来得晚）时，这段时间内的新对话 URL 绑到这条新 session。
                 runtime.pendingAssoc = Some(session.id)
@@ -229,20 +233,29 @@ private[background] object WebChatService {
       }
     }
 
-  /** 胶囊底部开关：`browser tools`（全局一份 —— 插件页 chat 是否把内置工具声明给网页 AI）。 */
+  /** Capsule switch: the browser-tools policy of the session bound to this provider tab. */
   def setBrowserTools(tabId: Int, on: Boolean): Future[js.Object] =
-    ChatToolSettings
-      .save(on)
-      .flatMap { _ =>
-        browserToolsOn = on
-        // 全局值：所有 provider tab 的胶囊都要跟着变。
-        resyncAll()
-      }
-      .map(_ => stateJson(tabId))
-      .recover { case e =>
-        PopCanLog.warn("webchat", s"set browser tools failed: ${e.getMessage}")
-        stateJson(tabId)
-      }
+    runtimes.get(tabId) match {
+      case Some(runtime) =>
+        runtime.assoc.map(_.sessionId).filter(_.nonEmpty) match {
+          case Some(sessionId) =>
+            SessionSettingsStore
+              .saveBrowserTools(sessionId, on)
+              .flatMap { _ =>
+                sessionBrowserTools.update(sessionId, on)
+                resyncSession(sessionId)
+              }
+              .map(_ => stateJson(tabId))
+              .recover { case e =>
+                PopCanLog.warn("webchat", s"set browser tools failed: ${e.getMessage}")
+                stateJson(tabId)
+              }
+          case None            =>
+            runtime.pendingBrowserTools = on
+            pushState(tabId).map(_ => stateJson(tabId))
+        }
+      case None          => Future.successful(stateJson(tabId))
+    }
 
   /**
    * 点列表里一条 session：
@@ -696,9 +709,27 @@ private[background] object WebChatService {
   /** 挂在 `chrome.storage.onChanged` 上：绑定的写入方可能是插件页 / 胶囊 / SW 自己，统一在这里重算。 */
   def onStorageChanged(changes: js.Dictionary[StorageChange], area: String): Unit =
     if (area == "local") {
+      val changedSessionSettings =
+        changes.keys.flatMap(SessionSettingsStore.sessionIdFromKey).toSet
+      if (changedSessionSettings.nonEmpty) {
+        Future
+          .sequence(changedSessionSettings.toList.map { sessionId =>
+            SessionSettingsStore.get(sessionId).map {
+              case Some(settings) => sessionBrowserTools.update(sessionId, settings.browserTools)
+              case None           => sessionBrowserTools.remove(sessionId)
+            }
+          })
+          .flatMap(_ =>
+            changedSessionSettings.toList.foldLeft(Future.successful(())) { (acc, sessionId) =>
+              acc.flatMap(_ => resyncSession(sessionId))
+            }
+          )
+          .recover { case _ => () }
+          .foreach(_ => ())
+      }
       // 会话现在是"一条记录一个 key"（`thChatS:<id>`），所以看前缀而不是某一个固定 key。
-      val sessionListChanged = changes.keys.exists(_.startsWith(ChatStore.SessionKeyPrefix))
-      val bindingKeys        = List("thWebChatHosts", "thSessionProviderContext", "popCanChatContext")
+      val sessionListChanged     = changes.keys.exists(_.startsWith(ChatStore.SessionKeyPrefix))
+      val bindingKeys            = List("thWebChatHosts", "thSessionProviderContext", "popCanChatContext")
       if (sessionListChanged || bindingKeys.exists(changes.contains)) {
         val prune =
           if (!sessionListChanged) Future.successful(())
@@ -804,11 +835,21 @@ private[background] object WebChatService {
       runtime,
       sessionTitles,
       cdpDetail,
-      browserToolsOn,
+      browserToolsFor(runtime),
       run,
       canTakeover
     )
   }
+
+  private def browserToolsFor(runtime: Option[Runtime]): Boolean =
+    runtime match {
+      case Some(value) =>
+        value.assoc match {
+          case Some(host) => sessionBrowserTools.getOrElse(host.sessionId, true)
+          case None       => value.pendingBrowserTools
+        }
+      case None        => true
+    }
 
   /** 记录一条可持续展示、可复制、可用稳定 id 去重的页面侧错误。 */
   private def recordError(runtime: Runtime, id: String, detail: String): Unit = {
@@ -826,19 +867,42 @@ private[background] object WebChatService {
   }
   private val sessionTitles                                                   = mutable.Map.empty[String, String]
 
-  /** `browser tools` 是全局开关（是否把内置 browser 工具声明给网页 AI）：SW 侧缓存一份，出状态前刷新。 */
-  private var browserToolsOn                      = true
-  private def refreshBrowserTools(): Future[Unit] =
-    ChatToolSettings.load().map(on => browserToolsOn = on).recover { case _ => () }
+  /** Derived cache of `thSessionSettings:v1:<sessionId>`; storage remains the only source of truth. */
+  private val sessionBrowserTools                                            = mutable.Map.empty[String, Boolean]
+  private def refreshSessionSettings(sessionIds: List[String]): Future[Unit] = {
+    val ids     = sessionIds.distinct.filter(_.nonEmpty)
+    val missing = ids.filterNot(sessionBrowserTools.contains)
+    SessionSettingsStore
+      .migrate(ids)
+      .flatMap { _ =>
+        Future
+          .sequence(missing.map(sessionId =>
+            SessionSettingsStore
+              .load(sessionId)
+              .map(settings => sessionId -> settings.browserTools)
+          ))
+          .map { loaded =>
+            sessionBrowserTools.retain((sessionId, _) => ids.contains(sessionId))
+            loaded.foreach { case (sessionId, enabled) => sessionBrowserTools.update(sessionId, enabled) }
+            ()
+          }
+      }
+      .recover { case _ => () }
+  }
 
   /** 会话标题缓存（胶囊 chip / 面板头部用）：读一次会话表就补齐，别再让状态用上一次的旧标题。 */
   private def refreshTitles(): Future[Unit]       =
     ChatStore
       .listSessions()
-      .map(sessions => sessions.foreach(session => sessionTitles.update(session.id, session.title)))
+      .flatMap { sessions =>
+        val ids = sessions.map(_.id)
+        sessionTitles.retain((sessionId, _) => ids.contains(sessionId))
+        sessions.foreach(session => sessionTitles.update(session.id, session.title))
+        refreshSessionSettings(ids)
+      }
       .recover { case _ => () }
   private def pushState(tabId: Int): Future[Unit] =
-    refreshTitles().flatMap(_ => refreshBrowserTools()).flatMap { _ =>
+    refreshTitles().flatMap { _ =>
       ChromeAPI.tabs
         .sendMessage(
           tabId,
@@ -848,9 +912,16 @@ private[background] object WebChatService {
         .map(_ => ())
         .recover { case _ => () }
     }
+
+  private def resyncSession(sessionId: String): Future[Unit] =
+    runtimes.values.toList
+      .filter(_.assoc.exists(_.sessionId == sessionId))
+      .foldLeft(Future.successful(())) { (acc, runtime) =>
+        acc.flatMap(_ => pushState(runtime.tabId).recover { case _ => () })
+      }
   // ---------------------------------------------------------------- 观察 / attach
   /** 网页原生接管的 tab 也要把 new-chat / input 标记打上，触发反馈才有地方可闪。 */
-  private def applyMarkers(tabId: Int): Unit      =
+  private def applyMarkers(tabId: Int): Unit                 =
     ChromeAPI.tabs
       .sendMessage(tabId, JsBridge.obj("type" -> ("LOCATION_APPLY")))
       .toFuture
@@ -1087,21 +1158,27 @@ private[background] object WebChatService {
     val active  = runtime.assoc.exists(host => nativeRuns.exists(host.sessionId, host.provider))
     // 注意：稳态 delta 轮**本来就不注入**（用户在输入框打的那句就是增量），所以这里不能要求 `hijackUserText` 非空 ——
     // 只要这一轮真的按 marker 协议回了工具调用，就说明这段对话在我们协议之下，可以交给 agent 接着跑。
-    if (convKey.isEmpty || active) Future.successful(None)
-    else
-      ChatToolSettings.load()
-        .map { toolsOn =>
-          if (!toolsOn) None
-          else
-            try {
-              new FinalSseProducer(runtime.turnGen, runtime.assoc.map(_.provider).getOrElse(""))
-                .parseMarkersText(normalized)
-                .toOption
-                .map(result => AgentRound(result.content, result.thinking, result.toolCalls))
-                .filter(_.toolCalls.nonEmpty)
-            } catch { case _: Throwable => None }
-        }
-        .recover { case _ => None }
+    runtime.assoc match {
+      case None if convKey.isEmpty => Future.successful(None)
+      case _ if active             => Future.successful(None)
+      case Some(host)              =>
+        SessionSettingsStore
+          .load(host.sessionId)
+          .map { settings =>
+            sessionBrowserTools.update(host.sessionId, settings.browserTools)
+            if (!settings.browserTools) None
+            else
+              try {
+                new FinalSseProducer(runtime.turnGen, runtime.assoc.map(_.provider).getOrElse(""))
+                  .parseMarkersText(normalized)
+                  .toOption
+                  .map(result => AgentRound(result.content, result.thinking, result.toolCalls))
+                  .filter(_.toolCalls.nonEmpty)
+              } catch { case _: Throwable => None }
+          }
+          .recover { case _ => None }
+      case None                    => Future.successful(None)
+    }
   }
   private def handoffToAgent(
       runtime: Runtime,
@@ -1346,7 +1423,8 @@ private[background] object WebChatService {
         treatAsRegenerate = regenerate,
         thinking = assistantThinking,
         // marker / 交接失败：这条 assistant 落 error（气泡上因此有 Retry 入口），不再伪装成成功。
-        failed = !ok
+        failed = !ok,
+        browserTools = sessionBrowserTools.getOrElse(host.sessionId, true)
       )
       .flatMap(_ => ChatStore.tipMessageId(host.sessionId))
       .flatMap { tip =>
@@ -1541,8 +1619,18 @@ private[background] object WebChatService {
    */
   private def needsInject(host: WebChatHost): Future[Boolean]        =
     if (host.seedToMessageId.isEmpty) Future.successful(true)
-    else if (browserToolsOn) Future.successful(true)
-    else ChatStore.sessionPathMessages(host.sessionId).map(path => unseen(host, path).nonEmpty)
+    else
+      SessionSettingsStore
+        .load(host.sessionId)
+        .map { settings =>
+          sessionBrowserTools.update(host.sessionId, settings.browserTools)
+          settings.browserTools
+        }
+        .recover { case _ => true }
+        .flatMap { browserTools =>
+          if (browserTools) Future.successful(true)
+          else ChatStore.sessionPathMessages(host.sessionId).map(path => unseen(host, path).nonEmpty)
+        }
   private def deltaFor(host: WebChatHost): Future[List[ChatMessage]] =
     ChatStore.sessionPathMessages(host.sessionId).map(path => unseen(host, path))
 
@@ -1633,7 +1721,7 @@ private[background] object WebChatService {
         case Some(_) if !runtime.pendingDeltaReady =>
           Future.successful(RewriteDecision.Pass("skip-not-ready", keepArmed = true))
         case Some(rawUserText)                     =>
-          val userText = PromptArtifact.userTextOrOriginal(rawUserText)
+          val userText  = PromptArtifact.userTextOrOriginal(rawUserText)
           if (userText != rawUserText) {
             TraceStore.noteEvidence(
               runtime.turnGen,
@@ -1643,68 +1731,74 @@ private[background] object WebChatService {
           runtime.hijackUserText = userText
           // 改写时手里这份就是**改写前**的原话：权威值，覆盖刚才"第一次看到请求"时的快照。
           runtime.turnUserText = userText
-          val provider = runtime.assoc.map(_.provider).getOrElse("")
+          val provider  = runtime.assoc.map(_.provider).getOrElse("")
           // 形态只看水位线：首投（这段对话还没有水位线）⇒ 完整模版；其余（含"欠账"那一档）⇒ 只投消息增量。
           // 网页原生不做"每轮重投整份"这种开关（那是插件页 `/context full` 的语义，且它每轮 New Chat）。
-          val form     = TemplateInjection.formOf(
+          val form      = TemplateInjection.formOf(
             TemplateInjection.ModeDelta,
             hasWatermark = runtime.assoc.exists(_.seedToMessageId.nonEmpty)
           )
-          val recent   =
+          val recent    =
             runtime.pendingDelta.takeRight(4).map(message => s"${message.role}: ${message.content.take(1200)}").mkString(
               "\n"
             )
-          MemoryRecallBridge
-            .recall(
-              MemoryQuery(
-                sessionId = runtime.assoc.map(_.sessionId).getOrElse(""),
-                query = userText,
-                recentContext = recent
-              )
-            )
-            .map { memory =>
-              // 原生首轮和插件页 agent 首轮同构：browser-tools on 时带上同一套工具声明 + 场景提示词。
-              val template =
-                TemplateInjection.buildNativePayload(
-                  form,
-                  provider,
-                  runtime.pendingDelta,
-                  userText,
-                  useBrowserTools = browserToolsOn,
-                  memoryContext = memory.text
-                )
-              TraceStore.noteInject(runtime.turnGen, s"native/$form", Some(template))
-              ProviderRequestRule.writeUserText(rule, body, template) match {
-                case Some(rewritten) =>
-                  // 只有规则里声明了"改请求头"才整份覆盖头。
-                  val headerPatch =
-                    if (!ProviderRequestRule.hasHeaderDerives(rule)) Right(headers)
-                    else ProviderRequestRule.rewriteHeaders(rule, headers, template)
-                  headerPatch match {
-                    case Right(patched) =>
-                      val headerNote =
-                        deriveHeaders(rule).map(name => s" headers=${name.mkString(",")}").getOrElse("")
-                      PopCanLog.info(
-                        "webchat",
-                        s"hijack rewrite tab=${runtime.tabId} form=$form delta=${runtime.pendingDelta.size} " +
-                          s"memory=${memory.hits.size} chars=${rewritten.length}$headerNote"
-                      )
-                      TraceStore.noteEvidence(
-                        runtime.turnGen,
-                        s"native/$form messages=${runtime.pendingDelta.size} memoryHits=${memory.hits.size} " +
-                          s"rewrittenChars=${rewritten.length}$headerNote"
-                      )
-                      if (ProviderRequestRule.hasHeaderDerives(rule)) RewriteDecision.Write(rewritten, patched)
-                      else RewriteDecision.Write(rewritten)
-                    case Left(reason)   =>
-                      skip("skip-header-derive", s"Could not rewrite request headers: $reason")
-                  }
-                case None            =>
-                  skip(
-                    "skip-rewrite-failed",
-                    s"Could not rewrite request.userText: ${ProviderRequestRule.diagnose(rule, body)}"
+          val sessionId = runtime.assoc.map(_.sessionId).getOrElse("")
+          SessionSettingsStore
+            .load(sessionId)
+            .recover { case _ => com.just3bowls.model.chat.SessionSettings.Default }
+            .flatMap { settings =>
+              MemoryRecallBridge
+                .recall(
+                  MemoryQuery(
+                    sessionId = sessionId,
+                    query = userText,
+                    recentContext = recent
                   )
-              }
+                )
+                .map { memory =>
+                  // 原生首轮和插件页 agent 首轮同构：Session 的 browser-tools on 时带上同一套工具声明 + 场景提示词。
+                  val template =
+                    TemplateInjection.buildNativePayload(
+                      form,
+                      provider,
+                      runtime.pendingDelta,
+                      userText,
+                      useBrowserTools = settings.browserTools,
+                      memoryContext = memory.text
+                    )
+                  TraceStore.noteInject(runtime.turnGen, s"native/$form", Some(template))
+                  ProviderRequestRule.writeUserText(rule, body, template) match {
+                    case Some(rewritten) =>
+                      // 只有规则里声明了"改请求头"才整份覆盖头。
+                      val headerPatch =
+                        if (!ProviderRequestRule.hasHeaderDerives(rule)) Right(headers)
+                        else ProviderRequestRule.rewriteHeaders(rule, headers, template)
+                      headerPatch match {
+                        case Right(patched) =>
+                          val headerNote =
+                            deriveHeaders(rule).map(name => s" headers=${name.mkString(",")}").getOrElse("")
+                          PopCanLog.info(
+                            "webchat",
+                            s"hijack rewrite tab=${runtime.tabId} form=$form delta=${runtime.pendingDelta.size} " +
+                              s"memory=${memory.hits.size} chars=${rewritten.length}$headerNote"
+                          )
+                          TraceStore.noteEvidence(
+                            runtime.turnGen,
+                            s"native/$form messages=${runtime.pendingDelta.size} memoryHits=${memory.hits.size} " +
+                              s"rewrittenChars=${rewritten.length}$headerNote"
+                          )
+                          if (ProviderRequestRule.hasHeaderDerives(rule)) RewriteDecision.Write(rewritten, patched)
+                          else RewriteDecision.Write(rewritten)
+                        case Left(reason)   =>
+                          skip("skip-header-derive", s"Could not rewrite request headers: $reason")
+                      }
+                    case None            =>
+                      skip(
+                        "skip-rewrite-failed",
+                        s"Could not rewrite request.userText: ${ProviderRequestRule.diagnose(rule, body)}"
+                      )
+                  }
+                }
             }
             .recover { case error =>
               PopCanLog.warn("memory", s"native recall degraded: ${Option(error.getMessage).getOrElse(error.toString)}")

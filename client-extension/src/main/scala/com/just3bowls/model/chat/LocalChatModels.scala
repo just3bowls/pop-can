@@ -38,7 +38,8 @@ final case class ChatAttempt(
     requestedMode: String = "",
     effectiveMode: String = "",
     modePath: String = "",
-    agentRunId: String = ""
+    agentRunId: String = "",
+    browserTools: Boolean = true
 )
 object ChatAttempt     {
   val Initial: String                                = "initial"
@@ -61,7 +62,8 @@ object ChatAttempt     {
       requestedMode = message.requestedMode,
       effectiveMode = message.effectiveMode,
       modePath = message.modePath,
-      agentRunId = message.agentRunId
+      agentRunId = message.agentRunId,
+      browserTools = message.browserTools
     )
 }
 final case class ChatMessage(
@@ -100,6 +102,8 @@ final case class ChatMessage(
     modePath: String = "",
     /** 跨页面重载定位 AgentRun / checkpoint 的 id。 */
     agentRunId: String = "",
+    /** Actual browser-tools decision used by this run, including a one-turn @tab override. */
+    browserTools: Boolean = true,
     /** User-selected tabs referenced by this question turn. */
     tabRefs: List[BrowserTabRef] = Nil
 ) {
