@@ -40,6 +40,7 @@ final private[ui] class SessionFolderPanel(
   private val draft                                        = Var("")
   private val editingSessionId                             = Var("")
   private val sessionDraft                                 = Var("")
+  private val confirmDelete                                = Var(Option.empty[TreeSelection])
   private val busy                                         = Var(false)
   private val creating                                     = Var(false)
   private val creatingParentId                             = Var("")
@@ -72,6 +73,7 @@ final private[ui] class SessionFolderPanel(
     draft.set("")
     editingSessionId.set("")
     sessionDraft.set("")
+    confirmDelete.set(None)
     dragging.set(None)
     dragTarget.set(None)
     moving.set(None)
@@ -101,9 +103,12 @@ final private[ui] class SessionFolderPanel(
         open.now() && moving.now().isEmpty && event.key == "Escape"
       ) --> { event =>
         event.preventDefault()
-        close()
+        if (confirmDelete.now().nonEmpty) confirmDelete.set(None)
+        else close()
       },
-      documentEvents(_.onKeyDown).filter(_ => open.now() && editingSessionId.now().isEmpty) --> { event =>
+      documentEvents(_.onKeyDown).filter(_ =>
+        open.now() && editingSessionId.now().isEmpty && confirmDelete.now().isEmpty
+      ) --> { event =>
         val target   = event.target.asInstanceOf[dom.Node]
         val panel    = dom.document.getElementById(PanelId)
         val isEditor = {
@@ -137,7 +142,7 @@ final private[ui] class SessionFolderPanel(
               startMoveMode()
             case "x" if event.ctrlKey || event.metaKey =>
               event.preventDefault()
-              deleteSelection()
+              requestDeleteSelection()
             case _                                     =>
               ()
           }
@@ -172,25 +177,13 @@ final private[ui] class SessionFolderPanel(
         padding                          := "4px 0",
         children <-- Signal
           .combine(
-            folders.signal,
-            currentFolder,
-            sessions.signal,
-            creating.signal,
-            editing.signal,
-            creatingParentId,
-            collapsed.signal,
-            selected.signal
+            Signal.combine(folders.signal, currentFolder, sessions.signal, creating.signal),
+            Signal.combine(editing.signal, creatingParentId, collapsed.signal, selected.signal, confirmDelete.signal)
           )
           .map {
             case (
-                  allFolders,
-                  folderId,
-                  allSessions,
-                  isCreating,
-                  editId,
-                  createParentId,
-                  collapsedIds,
-                  selectedRow
+                  (allFolders, folderId, allSessions, isCreating),
+                  (editId, createParentId, collapsedIds, selectedRow, confirmingDelete)
                 ) =>
               val rows           = tree(allFolders, allSessions, collapsedIds).flatMap {
                 case row: FolderTreeRow  =>
@@ -204,7 +197,8 @@ final private[ui] class SessionFolderPanel(
                     rowSelected = selectedRow == FolderSelection(row.folder.id),
                     expanded = !collapsedIds.contains(row.folder.id),
                     canDelete = canDelete(allFolders, allSessions, row.folder.id),
-                    isEditing = editId == row.folder.id
+                    isEditing = editId == row.folder.id,
+                    isConfirming = confirmingDelete.contains(FolderSelection(row.folder.id))
                   )
                   val editor  =
                     if (isCreating && createParentId == row.folder.id)
@@ -229,7 +223,8 @@ final private[ui] class SessionFolderPanel(
                       level = row.level,
                       isLast = row.isLast,
                       ancestorContinues = row.ancestorContinues,
-                      rowSelected = selectedRow == SessionSelection(row.session.id)
+                      rowSelected = selectedRow == SessionSelection(row.session.id),
+                      isConfirming = confirmingDelete.contains(SessionSelection(row.session.id))
                     )
                   )
               }
@@ -319,6 +314,7 @@ final private[ui] class SessionFolderPanel(
     }
   private def toggleFolder(id: String): Unit               = {
     clearPendingClick()
+    confirmDelete.set(None)
     selected.set(FolderSelection(id))
     collapsed.update(ids => if (ids.contains(id)) ids - id else ids + id)
   }
@@ -369,24 +365,22 @@ final private[ui] class SessionFolderPanel(
       case NoSelection          =>
         ()
     }
-  private def deleteSelection(): Unit                      =
+  private def requestDeleteSelection(): Unit               =
     selected.now() match {
       case FolderSelection(id)  =>
         folders.now().find(_.id == id).foreach { folder =>
           if (canDelete(folders.now(), sessions.now(), folder.id))
-            deleteFolder(folder.id, s"Deleted folder: ${folder.name}")
+            confirmDelete.set(Some(FolderSelection(id)))
           else Toast.info("Move or delete the folder contents first")
         }
       case SessionSelection(id) =>
-        sessions.now().find(_.id == id).foreach { session =>
-          val title = Option(session.title).map(_.trim).filter(_.nonEmpty).getOrElse(ChatStore.NewSessionTitle)
-          deleteSession(session.id, title)
-        }
+        sessions.now().find(_.id == id).foreach(_ => confirmDelete.set(Some(SessionSelection(id))))
       case NoSelection          =>
         ()
     }
   private def createSessionInContext(): Unit               =
     if (!busy.now()) {
+      confirmDelete.set(None)
       val folderId = validFolderContext(selectedFolderContextId())
       busy.set(true)
       onNewSession(folderId)
@@ -426,6 +420,7 @@ final private[ui] class SessionFolderPanel(
       singleAction: () => Unit,
       doubleAction: () => Unit
   ): Unit = {
+    confirmDelete.set(None)
     selected.set(selection)
     if (pendingClickTarget.contains(selection)) {
       clearPendingClick()
@@ -526,6 +521,7 @@ final private[ui] class SessionFolderPanel(
       case SessionDropTarget(id) => sessions.now().find(_.id == id).map(_.folderId).getOrElse("")
     }
   private def startMoveMode(): Unit                                                    =
+    confirmDelete.set(None)
     selected.now() match {
       case NoSelection =>
         Toast.info("Select a session or folder before moving")
@@ -686,7 +682,8 @@ final private[ui] class SessionFolderPanel(
       rowSelected: Boolean,
       expanded: Boolean,
       canDelete: Boolean,
-      isEditing: Boolean
+      isEditing: Boolean,
+      isConfirming: Boolean
   ): HtmlElement = {
     val hovered          = Var(false)
     val isDropTarget     = dragTarget.signal.map(_ == FolderDropTarget(id))
@@ -764,10 +761,17 @@ final private[ui] class SessionFolderPanel(
           alignItems.center,
           gap        := "1px",
           flexShrink := "0",
-          opacity <-- hovered.signal.map(value => if (value) "1" else "0"),
-          pointerEvents <-- hovered.signal.map(value => if (value) "auto" else "none"),
-          if (canDelete)
-            actionIcon("×", s"Delete empty folder $name", () => deleteFolder(id, s"Deleted folder: $name"))
+          opacity <-- hovered.signal.map(value => if (value || isConfirming) "1" else "0"),
+          pointerEvents <-- hovered.signal.map(value => if (value || isConfirming) "auto" else "none"),
+          if (isConfirming)
+            InlineDeleteConfirmation.render(
+              onConfirm = () => deleteFolder(id, s"Deleted folder: $name"),
+              onCancel = () =>
+                if (confirmDelete.now().contains(FolderSelection(id))) confirmDelete.set(None),
+              busySignal = busy.signal
+            )
+          else if (canDelete)
+            actionIcon("×", s"Delete empty folder $name", () => confirmDelete.set(Some(FolderSelection(id))))
           else span("")
         )
       else emptyNode
@@ -778,7 +782,8 @@ final private[ui] class SessionFolderPanel(
       level: Int,
       isLast: Boolean,
       ancestorContinues: List[Boolean],
-      rowSelected: Boolean
+      rowSelected: Boolean,
+      isConfirming: Boolean
   ): HtmlElement = {
     val hovered          = Var(false)
     val isCurrent        = currentSessionId.signal.map(_ == session.id)
@@ -854,8 +859,18 @@ final private[ui] class SessionFolderPanel(
                 }
               }
             ),
-            actionIcon("✓", "Save session name", saveSessionRename),
-            actionIcon("×", "Cancel session rename", cancelSessionRename)
+            NeutralIconButton.render(
+              "✓",
+              "Save session name",
+              saveSessionRename,
+              disabledSignal = busy.signal
+            ),
+            NeutralIconButton.render(
+              "×",
+              "Cancel session rename",
+              cancelSessionRename,
+              disabledSignal = busy.signal
+            )
           )
         case false =>
           div(
@@ -898,9 +913,21 @@ final private[ui] class SessionFolderPanel(
               display.flex,
               alignItems.center,
               flexShrink      := "0",
-              opacity <-- hovered.signal.map(value => if (value) "1" else "0"),
-              pointerEvents <-- hovered.signal.map(value => if (value) "auto" else "none"),
-              actionIcon("×", s"Delete session $displayTitle", () => deleteSession(session.id, displayTitle))
+              opacity <-- hovered.signal.map(value => if (value || isConfirming) "1" else "0"),
+              pointerEvents <-- hovered.signal.map(value => if (value || isConfirming) "auto" else "none"),
+              if (isConfirming)
+                InlineDeleteConfirmation.render(
+                  onConfirm = () => deleteSession(session.id, displayTitle),
+                  onCancel = () =>
+                    if (confirmDelete.now().contains(SessionSelection(session.id))) confirmDelete.set(None),
+                  busySignal = busy.signal
+                )
+              else
+                actionIcon(
+                  "×",
+                  s"Delete session $displayTitle",
+                  () => confirmDelete.set(Some(SessionSelection(session.id)))
+                )
             )
           )
       }
@@ -1020,8 +1047,8 @@ final private[ui] class SessionFolderPanel(
           }
         }
       ),
-      actionIcon("✓", "Save folder name", onSave),
-      actionIcon("×", "Cancel folder rename", onCancel)
+      NeutralIconButton.render("✓", "Save folder name", onSave, disabledSignal = busy.signal),
+      NeutralIconButton.render("×", "Cancel folder rename", onCancel, disabledSignal = busy.signal)
     )
   private def actionIcon(label: String, tooltip: String, run: () => Unit): HtmlElement =
     button(
@@ -1073,6 +1100,7 @@ final private[ui] class SessionFolderPanel(
       sessions.now().find(_.id == currentSessionId.now()).map(_.folderId).getOrElse(draftFolderId.now())
     )
   private def beginCreate(parentId: String): Unit                                      = {
+    confirmDelete.set(None)
     creating.set(true)
     creatingParentId.set(validFolderContext(parentId))
     editing.set("")
@@ -1082,6 +1110,7 @@ final private[ui] class SessionFolderPanel(
   }
   private def beginRename(folderId: String): Unit                                      =
     folders.now().find(_.id == folderId).foreach { folder =>
+      confirmDelete.set(None)
       selected.set(FolderSelection(folder.id))
       editing.set(folder.id)
       creating.set(false)
@@ -1091,6 +1120,7 @@ final private[ui] class SessionFolderPanel(
       focusNameEditor()
     }
   private def beginSessionRename(session: ChatSession): Unit                           = {
+    confirmDelete.set(None)
     cancelEditing()
     selected.set(SessionSelection(session.id))
     editingSessionId.set(session.id)
@@ -1168,6 +1198,7 @@ final private[ui] class SessionFolderPanel(
       busy.set(true)
       onDeleteSession(sessionId)
         .map { _ =>
+          if (confirmDelete.now().contains(SessionSelection(sessionId))) confirmDelete.set(None)
           if (selected.now() == SessionSelection(sessionId)) selected.set(NoSelection)
           Toast.success(s"Deleted session: $title")
           js.timers.setTimeout(0)(ensureTreeSelection())
@@ -1183,6 +1214,7 @@ final private[ui] class SessionFolderPanel(
       busy.set(true)
       onDelete(folderId)
         .map { _ =>
+          if (confirmDelete.now().contains(FolderSelection(folderId))) confirmDelete.set(None)
           if (currentSessionId.now().isEmpty && draftFolderId.now() == folderId) draftFolderId.set(parentId)
           if (selected.now() == FolderSelection(folderId))
             selected.set(if (parentId.nonEmpty) FolderSelection(parentId) else NoSelection)

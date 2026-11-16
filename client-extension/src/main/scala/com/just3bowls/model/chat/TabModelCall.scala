@@ -31,6 +31,8 @@ object TabModelCall {
       promptMode: String = ProviderChatSettings.Inline,
       /** 这一轮用过的对话要不要绑给会话（插件页 Chat / Retry 为 true；网页原生轮为 false）。 */
       bindConversation: Boolean = false,
+      /** Exact LangChain tool-surface revision used by this provider conversation. */
+      toolProfileId: String = "",
       onTaskStarted: String => Unit = _ => ()
   ): Future[TabAiResult] = {
     val pageStartedAt = js.Date.now()
@@ -52,6 +54,7 @@ object TabModelCall {
         conversation = conversation,
         inject = inject,
         hostTabId = hostTabId,
+        toolProfileId = toolProfileId,
         promptMode = ProviderChatSettings.normalizePrompt(promptMode),
         bindConversation = bindConversation,
         onTaskStarted = onTaskStarted

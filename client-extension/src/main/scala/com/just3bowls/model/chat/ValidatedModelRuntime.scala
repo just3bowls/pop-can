@@ -4,7 +4,7 @@ import com.just3bowls.facade.JsonValue
 import com.just3bowls.model.provider.*
 import com.just3bowls.model.localapi.*
 
-import com.just3bowls.api.marker.ProtocolRepair
+import com.just3bowls.api.marker.{DeclaredToolPolicy, ProtocolRepair}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
@@ -21,7 +21,8 @@ final case class ModelRunRequest(
     promptMode: String = ProviderChatSettings.Inline,
     inject: Boolean = true,
     hostTabId: Int = 0,
-    bindConversation: Boolean = false
+    bindConversation: Boolean = false,
+    toolProfileId: String = ""
 )
 
 /**
@@ -37,14 +38,17 @@ object ValidatedModelRuntime {
       onEvent: TabAiEvent => Unit = (_: TabAiEvent) => (),
       cancellation: AgentCancellation = new AgentCancellation(),
       onTaskStarted: String => Unit = _ => (),
-      budgetMs: Int = BudgetMs
+      budgetMs: Int = BudgetMs,
+      initialProtocolRepair: Option[String] = None,
+      initialRepairCount: Int = 0
   ): Future[TabAiResult] = {
     val effectiveBudgetMs = math.max(1, budgetMs)
     val deadline          = js.Date.now() + effectiveBudgetMs
     def attempt(
         protocolRepair: Option[String],
-        recoveryReason: String = "",
-        repairCount: Int = 0
+        recoveryReason: String,
+        repairCount: Int,
+        reuseConversation: Boolean
     ): Future[TabAiResult] = {
       cancellation.check()
       val remaining = deadline - js.Date.now()
@@ -75,48 +79,74 @@ object ValidatedModelRuntime {
             contextMode = request.contextMode,
             protocolRepair = protocolRepair,
             // A repair is an extra turn inside the provider conversation that produced the invalid answer.
-            conversation = if (protocolRepair.nonEmpty) "reuse" else request.conversation,
+            conversation = if (reuseConversation) "reuse" else request.conversation,
             inject = request.inject,
             hostTabId = request.hostTabId,
             promptMode = request.promptMode,
             bindConversation = request.bindConversation,
+            toolProfileId = request.toolProfileId,
             onTaskStarted = onTaskStarted
           )
           .recover { case e =>
             failed(Option(e.getMessage).getOrElse(e.toString), protocol = false)
           }
           .flatMap { result =>
-            if (result.ok) {
-              onEvent(TabAiEvent.StepFinished(result.toolCalls.nonEmpty))
-              Future.successful(result)
+            val declaredTools = toolNames(request.bodyJson).toSet
+            val violations    =
+              if (!result.ok) Nil
+              else
+                DeclaredToolPolicy.validate(
+                  result.content,
+                  result.toolCalls.map(call => call.name -> call.arguments),
+                  declaredTools
+                )
+            val checked       =
+              if (violations.isEmpty) result
+              else
+                result.copy(
+                  ok = false,
+                  finishReason = "error",
+                  error = DeclaredToolPolicy.messages(violations).mkString(" | "),
+                  protocolFailure = true,
+                  protocolErrors = DeclaredToolPolicy.messages(violations)
+                )
+            if (checked.ok) {
+              onEvent(TabAiEvent.StepFinished(checked.toolCalls.nonEmpty))
+              Future.successful(checked)
             } else {
-              val error  = Option(result.error).filter(_.nonEmpty).getOrElse("Model call failed")
-              val errors = if (result.protocolErrors.nonEmpty) result.protocolErrors else List(error)
-              if (result.protocolFailure && js.Date.now() < deadline && repairCount < MaxProtocolRepairs)
+              val error  = Option(checked.error).filter(_.nonEmpty).getOrElse("Model call failed")
+              val errors = if (checked.protocolErrors.nonEmpty) checked.protocolErrors else List(error)
+              if (checked.protocolFailure && js.Date.now() < deadline && repairCount < MaxProtocolRepairs)
                 attempt(
-                  Some(ProtocolRepair.directive(errors)),
+                  Some(ProtocolRepair.directive(errors, declaredTools)),
                   errors.mkString(" | "),
-                  repairCount + 1
+                  repairCount + 1,
+                  reuseConversation = true
                 )
               else {
-                if (result.protocolFailure)
+                if (checked.protocolFailure)
                   onEvent(TabAiEvent.InternalRecoveryStarted(errors.mkString(" | ")))
                 onEvent(TabAiEvent.StepFailed(error))
-                if (result.protocolFailure)
+                if (checked.protocolFailure)
                   onEvent(TabAiEvent.TurnFailed(
                     provider = request.provider,
                     keyId = request.keyId,
                     messagesJson = messagesJson(request.bodyJson),
-                    toolNames = toolNames(request.bodyJson),
+                    toolNames = declaredTools.toList,
                     message = errors.mkString(" | ")
                   ))
-                Future.successful(result)
+                Future.successful(checked)
               }
             }
           }
       }
     }
-    attempt(None)
+    attempt(
+      initialProtocolRepair,
+      recoveryReason = initialProtocolRepair.getOrElse(""),
+      repairCount = math.max(0, initialRepairCount),
+      reuseConversation = false
+    )
   }
   private def failed(
       message: String,

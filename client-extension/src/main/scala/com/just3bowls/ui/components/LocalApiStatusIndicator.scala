@@ -38,12 +38,13 @@ private[ui] object LocalApiStatusIndicator {
   def render(
       statusSignal: Signal[String],
       activeSignal: Signal[Boolean],
-      onOpen: () => Unit
+      onToggle: () => Unit
   ): HtmlElement = {
     val hover           = Var(false)
     val visual          = statusSignal.combineWith(activeSignal).map { case (status, active) =>
       (
         status,
+        active,
         LocalApiStatus.indicatorColor(status, active),
         LocalApiStatus.indicatorHollow(status, active),
         LocalApiStatus.isProgress(status)
@@ -52,44 +53,63 @@ private[ui] object LocalApiStatusIndicator {
     button(
       cls          := "th-config-focus",
       `type`       := "button",
-      aria.label <-- visual.map { case (status, _, _, _) =>
-        s"Local API $status. Open API settings"
+      aria.label <-- visual.map { case (status, active, _, _, _) =>
+        s"Local API $status. ${if (active) "Stop" else "Start"} Local API"
       },
       display      := "inline-flex",
       alignItems.center,
       justifyContent.center,
-      gap          := "4px",
+      position     := "relative",
+      width        := "24px",
       height       := "22px",
-      padding      := "0 4px",
+      padding      := "0",
       cursor.pointer,
       border       := "none",
       borderRadius := "4px",
       backgroundColor <-- hover.signal.map(value => if (value) "#f3f4f6" else "transparent"),
-      color        := "#6b7280",
-      transition   := "background-color 120ms ease",
-      title <-- visual.map { case (status, _, _, _) =>
-        s"Local API · $status\n${LocalApiStatus.Endpoint}\nClick to open API settings"
+      color <-- hover.signal.map(value => if (value) "#111827" else "#6b7280"),
+      transition   := "color 120ms ease, background-color 120ms ease",
+      title <-- visual.map { case (status, active, _, _, _) =>
+        val action = if (active) "stop" else "start"
+        s"Local API · $status\n${LocalApiStatus.Endpoint}\nClick to $action"
       },
-      span("API", fontSize := "10px", fontWeight := "500", lineHeight := "1"),
+      svg.svg(
+        svg.width          := "15",
+        svg.height         := "15",
+        svg.viewBox        := "0 0 16 16",
+        svg.fill           := "none",
+        svg.stroke         := "currentColor",
+        svg.strokeWidth    := "1.45",
+        svg.strokeLineCap  := "round",
+        svg.strokeLineJoin := "round",
+        aria.hidden        := true,
+        svg.path(svg.d := "M6.7 9.3l2.6-2.6"),
+        svg.path(svg.d := "M7.3 4.5l1.1-1.1a2.75 2.75 0 0 1 3.9 3.9l-1.1 1.1"),
+        svg.path(svg.d := "M8.7 11.5l-1.1 1.1a2.75 2.75 0 0 1-3.9-3.9l1.1-1.1")
+      ),
       span(
-        width              := "6px",
-        height             := "6px",
+        position           := "absolute",
+        right              := "1px",
+        bottom             := "1px",
+        width              := "5px",
+        height             := "5px",
         boxSizing          := "border-box",
         flexShrink         := "0",
         borderRadius       := "999px",
-        backgroundColor <-- visual.map { case (_, color, hollow, _) =>
+        boxShadow          := "0 0 0 1px #ffffff",
+        backgroundColor <-- visual.map { case (_, _, color, hollow, _) =>
           if (hollow) "transparent" else color
         },
-        border <-- visual.map { case (_, color, hollow, _) =>
+        border <-- visual.map { case (_, _, color, hollow, _) =>
           if (hollow) s"1px solid $color" else "none"
         },
-        animation <-- visual.map { case (_, _, _, progress) =>
+        animation <-- visual.map { case (_, _, _, _, progress) =>
           if (progress) "popcan-api-pulse 1.2s ease-in-out infinite" else "none"
         }
       ),
       onMouseEnter --> { _ => hover.set(true) },
       onMouseLeave --> { _ => hover.set(false) },
-      onClick --> { _ => onOpen() }
+      onClick --> { _ => onToggle() }
     )
   }
 }

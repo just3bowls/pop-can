@@ -26,7 +26,8 @@ object RuntimeMessageFactory {
       attachmentName: String = "",
       attachmentBody: String = "",
       promptMode: String = "",
-      bindConversation: Boolean = false
+      bindConversation: Boolean = false,
+      toolProfileId: String = ""
   ): InputPromptMessage =
     JsBridge.obj(
       "type"             -> ("INPUT_PROMPT"),
@@ -48,7 +49,8 @@ object RuntimeMessageFactory {
       "attachmentName"   -> (attachmentName),
       "attachmentBody"   -> (attachmentBody),
       "promptMode"       -> (promptMode),
-      "bindConversation" -> (bindConversation)
+      "bindConversation" -> (bindConversation),
+      "toolProfileId"    -> (toolProfileId)
     ).asInstanceOf[InputPromptMessage]
 
   def tabAiNotice(generationId: String, text: String): TabAiNoticeMessage =

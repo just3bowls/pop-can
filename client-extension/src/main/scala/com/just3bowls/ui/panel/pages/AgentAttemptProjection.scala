@@ -64,7 +64,8 @@ private[pages] object AgentAttemptProjection {
       requestedMode = actual.requestedMode,
       effectiveMode = actual.effectiveMode,
       modePath = actual.modePath,
-      agentRunId = actual.agentRunId
+      agentRunId = actual.agentRunId,
+      browserTools = actual.browserTools
     )
   }
 }

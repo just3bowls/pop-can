@@ -85,7 +85,6 @@ object WebChatMain {
         sessionId = "",
         canTakeover = false,
         agentRunning = false,
-        browserTools = false,
         sessionsLoaded = false,
         sessions = Nil,
         listError = "",
@@ -128,7 +127,6 @@ object WebChatMain {
           sessionId = state.sessionId.getOrElse(""),
           canTakeover = state.canTakeover.getOrElse(false),
           agentRunning = state.agentRunning.getOrElse(false),
-          browserTools = state.browserTools.getOrElse(false),
           sessionsLoaded = sessionsLoaded,
           sessions = sessions.map(session =>
             WebChatSessionView(
@@ -437,11 +435,6 @@ object WebChatMain {
           runAction(JsBridge.obj(
             "type"      -> ("WEBCHAT_STOP_RUN"),
             "sessionId" -> (state.sessionId.getOrElse(""))
-          )),
-        toggleBrowserTools = () =>
-          runAction(JsBridge.obj(
-            "type" -> ("WEBCHAT_SET_BROWSER_TOOLS"),
-            "on"   -> (!state.browserTools.getOrElse(false))
           )),
         copyToast = copyToast,
         dismissToast = dismissToast

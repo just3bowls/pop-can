@@ -31,7 +31,7 @@ object ChatRunner {
       onEvent: TabAiEvent => Unit,
       registerCancel: (() => Unit) => Unit,
       maxSteps: Int,
-      useBrowserTools: Boolean = true,
+      useBrowserTools: Boolean = false,
       contextMode: String = ProviderChatSettings.Delta,
       conversation: String = "",
       /** 正文投递方式（`inline` / `file`）：由插件页按 `/provider` 的本次设置给出。 */
@@ -42,7 +42,8 @@ object ChatRunner {
       retries: Int = 0,
       agentMode: String = AgentModePolicy.React,
       requestedMode: String = AgentModePolicy.React,
-      modeReason: String = "retry"
+      modeReason: String = "retry",
+      initialProtocolRepair: Option[String] = None
   ): Future[ChatMessage] =
     ChatStore.getMessagePath(user.id).flatMap { context =>
       val cancellation = new AgentCancellation(() => TabAiExecutor.cancelRunning(provider))
@@ -70,7 +71,8 @@ object ChatRunner {
             tabRefs = user.tabRefs,
             mode = AgentModePolicy.normalize(agentMode),
             // Retry/Regenerate re-runs the mode already recorded on this turn.
-            allowHandoff = false
+            allowHandoff = false,
+            initialProtocolRepair = initialProtocolRepair
           )
           .flatMap { outcome =>
             val assistant = ChatMessage(
@@ -94,7 +96,8 @@ object ChatRunner {
               requestedMode = AgentModePolicy.normalize(requestedMode),
               effectiveMode = AgentModePolicy.normalize(agentMode),
               modePath = routePathJson(requestedMode, agentMode, modeReason),
-              agentRunId = s"agent-${user.id}"
+              agentRunId = s"agent-${user.id}",
+              browserTools = useBrowserTools
             )
             ChatStore.addMessage(assistant).map(_ => assistant)
           }
@@ -120,7 +123,8 @@ object ChatRunner {
               requestedMode = AgentModePolicy.normalize(requestedMode),
               effectiveMode = AgentModePolicy.normalize(agentMode),
               modePath = routePathJson(requestedMode, agentMode, modeReason),
-              agentRunId = s"agent-${user.id}"
+              agentRunId = s"agent-${user.id}",
+              browserTools = useBrowserTools
             )
             ChatStore.addMessage(errorAssistant).flatMap(_ => Future.failed(e))
           }
@@ -136,7 +140,7 @@ object ChatRunner {
       registerCancel: (() => Unit) => Unit = _ => (),
       mode: String = "chat",
       maxSteps: Int = 10,
-      useBrowserTools: Boolean = true,
+      useBrowserTools: Boolean = false,
       contextMode: String = ProviderChatSettings.Delta,
       conversation: String = "",
       /** 正文投递方式（`inline` / `file`）：由插件页按 `/provider` 的本次设置给出。 */
@@ -181,7 +185,8 @@ object ChatRunner {
       requestedMode = AgentModePolicy.normalize(requestedMode),
       effectiveMode = AgentModePolicy.normalize(agentMode),
       modePath = routePathJson(requestedMode, agentMode, modeReason),
-      tabRefs = tabRefs
+      tabRefs = tabRefs,
+      browserTools = useBrowserTools
     )
     val contextF =
       parentId match {
@@ -298,7 +303,8 @@ object ChatRunner {
             requestedMode = AgentModePolicy.normalize(requestedMode),
             effectiveMode = AgentModePolicy.normalize(agentMode),
             modePath = routePathJson(requestedMode, agentMode, modeReason),
-            agentRunId = s"agent-${user.id}"
+            agentRunId = s"agent-${user.id}",
+            browserTools = useBrowserTools
           )
           ChatStore.addMessage(errorAssistant).flatMap(_ => Future.failed(e))
         }
@@ -324,7 +330,8 @@ object ChatRunner {
         requestedMode = AgentModePolicy.normalize(requestedMode),
         effectiveMode = assistantMode,
         modePath = routePathJson(requestedMode, assistantMode, modeReason, outcome.handoffs),
-        agentRunId = s"agent-${user.id}"
+        agentRunId = s"agent-${user.id}",
+        browserTools = useBrowserTools
       )
       _ <- ChatStore.addMessage(assistant)
     } yield assistant
@@ -368,6 +375,7 @@ object ChatRunner {
               steps = "",
               provider = spec.provider,
               origin = spec.origin,
+              browserTools = spec.useBrowserTools,
               updatedAt = now
             )
             (before, userMsg, running)
@@ -387,7 +395,8 @@ object ChatRunner {
               mergedFrom = Nil,
               createdAt = now,
               updatedAt = now,
-              origin = spec.origin
+              origin = spec.origin,
+              browserTools = spec.useBrowserTools
             )
             val assistant = ChatMessage(
               id = ChatStore.nextId(),
@@ -404,7 +413,8 @@ object ChatRunner {
               mergedFrom = Nil,
               createdAt = ChatStore.childCreatedAt(Some(now)),
               updatedAt = now,
-              origin = spec.origin
+              origin = spec.origin,
+              browserTools = spec.useBrowserTools
             )
             (path :+ userMsg, Some(userMsg), assistant)
         }

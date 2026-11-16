@@ -243,7 +243,7 @@ object ChatStore {
       // 会话没了，它在各 provider 上的上下文覆盖也一起清掉。
       // 「这个 provider 下次开新对话」的待办同理。
       _        <- SessionFreshChats.removeSession(id)
-      _        <- AgentModeSettings.clear(id)
+      _        <- SessionSettingsStore.clear(id)
     } yield ()
 
   /** 撤销栈：会话 id -> 若干删除步骤，最近一次在最后。 */
@@ -420,7 +420,8 @@ object ChatStore {
        *
        * 以前失败也写成 success（正文是模型原文），于是气泡上看不出失败、也没有 Retry 入口；现在由自动重试接手替换。
        */
-      failed: Boolean = false
+      failed: Boolean = false,
+      browserTools: Boolean = false
   ): Future[Unit] =
     if (sessionId.isEmpty) Future.successful(())
     else
@@ -442,6 +443,7 @@ object ChatStore {
                   toolResults = "",
                   steps = "",
                   origin = origin,
+                  browserTools = browserTools,
                   updatedAt = now
                 )
               ).flatMap(_ =>
@@ -471,7 +473,8 @@ object ChatStore {
             mergedFrom = Nil,
             createdAt = now,
             updatedAt = now,
-            origin = origin
+            origin = origin,
+            browserTools = browserTools
           )
           // assistant 的 createdAt 必须严格大于它的父消息：同毫秒并列会让"最后一条 / 树梢"这类排序选出错误的分支。
           val parentAt  = if (userText.nonEmpty) Some(now) else tip.map(_.createdAt)
@@ -491,7 +494,8 @@ object ChatStore {
             mergedFrom = Nil,
             createdAt = answerAt,
             updatedAt = answerAt,
-            origin = origin
+            origin = origin,
+            browserTools = browserTools
           )
           val appended  = if (userText.nonEmpty) List(user, assistant) else List(assistant)
           addMessages(appended).flatMap { _ =>
@@ -513,9 +517,9 @@ object ChatStore {
   /** 把一条消息路径复制成新的 session（消息是独立副本），返回新 session。 */
   def forkSession(source: ChatSession, path: List[ChatMessage], title: String): Future[ChatSession] =
     createSession(title, source.provider, folderId = source.folderId).flatMap { session =>
-      val idMap  = path.map(message => message.id -> nextId()).toMap
-      val base   = js.Date.now()
-      val copies = path.zipWithIndex.map { case (message, index) =>
+      val idMap           = path.map(message => message.id -> nextId()).toMap
+      val base            = js.Date.now()
+      val copies          = path.zipWithIndex.map { case (message, index) =>
         message.copy(
           id = idMap.getOrElse(message.id, nextId()),
           sessionId = session.id,
@@ -524,7 +528,15 @@ object ChatStore {
           updatedAt = base + index
         )
       }
-      addMessages(copies).map(_ => session)
+      val inheritSettings =
+        if (source.id.trim.isEmpty) Future.successful(())
+        else
+          SessionSettingsStore
+            .load(source.id)
+            .flatMap(settings =>
+              SessionSettingsStore.ensure(session.id, settings.browserTools, settings.agentMode)
+            )
+      inheritSettings.flatMap(_ => addMessages(copies).map(_ => session))
     }
   def updateMessage(message: ChatMessage): Future[Unit]                                             =
     saveMessages(List(message))
@@ -633,6 +645,7 @@ object ChatStore {
       effectiveMode = JsBridge.stringField(item, "effectiveMode").getOrElse(""),
       modePath = JsBridge.stringField(item, "modePath").getOrElse(""),
       agentRunId = JsBridge.stringField(item, "agentRunId").getOrElse(""),
+      browserTools = JsBridge.booleanField(item, "browserTools").getOrElse(false),
       tabRefs = parseBrowserTabRefs(JsBridge.asObject(JsBridge.field(item, "tabRefs")))
     ))
   private def sessionToJs(s: ChatSession): js.Any                               =
@@ -691,6 +704,7 @@ object ChatStore {
       "effectiveMode"   -> (m.effectiveMode),
       "modePath"        -> (m.modePath),
       "agentRunId"      -> (m.agentRunId),
+      "browserTools"    -> (m.browserTools),
       "tabRefs"         -> (js.Array(m.tabRefs.map(tabRefToJs)*))
     )
   }
@@ -745,7 +759,8 @@ object ChatStore {
       requestedMode = JsBridge.undefinedString(m.requestedMode).getOrElse(""),
       effectiveMode = JsBridge.undefinedString(m.effectiveMode).getOrElse(""),
       modePath = JsBridge.undefinedString(m.modePath).getOrElse(""),
-      agentRunId = JsBridge.undefinedString(m.agentRunId).getOrElse("")
+      agentRunId = JsBridge.undefinedString(m.agentRunId).getOrElse(""),
+      browserTools = JsBridge.undefinedBoolean(m.browserTools).getOrElse(false)
     )
   }
   private def attemptToJs(attempt: ChatAttempt): js.Any                         =
@@ -765,7 +780,8 @@ object ChatStore {
       "requestedMode"      -> (attempt.requestedMode),
       "effectiveMode"      -> (attempt.effectiveMode),
       "modePath"           -> (attempt.modePath),
-      "agentRunId"         -> (attempt.agentRunId)
+      "agentRunId"         -> (attempt.agentRunId),
+      "browserTools"       -> (attempt.browserTools)
     )
   private def loadUndoStacks(): Future[Map[String, List[UndoStep]]]             =
     BrowserAPIStorage.get(UndoStacksKey).map {

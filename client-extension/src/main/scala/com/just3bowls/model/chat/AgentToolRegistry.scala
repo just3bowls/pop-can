@@ -65,6 +65,46 @@ final case class AgentToolSpec(
   }
 }
 
+/** Exact tools visible to one agent turn. Provider-native tools are deliberately not represented here. */
+final case class AgentToolSurface(tools: List[AgentToolSpec]) {
+  val toolNames: Set[String]            = tools.map(_.name).toSet
+  val browserTools: List[AgentToolSpec] = tools.filter(_.kind == ToolKind.BrowserUse)
+  val browserToolsEnabled: Boolean      = browserTools.nonEmpty
+  val revision: String                  = AgentToolSurface.revisionOf(tools)
+}
+
+object AgentToolSurface {
+
+  /**
+   * Stable content revision for Provider-conversation isolation.
+   *
+   * Tool order is irrelevant, but changing a name, description, schema or execution metadata creates a new revision.
+   * FNV-1a is sufficient here: this is an equality token for local conversation binding, not a security hash.
+   */
+  def revisionOf(tools: List[AgentToolSpec]): String = {
+    def kindName(kind: ToolKind): String       =
+      kind match {
+        case ToolKind.BrowserUse => "browser"
+        case ToolKind.Local      => "local"
+      }
+    def canonical(tool: AgentToolSpec): String =
+      List(
+        tool.name,
+        tool.description,
+        kindName(tool.kind),
+        tool.terminal.toString,
+        tool.parametersJson
+      ).map(value => s"${value.length}:$value").mkString("|")
+    val input                                  = tools.map(canonical).sorted.mkString("\n")
+    var hash                                   = -3750763034362895579L
+    input.foreach { char =>
+      hash ^= char.toLong
+      hash *= 1099511628211L
+    }
+    s"${java.lang.Long.toHexString(hash)}-${input.length}"
+  }
+}
+
 /** 全部浏览器工具的唯一声明处。 */
 object AgentToolRegistry {
   private val BrowserSearch = AgentToolSpec(
@@ -210,9 +250,15 @@ object AgentToolRegistry {
     BrowserUseTab
   )
 
-  /** chat agent 暴露的全部工具（目前等于浏览器工具全集）。 */
-  val chatTools: List[AgentToolSpec] = browserTools
+  /** Non-browser tools that remain available regardless of the browser-tools session switch. */
+  val alwaysOnChatTools: List[AgentToolSpec] = Nil
 
-  private val byName: Map[String, AgentToolSpec] = browserTools.map(tool => tool.name -> tool).toMap
+  def chatToolsFor(browserToolsEnabled: Boolean): List[AgentToolSpec] =
+    alwaysOnChatTools ++ (if (browserToolsEnabled) browserTools else Nil)
+
+  /** chat agent 默认暴露的全部工具。 */
+  val chatTools: List[AgentToolSpec] = chatToolsFor(browserToolsEnabled = true)
+
+  private val byName: Map[String, AgentToolSpec] = chatTools.map(tool => tool.name -> tool).toMap
   def find(name: String): Option[AgentToolSpec]  = byName.get(name)
 }

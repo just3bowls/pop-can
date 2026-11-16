@@ -81,7 +81,7 @@ object LocalAgentRunner {
       maxSteps: Int = DefaultToolRounds,
       cancellation: AgentCancellation = new AgentCancellation(),
       browserContext: AgentBrowserContext = AgentBrowserContext.empty,
-      useBrowserTools: Boolean = true,
+      useBrowserTools: Boolean = false,
       contextIDs: List[String] = Nil,
       contextMode: String = ProviderChatSettings.Delta,
       conversation: String = "",
@@ -106,9 +106,13 @@ object LocalAgentRunner {
       /** ReAct / Plan. Browser tools are an execution capability, not a separate mode. */
       mode: String = AgentModePolicy.React,
       /** Only Auto may escalate while running; explicit / pinned modes stay locked. */
-      allowHandoff: Boolean = false
+      allowHandoff: Boolean = false,
+      /** Transient repair directive used by the first provider call of a native auto-retry. */
+      initialProtocolRepair: Option[String] = None
   ): Future[LocalAgentOutcome] = {
     val requestedMode                                                    = AgentModePolicy.normalize(mode)
+    val repairState                                                      =
+      initialProtocolRepair.map(value => new LocalAgentModel.RepairState(Some(value)))
     def runPlanMode(): Future[LocalAgentOutcome]                         =
       runPlanExecute(
         provider,
@@ -124,7 +128,8 @@ object LocalAgentRunner {
         hostTabId,
         bindConversation,
         tabRefs,
-        memoryContext
+        memoryContext,
+        repairState
       )
     def runReactMode(handoffEnabled: Boolean): Future[LocalAgentOutcome] =
       runReact(
@@ -144,7 +149,8 @@ object LocalAgentRunner {
         bindConversation,
         tabRefs,
         memoryContext,
-        handoffEnabled
+        handoffEnabled,
+        repairState
       )
     if (requestedMode == AgentModePolicy.Plan)
       runPlanMode()
@@ -171,7 +177,8 @@ object LocalAgentRunner {
       hostTabId: Int,
       bindConversation: Boolean,
       tabRefs: List[BrowserTabRef],
-      memoryContext: String
+      memoryContext: String,
+      repair: Option[LocalAgentModel.RepairState]
   ): Future[LocalAgentOutcome] = {
     val messageReducer: js.Function2[js.Array[js.Any], js.Array[js.Any], js.Array[js.Any]] =
       (left, right) => left.concat(right)
@@ -190,14 +197,6 @@ object LocalAgentRunner {
         JsBridge.obj("default" -> ((() => null): js.Function0[js.Any]))
       )
     ))
-    def plannerMessages(note: String): js.Array[LangChainBaseMessage] = {
-      val revision = Option(note).getOrElse("").trim
-      val extra    = if (revision.isEmpty) "" else s"\n\nUser revision request: $revision"
-      val prompt = new SystemMessage(JsBridge.obj("content" -> (ChatScenario.planRequestPolicy + extra))).asInstanceOf[
-        LangChainBaseMessage
-      ]
-      js.Array(prompt).concat(withScenario(initialMessages, useTools = false, Nil, memoryContext))
-    }
     val submitPlan                                                    = AgentToolSpec(
       name = "submit_plan",
       description =
@@ -206,9 +205,19 @@ object LocalAgentRunner {
       params = List(ToolParam("plan", ToolParamKind.Text, "The complete markdown execution plan.")),
       terminal = true
     )
+    val plannerSurface                                                = AgentToolSurface(List(submitPlan))
+    def plannerMessages(note: String): js.Array[LangChainBaseMessage] = {
+      val revision = Option(note).getOrElse("").trim
+      val extra    = if (revision.isEmpty) "" else s"\n\nUser revision request: $revision"
+      val prompt = new SystemMessage(JsBridge.obj("content" -> (ChatScenario.planRequestPolicy + extra))).asInstanceOf[
+        LangChainBaseMessage
+      ]
+      js.Array(prompt).concat(withScenario(initialMessages, plannerSurface, Nil, memoryContext))
+    }
     def generatePlan(note: String): Future[String]                    = {
       cancellation.check()
-      val model = LocalAgentModel
+      val conversationState = new LocalAgentModel.ConversationState(plannerSurface.revision)
+      val model             = LocalAgentModel
         .create(
           provider,
           List(submitPlan),
@@ -220,7 +229,9 @@ object LocalAgentRunner {
           conversation = conversation,
           promptMode = promptMode,
           hostTabId = hostTabId,
-          bindConversation = bindConversation
+          bindConversation = bindConversation,
+          conversationState = conversationState,
+          repair = repair
         )
         .asInstanceOf[LangChainRunnable]
       StructuredAgentRunner
@@ -299,7 +310,8 @@ object LocalAgentRunner {
           bindConversation,
           tabRefs,
           memoryContext,
-          allowHandoff = false
+          allowHandoff = false,
+          repair
         ).map { outcome =>
           val result = JsBridge.obj(
             "content"   -> (outcome.content),
@@ -421,24 +433,22 @@ object LocalAgentRunner {
       bindConversation: Boolean,
       tabRefs: List[BrowserTabRef],
       memoryContext: String,
-      allowHandoff: Boolean
+      allowHandoff: Boolean,
+      repair: Option[LocalAgentModel.RepairState]
   ): Future[LocalAgentOutcome] = {
-    val evidence     = mutable.ArrayBuffer.empty[ToolEvidence]
-    val seed         = firstRound.map(round => new LocalAgentModel.SeedState(Some(round)))
-    val runTabRefs   = if (useBrowserTools) tabRefs else Nil
-    var handoff      = Option.empty[AgentHandoff]
-    // 关掉浏览器工具时不声明 browser_*；Auto 仍可保留本地 Plan handoff 工具。
-    val baseTools    =
-      if (useBrowserTools)
-        LocalAgentModel.defaultTools.filter(tool => tool.name != "browser_use_tab" || runTabRefs.nonEmpty)
-      else Nil
-    val handoffModes = if (allowHandoff) List(AgentModePolicy.Plan) else Nil
-    val toolSpecs    = baseTools ++ (if (handoffModes.nonEmpty) List(RequestModeHandoff) else Nil)
+    val evidence          = mutable.ArrayBuffer.empty[ToolEvidence]
+    val seed              = firstRound.map(round => new LocalAgentModel.SeedState(Some(round)))
+    val runTabRefs        = if (useBrowserTools) tabRefs else Nil
+    var handoff           = Option.empty[AgentHandoff]
+    val baseTools         =
+      AgentToolRegistry.chatToolsFor(useBrowserTools)
+    val handoffModes      = if (allowHandoff) List(AgentModePolicy.Plan) else Nil
+    val toolSpecs         = baseTools ++ (if (handoffModes.nonEmpty) List(RequestModeHandoff) else Nil)
+    val toolSurface       = AgentToolSurface(toolSpecs)
+    val conversationState = new LocalAgentModel.ConversationState(toolSurface.revision)
     // 场景 / Memory system 消息由 withScenario 前置，它不对应任何会话消息，id 记空串。
-    val contextIds   =
-      if (toolSpecs.nonEmpty || memoryContext.trim.nonEmpty) "" :: contextIDs
-      else contextIDs
-    val toolObjects  = toolSpecs.map { toolDef =>
+    val contextIds        = "" :: contextIDs
+    val toolObjects       = toolSpecs.map { toolDef =>
       val callTool = (name: String, argsText: String) =>
         if (name == RequestModeHandoff.name) {
           cancellation.check()
@@ -464,7 +474,7 @@ object LocalAgentRunner {
             }
       LocalAgentModel.createLangChainTool(toolDef, callTool, cancellation, onEvent)
     }
-    val model        = LocalAgentModel.create(
+    val model             = LocalAgentModel.create(
       provider,
       toolSpecs,
       onEvent,
@@ -476,10 +486,12 @@ object LocalAgentRunner {
       promptMode = promptMode,
       hostTabId = hostTabId,
       bindConversation = bindConversation,
-      seed = seed
+      conversationState = conversationState,
+      seed = seed,
+      repair = repair
     )
-    val app          = AgentHarness.create(model, toolObjects, Nil)
-    val config       = JsBridge.obj("recursionLimit" -> (AgentStepPolicy.reactRecursionLimit(maxSteps)))
+    val app               = AgentHarness.create(model, toolObjects, Nil)
+    val config            = JsBridge.obj("recursionLimit" -> (AgentStepPolicy.reactRecursionLimit(maxSteps)))
     def runRuntimeHandoff(request: AgentHandoff): Future[LocalAgentOutcome] =
       request.mode match {
         case AgentModePolicy.Plan =>
@@ -497,7 +509,8 @@ object LocalAgentRunner {
             hostTabId,
             bindConversation,
             tabRefs,
-            memoryContext
+            memoryContext,
+            repair
           ).map(_.copy(handoffs = List(request)))
         case _                    =>
           Future.successful(LocalAgentOutcome(content = "", thinking = "", toolCalls = Nil, handoffs = List(request)))
@@ -509,7 +522,7 @@ object LocalAgentRunner {
         val input =
           JsBridge.obj("messages" -> (withScenario(
             initialMessages,
-            useBrowserTools,
+            toolSurface,
             validTabs,
             memoryContext,
             handoffModes
@@ -561,7 +574,8 @@ object LocalAgentRunner {
                     contextMode,
                     conversation,
                     promptMode,
-                    memoryContext
+                    memoryContext,
+                    conversationState
                   )
               }
           }
@@ -588,7 +602,8 @@ object LocalAgentRunner {
       contextMode: String,
       conversation: String,
       promptMode: String,
-      memoryContext: String
+      memoryContext: String,
+      conversationState: LocalAgentModel.ConversationState
   ): Future[LocalAgentOutcome] = {
     cancellation.check()
     val memoryMessage =
@@ -611,7 +626,8 @@ object LocalAgentRunner {
         contextIds = memoryIds ++ contextIDs ++ List.fill(evidence.size * 2 + 1)(""),
         contextMode = contextMode,
         conversation = conversation,
-        promptMode = promptMode
+        promptMode = promptMode,
+        conversationState = conversationState
       )
       .asInstanceOf[LangChainRunnable]
     model.invoke(JsBridge.asObject(messages)).toFuture.map { raw =>
@@ -699,18 +715,16 @@ object LocalAgentRunner {
       }.mkString("\n")
     }
 
-  /**
-   * 声明了工具时补一条 chat 场景 system 消息：固定模版只讲「扮演 API」，工具衔接与取证规则只能从 body 里给。 关掉工具（off）时一个消息都不加，保持「用网页 AI 自己的能力回答」的原义。
-   */
+  /** 每轮补充非工具面的运行上下文；工具能力本身只由 LangChain tool definitions 表达。 */
   private def withScenario(
       messages: js.Array[LangChainBaseMessage],
-      useTools: Boolean,
+      surface: AgentToolSurface,
       tabs: List[BrowserTabRef],
       memoryContext: String,
       handoffModes: List[String] = Nil
   ): js.Array[LangChainBaseMessage] = {
     val scenario = List(
-      if (useTools) ChatScenario.browserToolsPolicy + ChatScenario.attachedTabsPolicy(tabs) else "",
+      if (surface.browserToolsEnabled) ChatScenario.attachedTabsPolicy(tabs) else "",
       ChatScenario.autoHandoffPolicy(handoffModes)
     ).filter(_.nonEmpty).mkString("\n\n")
     val combined = List(scenario, Option(memoryContext).getOrElse("").trim).filter(_.nonEmpty).mkString("\n\n")
@@ -718,7 +732,8 @@ object LocalAgentRunner {
     else {
       PopCanLog.debug(
         "agent",
-        s"chat scenario: tools=$useTools system message ${combined.length} chars tabs=${tabs.size} memory=${memoryContext.nonEmpty}"
+        s"chat scenario: tools=${surface.toolNames.mkString(",")} revision=${surface.revision} " +
+          s"system message ${combined.length} chars tabs=${tabs.size} memory=${memoryContext.nonEmpty}"
       )
       js.Array[LangChainBaseMessage](
         new SystemMessage(JsBridge.obj("content" -> (combined)))

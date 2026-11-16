@@ -61,6 +61,70 @@ final private[ui] class MemoryLibraryPanel(
   def externalChange(): Unit                                               =
     if (open.now()) refresh()
     else probeStatus(showChecking = triggerState.now() == MemoryTriggerState.Checking, retryOnce = false)
+  private def renderTriggerIcon: HtmlElement                               = {
+    val tone    = triggerView.map(_.tone)
+    span(
+      display    := "inline-flex",
+      alignItems.center,
+      justifyContent.center,
+      flexShrink := "0",
+      width      := "16px",
+      height     := "16px",
+      color <-- tone.map {
+        case MemoryTriggerTone.Ready       => "#6b7280"
+        case MemoryTriggerTone.Checking    => "#2563eb"
+        case MemoryTriggerTone.Off         => "#9ca3af"
+        case MemoryTriggerTone.Unavailable => "#b91c1c"
+      },
+      opacity <-- tone.map {
+        case MemoryTriggerTone.Off => 0.72
+        case _                     => 1.0
+      },
+      animation <-- tone.map {
+        case MemoryTriggerTone.Checking => "popcan-api-pulse 1.2s ease-in-out infinite"
+        case _                          => "none"
+      },
+      svg.svg(
+        svg.width          := "16",
+        svg.height         := "16",
+        svg.viewBox        := "0 0 16 16",
+        svg.fill           := "none",
+        svg.stroke         := "currentColor",
+        svg.strokeWidth    := "1.35",
+        svg.strokeLineCap  := "round",
+        svg.strokeLineJoin := "round",
+        aria.hidden        := true,
+        svg.g(
+          svg.transform := "translate(0 -0.8)",
+          svg.path(
+            svg.d        :=
+              "M8 3.2C6.9 2.4 5.3 2.7 4.7 4c-1.1.1-1.9 1-1.8 2.1-.9.6-1.1 1.8-.4 2.6" +
+                "-.4.9 0 2 .9 2.4.1 1 .9 1.8 1.9 1.8.4.8 1.3 1.1 2.1.8.2.7.7 1.2 1.4 1.4"
+          ),
+          svg.path(
+            svg.d        :=
+              "M8 3.2c1.1-.8 2.7-.5 3.3.8 1.1.1 1.9 1 1.8 2.1.9.6 1.1 1.8.4 2.6" +
+                ".4.9 0 2-.9 2.4-.1 1-.9 1.8-1.9 1.8-.4.8-1.3 1.1-2.1.8-.2.7-.7 1.2-1.4 1.4"
+          ),
+          svg.path(svg.d := "M8 3.2v10.9"),
+          svg.path(svg.d := "M4.7 5.5c.9.1 1.4.9 1.1 1.7"),
+          svg.path(svg.d := "M3.3 9.2c.8-.3 1.6.1 1.9.9"),
+          svg.path(svg.d := "M5 12.5c.2-.7.9-1.1 1.6-1"),
+          svg.path(svg.d := "M11.3 5.5c-.9.1-1.4.9-1.1 1.7"),
+          svg.path(svg.d := "M12.7 9.2c-.8-.3-1.6.1-1.9.9"),
+          svg.path(svg.d := "M11 12.5c-.2-.7-.9-1.1-1.6-1")
+        ),
+        child <-- tone.map {
+          case MemoryTriggerTone.Off =>
+            svg.path(
+              svg.d           := "M2.6 13.4L13.4 2.6",
+              svg.strokeWidth := "1.5"
+            )
+          case _                     => emptyNode
+        }
+      )
+    )
+  }
   def renderTrigger: HtmlElement                                           =
     button(
       idAttr          := TriggerId,
@@ -79,6 +143,7 @@ final private[ui] class MemoryLibraryPanel(
       fontWeight      := "500",
       lineHeight      := "1.4",
       title <-- triggerView.map(_.tooltip),
+      renderTriggerIcon,
       children <-- triggerView.map(_.segments.map(segment =>
         span(segment.text, color := segment.color)
       )),

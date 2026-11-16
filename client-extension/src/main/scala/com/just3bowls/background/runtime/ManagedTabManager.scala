@@ -58,17 +58,19 @@ private[background] object ManagedTabManager {
       url: String,
       conversation: ConversationPolicy,
       sessionId: String = "",
+      toolProfileId: String = "",
       gen: String = ""
   ): Future[(Int, ManagedTab)] =
     reconcileManagedTabs()
       .flatMap(_ => TabOwnership.reconcileAll())
-      .flatMap(_ => createOrReuseTab(modelName, keyId, url, conversation, sessionId, gen))
+      .flatMap(_ => createOrReuseTab(modelName, keyId, url, conversation, sessionId, toolProfileId, gen))
   private def createOrReuseTab(
       modelName: String,
       keyId: String,
       url: String,
       conversation: ConversationPolicy,
       sessionId: String,
+      toolProfileId: String,
       gen: String
   ): Future[(Int, ManagedTab)] =
     TabStore.load().flatMap { window =>
@@ -82,7 +84,14 @@ private[background] object ManagedTabManager {
                 TabStore.load().flatMap { latest =>
                   TabStore.findSlot(latest, modelName, keyId) match {
                     case Some(current) =>
-                      alignConversation(modelName, tabId, sessionId, conversation, gen).flatMap { effective =>
+                      alignConversation(
+                        modelName,
+                        tabId,
+                        sessionId,
+                        conversation,
+                        toolProfileId,
+                        gen
+                      ).flatMap { effective =>
                         prepareExistingTab(modelName, tabId, current, effective, gen, sessionId).flatMap { _ =>
                           TabStore.load().map { refreshed =>
                             TabStore.findTab(refreshed, modelName, keyId)
@@ -106,10 +115,12 @@ private[background] object ManagedTabManager {
                 )
                 TabStore.update { currentWindow =>
                   (TabStore.detachSlot(currentWindow, tabId), ())
-                }.flatMap(_ => adoptOrCreateTab(modelName, keyId, url, conversation, sessionId, gen))
+                }.flatMap(_ =>
+                  adoptOrCreateTab(modelName, keyId, url, conversation, sessionId, toolProfileId, gen)
+                )
             }
         case None        =>
-          adoptOrCreateTab(modelName, keyId, url, conversation, sessionId, gen)
+          adoptOrCreateTab(modelName, keyId, url, conversation, sessionId, toolProfileId, gen)
       }
     }
 
@@ -130,17 +141,21 @@ private[background] object ManagedTabManager {
       tabId: Int,
       sessionId: String,
       conversation: ConversationPolicy,
+      toolProfileId: String,
       gen: String
   ): Future[ConversationPolicy] =
     if (sessionId.isEmpty || conversation == ConversationPolicy.Fresh) Future.successful(conversation)
     else
       currentTabUrl(tabId).flatMap(WebChatHosts.findConversation).flatMap { currentHost =>
-        val belongsToMe = currentHost.exists(_.sessionId == sessionId)
+        def compatible(host: WebChatHost): Boolean =
+          toolProfileId.isEmpty || host.toolProfileId == toolProfileId
+        val belongsToMe  = currentHost.exists(host => host.sessionId == sessionId && compatible(host))
+        val staleCurrent = currentHost.exists(host => host.sessionId == sessionId && !compatible(host))
         if (belongsToMe) Future.successful(conversation)
         else
           WebChatHosts
             .findBySession(sessionId)
-            .map(_.find(_.provider == modelName).map(_.convKey).getOrElse(""))
+            .map(_.find(host => host.provider == modelName && compatible(host)).map(_.convKey).getOrElse(""))
             .flatMap { sessionConv =>
               if (sessionConv.nonEmpty)
                 guardBusy(tabId).flatMap { _ =>
@@ -151,6 +166,8 @@ private[background] object ManagedTabManager {
                   )
                   navigateToConversation(modelName, tabId, sessionConv, gen).map(_ => ConversationPolicy.Reuse)
                 }
+              else if (staleCurrent)
+                Future.successful(ConversationPolicy.Fresh)
               else if (currentHost.isEmpty) Future.successful(conversation)
               else
                 guardBusy(tabId).map { _ =>
@@ -200,6 +217,7 @@ private[background] object ManagedTabManager {
       url: String,
       conversation: ConversationPolicy,
       sessionId: String,
+      toolProfileId: String,
       gen: String
   ): Future[(Int, ManagedTab)] =
     ServerTabManager.hostWindow().flatMap { windowId =>
@@ -246,7 +264,14 @@ private[background] object ManagedTabManager {
               TabStore.load().flatMap { refreshed =>
                 TabStore.findSlot(refreshed, modelName, keyId) match {
                   case Some(adopted) =>
-                    alignConversation(modelName, keepId, sessionId, conversation, gen).flatMap { effective =>
+                    alignConversation(
+                      modelName,
+                      keepId,
+                      sessionId,
+                      conversation,
+                      toolProfileId,
+                      gen
+                    ).flatMap { effective =>
                       prepareExistingTab(modelName, keepId, adopted, effective, gen, sessionId).flatMap { _ =>
                         TabStore.load().map { after =>
                           TabStore.findTab(after, modelName, keyId).getOrElse((keepId, adopted))

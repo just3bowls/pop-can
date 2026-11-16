@@ -123,7 +123,7 @@ private[background] object SessionUrls {
         ()
       }
 
-  /** `{ok, sessionId, latestProvider, urls:[{tabId, url, provider, isCurrent, isLast}]}`。 */
+  /** `{ok, sessionId, latestProvider, urls:[{tabId, url, provider, toolProfileId, isCurrent, isLast}]}`。 */
   def snapshot(sessionId: String): Future[js.Object] =
     if (sessionId.trim.isEmpty)
       Future.successful(payload("", Nil, latestProvider = ""))
@@ -179,6 +179,7 @@ private[background] object SessionUrls {
         provider = host.provider,
         url = tab.flatMap(_.url.toOption).getOrElse(host.convKey),
         convKey = host.convKey,
+        toolProfileId = host.toolProfileId,
         index = tab.flatMap(_.index.toOption).getOrElse(Int.MaxValue)
       )
     }
@@ -186,12 +187,13 @@ private[background] object SessionUrls {
       .sortBy(row => (row.index, row.tabId))
       .map { row =>
         JsBridge.obj(
-          "tabId"     -> (row.tabId),
-          "url"       -> (row.url),
-          "provider"  -> (row.provider),
-          "isCurrent" -> (currentUrl.nonEmpty &&
+          "tabId"         -> (row.tabId),
+          "url"           -> (row.url),
+          "provider"      -> (row.provider),
+          "toolProfileId" -> (row.toolProfileId),
+          "isCurrent"     -> (currentUrl.nonEmpty &&
             (row.url == currentUrl || ConversationUrl.sameConversation(row.convKey, currentUrl))),
-          "isLast"    -> (lastKey.nonEmpty && row.convKey == lastKey)
+          "isLast"        -> (lastKey.nonEmpty && row.convKey == lastKey)
         )
 
       }
@@ -202,6 +204,7 @@ private[background] object SessionUrls {
       provider: String,
       url: String,
       convKey: String,
+      toolProfileId: String,
       index: Int = Int.MaxValue
   )
   private def payload(sessionId: String, rows: List[js.Object], latestProvider: String): js.Object          =

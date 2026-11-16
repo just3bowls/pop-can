@@ -68,7 +68,7 @@ object NativeRunHost {
       val tabId        = JsBridge.intField(spec, "tabId").getOrElse(0)
       val userText     = asString(JsBridge.field(spec, "userText"))
       val regen        = JsBridge.booleanField(spec, "treatAsRegenerate").getOrElse(false)
-      val useTools     = JsBridge.booleanField(spec, "useBrowserTools").getOrElse(true)
+      val useTools     = JsBridge.booleanField(spec, "useBrowserTools").getOrElse(false)
       val round        = JsBridge.asObject(JsBridge.field(spec, "firstRound"))
       val toolCalls    = JsBridge.undefinedArrayAny(round.toolCalls).toOption
         .map(_.toList)

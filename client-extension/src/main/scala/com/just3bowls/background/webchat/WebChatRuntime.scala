@@ -46,6 +46,15 @@ final private[background] class Runtime(val tabId: Int) {
   /** 这一轮开始时这个 tab 的归属。 */
   var turnAssoc: Option[WebChatHost] = None
 
+  /** Exact tool names declared to the provider for this turn; empty means final-answer-only. */
+  var turnAllowedTools: Set[String] = Set.empty
+
+  /** Browser capability state for this turn; other groups are represented by turnAllowedTools. */
+  var turnBrowserTools: Boolean = false
+
+  /** AgentToolSurface revision advertised to the provider for this turn. */
+  var turnToolProfileId: String = ""
+
   /** 劫持时截下来的用户原话。 */
   var hijackUserText: String  = ""
   var lastErrorId: String     = ""

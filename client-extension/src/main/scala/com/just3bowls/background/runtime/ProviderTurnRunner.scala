@@ -42,6 +42,7 @@ private[background] object ProviderTurnRunner {
     val inputPromptMode                           = input.promptMode.toOption.getOrElse("")
     // 这一轮用过的对话要不要绑给会话（chat / Retry 为 true）：New Chat 出来的新 URL 成功失败都要绑住。
     val inputBindConv                             = input.bindConversation.toOption.getOrElse(false)
+    val inputToolProfileId                        = input.toolProfileId.toOption.getOrElse("")
     // 这一轮是复用同一段对话（delta）还是每轮 New Chat（full）：显式字段优先，其余由上下文模式推导。
     val conversation                              = conversationPolicyOf(
       input.conversation.toOption.getOrElse(""),
@@ -61,7 +62,10 @@ private[background] object ProviderTurnRunner {
       else TaskSource.Server
     PopCanLog
       .withContext("cdp", "gen" -> generationId, "provider" -> provider)
-      .info(s"INPUT_PROMPT stream=$streaming mode=cdp promptChars=${prompt.length}")
+      .info(
+        s"INPUT_PROMPT stream=$streaming mode=cdp promptChars=${prompt.length} " +
+          s"toolProfile=${PopCanLog.short(inputToolProfileId, 32)}"
+      )
     new js.Promise[js.Any]((resolve, _) => {
       val bgEntryAt                                         = js.Date.now()
       // 收尾统一入口：先把 SW 侧这段的分阶段耗时并进 trace，再 resolve，避免 bgTotal 漏记。
@@ -86,6 +90,7 @@ private[background] object ProviderTurnRunner {
                 managedKeyId,
                 providerUrl,
                 conversation = conv,
+                toolProfileId = inputToolProfileId,
                 // 分配按会话归属：同一个会话继续用同一个 tab，只有 slot 里是别人会话的对话时才另找/新建。
                 sessionId = inputSessionId,
                 gen = generationId
@@ -126,7 +131,7 @@ private[background] object ProviderTurnRunner {
             if (BackgroundState.cancelledCdpTasks.contains(generationId)) {
               val bindF =
                 if (inputBindConv && inputSessionId.nonEmpty)
-                  WebChatService.bindTabConversation(tabId, inputSessionId, provider)
+                  WebChatService.bindTabConversation(tabId, inputSessionId, provider, inputToolProfileId)
                 else Future.successful(())
               bindF
                 .flatMap(_ =>
@@ -156,7 +161,7 @@ private[background] object ProviderTurnRunner {
                 // 成功 / 失败都在这里绑，不能只靠成功路径的 `commitTip`。
                 .flatMap(_ =>
                   if (inputBindConv && inputSessionId.nonEmpty)
-                    WebChatService.bindTabConversation(tabId, inputSessionId, provider)
+                    WebChatService.bindTabConversation(tabId, inputSessionId, provider, inputToolProfileId)
                   else Future.successful(())
                 )
                 .flatMap { _ =>
@@ -202,7 +207,8 @@ private[background] object ProviderTurnRunner {
                             mode = inputContextMode,
                             protocolRepair = inputProtocolRepair,
                             inject = inputInject,
-                            promptMode = inputPromptMode
+                            promptMode = inputPromptMode,
+                            toolProfileId = inputToolProfileId
                           )
                           .map { injection =>
                             TraceStore.noteInject(generationId, injection.modeTag, injection.template)
@@ -329,7 +335,7 @@ private[background] object ProviderTurnRunner {
                       // 收口绑定：URL 可能在跑的过程中细化（`/chat` → `/chat/<id>`），失败也要绑（新对话不能变孤儿）。
                       val bindF       =
                         if (inputBindConv && inputSessionId.nonEmpty)
-                          WebChatService.bindTabConversation(tabId, inputSessionId, provider)
+                          WebChatService.bindTabConversation(tabId, inputSessionId, provider, inputToolProfileId)
                         else Future.successful(())
                       bindF
                         .flatMap(_ =>
@@ -349,7 +355,7 @@ private[background] object ProviderTurnRunner {
                       BackgroundState.clearChunkParsingState(generationId)
                       val bindF =
                         if (inputBindConv && inputSessionId.nonEmpty)
-                          WebChatService.bindTabConversation(tabId, inputSessionId, provider)
+                          WebChatService.bindTabConversation(tabId, inputSessionId, provider, inputToolProfileId)
                         else Future.successful(())
                       bindF
                         .flatMap(_ =>
