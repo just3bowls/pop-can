@@ -882,7 +882,7 @@ private[background] object WebChatService {
               .map(settings => sessionId -> settings.browserTools)
           ))
           .map { loaded =>
-            sessionBrowserTools.retain((sessionId, _) => ids.contains(sessionId))
+            sessionBrowserTools.filterInPlace((sessionId, _) => ids.contains(sessionId))
             loaded.foreach { case (sessionId, enabled) => sessionBrowserTools.update(sessionId, enabled) }
             ()
           }
@@ -896,7 +896,7 @@ private[background] object WebChatService {
       .listSessions()
       .flatMap { sessions =>
         val ids = sessions.map(_.id)
-        sessionTitles.retain((sessionId, _) => ids.contains(sessionId))
+        sessionTitles.filterInPlace((sessionId, _) => ids.contains(sessionId))
         sessions.foreach(session => sessionTitles.update(session.id, session.title))
         refreshSessionSettings(ids)
       }
