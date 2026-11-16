@@ -2,7 +2,12 @@ package com.just3bowls.ui.content.webchat
 
 import com.just3bowls.facade.JsBridge
 import com.just3bowls.facade.BrowserEvents
-import com.just3bowls.ui.components.{BrowserToolsIndicator, InlineDeleteConfirmation, NeutralIconButton}
+import com.just3bowls.ui.components.{
+  BrowserToolsIndicator,
+  InlineDeleteConfirmation,
+  NeutralActionButton,
+  NeutralIconButton
+}
 
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.nodes.CommentNode
@@ -156,8 +161,8 @@ object WebChatView {
   ): HtmlElement         =
     div(
       position.absolute,
-      if (placement.openLeft) right            := "0" else left               := "0",
-      if (placement.openAbove) bottom          := "calc(100% + 6px)" else top := "calc(100% + 6px)",
+      if (placement.openLeft) right   := "0" else left               := "0",
+      if (placement.openAbove) bottom := "calc(100% + 6px)" else top := "calc(100% + 6px)",
       padding         := "8px",
       width           := "min(300px, calc(100vw - 24px))",
       maxHeight       := "min(70vh, 520px)",
@@ -172,29 +177,17 @@ object WebChatView {
       div(
         display.flex,
         alignItems.center,
-        gap          := "6px",
-        marginBottom := "2px",
-        borderTop    := "1px solid #e5e7eb",
-        paddingTop   := "6px",
-        div(
-          flex            := "1",
-          minWidth        := "0",
-          color           := "#6b7280",
-          fontSize        := "10px",
-          if (!state.sessionsLoaded) "Loading sessions…" else "Sessions:"
-        ),
-        button(
-          "+",
-          title           := "New session",
-          padding         := "2px 8px",
-          fontSize        := "13px",
-          lineHeight      := "1.2",
-          cursor.pointer,
-          backgroundColor := "#1d4ed8",
-          color           := "#ffffff",
-          border          := "1px solid #1d4ed8",
-          borderRadius    := "4px",
-          onClick --> { _ => cb.newSession() }
+        justifyContent := "flex-end",
+        gap            := "6px",
+        marginBottom   := "2px",
+        borderTop      := "1px solid #e5e7eb",
+        paddingTop     := "6px",
+        NeutralActionButton.render(
+          span("+ Session"),
+          () => cb.newSession(),
+          textSize = "11px",
+          spacing = "4px 9px",
+          titleText = Some("New session")
         )
       ),
       if (state.actionError.nonEmpty)
