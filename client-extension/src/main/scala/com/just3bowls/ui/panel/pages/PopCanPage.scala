@@ -2685,6 +2685,19 @@ object PopCanPage {
           ),
           new CommentNode("")
         ),
+        div(
+          position        := "fixed",
+          top             := "12px",
+          right           := "12px",
+          zIndex          := 60,
+          LocalApiStatusIndicator.render(
+            statusSignal = serverStatusVar.signal,
+            activeSignal = serverRunningVar.signal
+              .combineWith(serverStatusVar.signal)
+              .map { case (running, status) => LocalApiStatus.isActive(status, running) },
+            onOpen = () => openApiKeySettings()
+          )
+        ),
         // Sticky bottom controls: provider + tab list + task input
         div(
           cls             := "popcan-composer",
@@ -3000,13 +3013,6 @@ object PopCanPage {
                     }
                   )
                 )
-              ),
-              LocalApiStatusIndicator.render(
-                statusSignal = serverStatusVar.signal,
-                activeSignal = serverRunningVar.signal
-                  .combineWith(serverStatusVar.signal)
-                  .map { case (running, status) => LocalApiStatus.isActive(status, running) },
-                onOpen = () => openApiKeySettings()
               ),
               ConfigDrawer.renderTrigger(
                 configDrawerOpenVar,
