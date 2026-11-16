@@ -17,7 +17,7 @@ import com.just3bowls.model.chat.ChatMessage
 import com.just3bowls.model.chat.ChatStore
 import com.just3bowls.model.provider.ParserProviderInfo
 import com.just3bowls.model.localapi.ApiKeyStore
-import com.just3bowls.model.chat.{LocalAgentModel, SessionSettingsStore}
+import com.just3bowls.model.chat.{AgentCapabilitySnapshot, AgentToolRegistry, SessionSettingsStore}
 import com.just3bowls.api.marker.{DeclaredToolPolicy, ProtocolRepair}
 import com.just3bowls.model.chat.FinalSseProducer
 import com.just3bowls.model.provider.ProviderRequestRule
@@ -990,6 +990,7 @@ private[background] object WebChatService {
       val provider = runtime.assoc.map(_.provider).getOrElse("")
       runtime.turnAssoc = runtime.assoc
       runtime.turnAllowedTools = Set.empty
+      runtime.turnBrowserTools = false
       runtime.content.clear()
       // 新的一轮开始：清掉上一轮的错误，免得胶囊一直挂着旧报错。
       clearError(runtime)
@@ -1163,27 +1164,21 @@ private[background] object WebChatService {
     runtime.assoc match {
       case None if convKey.isEmpty => Future.successful(None)
       case _ if active             => Future.successful(None)
-      case Some(host)              =>
-        SessionSettingsStore
-          .load(host.sessionId)
-          .map { settings =>
-            sessionBrowserTools.update(host.sessionId, settings.browserTools)
-            if (!settings.browserTools) None
-            else
-              try {
-                new FinalSseProducer(runtime.turnGen, runtime.assoc.map(_.provider).getOrElse(""))
-                  .parseMarkersText(normalized)
-                  .toOption
-                  .filter(result =>
-                    DeclaredToolPolicy
-                      .validate(result.content, result.toolCalls, runtime.turnAllowedTools)
-                      .isEmpty
-                  )
-                  .map(result => AgentRound(result.content, result.thinking, result.toolCalls))
-                  .filter(_.toolCalls.nonEmpty)
-              } catch { case _: Throwable => None }
-          }
-          .recover { case _ => None }
+      case Some(_)                 =>
+        try {
+          Future.successful(
+            new FinalSseProducer(runtime.turnGen, runtime.assoc.map(_.provider).getOrElse(""))
+              .parseMarkersText(normalized)
+              .toOption
+              .filter(result =>
+                DeclaredToolPolicy
+                  .validate(result.content, result.toolCalls, runtime.turnAllowedTools)
+                  .isEmpty
+              )
+              .map(result => AgentRound(result.content, result.thinking, result.toolCalls))
+              .filter(_.toolCalls.nonEmpty)
+          )
+        } catch { case _: Throwable => Future.successful(None) }
       case None                    => Future.successful(None)
     }
   }
@@ -1203,7 +1198,7 @@ private[background] object WebChatService {
       "tabId"             -> (runtime.tabId),
       "userText"          -> (userText),
       "treatAsRegenerate" -> (isRegenerate(userText, host)),
-      "useBrowserTools"   -> (true),
+      "useBrowserTools"   -> (runtime.turnBrowserTools),
       "firstRound"        -> (JsBridge.obj(
         "content"   -> (round.content),
         "thinking"  -> (round.thinking),
@@ -1615,7 +1610,7 @@ private[background] object WebChatService {
       runtime.assoc match {
         case None       => disarm(runtime)
         case Some(host) =>
-          needsInject(host).flatMap { needed =>
+          needsInject().flatMap { needed =>
             if (needed && !runtime.hijacking) {
               // 抢先把"该补的上下文"算好放内存：劫持发生在请求已经暂停的时刻，那里每多读一次 storage 都会拉长暂停。
               runtime.pendingDeltaReady = false
@@ -1645,25 +1640,12 @@ private[background] object WebChatService {
   /**
    * 这一轮要不要注入（要不要武装劫持窗口）。
    *
-   * 三种情形要注入：**首投**（这段对话还没有水位线 —— 新建 session 后的第一问就是这种，不给模版模型就收到一句裸提问）、**browser-tools on**（工具声明是每次请求的
-   * 一部分，不注入就等于后面几轮没有工具可用）、**有欠账**（水位线之后还有没投过的会话消息）。都不成立才原样放行，只靠 `Network` 观察。
+   * 每次已绑定 Session 的请求都注入：capability policy 和当前工具声明都是本轮状态，不能依赖历史对话推断。 Browser tools off 也必须重投，明确历史工具调用不代表当前仍可使用。
    *
    * 形态另算（`decideHijack`）：**首投 ⇒ 整份模版**，其余（含欠账）⇒ **只投增量**；网页原生不做"每轮重投整份"的开关。
    */
-  private def needsInject(host: WebChatHost): Future[Boolean]        =
-    if (host.seedToMessageId.isEmpty) Future.successful(true)
-    else
-      SessionSettingsStore
-        .load(host.sessionId)
-        .map { settings =>
-          sessionBrowserTools.update(host.sessionId, settings.browserTools)
-          settings.browserTools
-        }
-        .recover { case _ => true }
-        .flatMap { browserTools =>
-          if (browserTools) Future.successful(true)
-          else ChatStore.sessionPathMessages(host.sessionId).map(path => unseen(host, path).nonEmpty)
-        }
+  private def needsInject(): Future[Boolean]                         =
+    Future.successful(true)
   private def deltaFor(host: WebChatHost): Future[List[ChatMessage]] =
     ChatStore.sessionPathMessages(host.sessionId).map(path => unseen(host, path))
 
@@ -1780,9 +1762,9 @@ private[background] object WebChatService {
             .load(sessionId)
             .recover { case _ => com.just3bowls.model.chat.SessionSettings.Default }
             .flatMap { settings =>
-              runtime.turnAllowedTools =
-                if (settings.browserTools) LocalAgentModel.defaultTools.map(_.name).toSet
-                else Set.empty
+              val toolDefs = AgentToolRegistry.chatToolsFor(settings.browserTools)
+              runtime.turnBrowserTools = settings.browserTools
+              runtime.turnAllowedTools = AgentCapabilitySnapshot(toolDefs).toolNames
               MemoryRecallBridge
                 .recall(
                   MemoryQuery(
@@ -1799,7 +1781,7 @@ private[background] object WebChatService {
                       provider,
                       runtime.pendingDelta,
                       userText,
-                      useBrowserTools = settings.browserTools,
+                      toolDefs = toolDefs,
                       memoryContext = memory.text
                     )
                   TraceStore.noteInject(runtime.turnGen, s"native/$form", Some(template))

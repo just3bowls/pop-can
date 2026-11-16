@@ -6,10 +6,9 @@ import com.just3bowls.background.webchat.*
 import com.just3bowls.api.protocol.Bytes
 import com.just3bowls.api.marker.PromptArtifact
 import com.just3bowls.facade.{ChromeAPI, LastWebRequestBody}
-import com.just3bowls.model.chat.ChatMessage
+import com.just3bowls.model.chat.{AgentCapabilitySnapshot, AgentToolSpec, ChatMessage, ChatScenario}
 import com.just3bowls.model.provider.ParserProviderInfo
 import com.just3bowls.model.chat.AgentBody
-import com.just3bowls.model.chat.LocalAgentModel
 import com.just3bowls.model.chat.OpenAiRequestPreview
 import com.just3bowls.model.provider.PromptAttachment
 import com.just3bowls.model.provider.PromptSettings
@@ -85,9 +84,10 @@ private[background] object TemplateInjection {
    *
    * `useBrowserTools` 时补上场景 system + 工具声明，让它和插件页 agent 的首轮 body 完全同构 —— 网页原生第一轮因此也能合法地发起工具调用。
    */
-  def fullPayloadOf(provider: String, messages: List[js.Any], useBrowserTools: Boolean = false): String = {
-    val tools    = if (useBrowserTools) AgentBody.toolsJson(LocalAgentModel.defaultTools) else js.Array[js.Any]()
-    val withRole = if (useBrowserTools) AgentBody.scenarioMessage :: messages else messages
+  def fullPayloadOf(provider: String, messages: List[js.Any], toolDefs: List[AgentToolSpec]): String = {
+    val tools      = AgentBody.toolsJson(toolDefs)
+    val capability = ChatScenario.capabilityPolicy(AgentCapabilitySnapshot(toolDefs))
+    val withRole   = AgentBody.systemMessage(capability) :: messages
     ThinOpenAi.buildPrompt(AgentBody.body(provider, js.Array(withRole*), tools))
   }
 
@@ -101,7 +101,7 @@ private[background] object TemplateInjection {
       provider: String,
       delta: List[ChatMessage],
       userText: String,
-      useBrowserTools: Boolean = false,
+      toolDefs: List[AgentToolSpec],
       memoryContext: String = ""
   ): String = {
     val semanticUser = PromptArtifact.userTextOrOriginal(userText)
@@ -115,10 +115,10 @@ private[background] object TemplateInjection {
     val messages     = memory ++ history ++ pending
     if (form == ModeDelta)
       deltaPayload(
-        messages,
-        if (useBrowserTools) Some(AgentBody.toolsJson(LocalAgentModel.defaultTools)) else None
+        AgentBody.systemMessage(ChatScenario.capabilityPolicy(AgentCapabilitySnapshot(toolDefs))) :: messages,
+        Option.when(toolDefs.nonEmpty)(AgentBody.toolsJson(toolDefs))
       )
-    else fullPayloadOf(provider, messages, useBrowserTools)
+    else fullPayloadOf(provider, messages, toolDefs)
   }
 
   /** 页面给的上下文 id 数不对（LangGraph 改过消息数组）时不切片，直接全量。 */

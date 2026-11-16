@@ -18,9 +18,9 @@ object ChatScenario {
          |Use the transition only when it is necessary. Answer normally when the current mode is already sufficient.
          |For plan, the user will approve or revise the generated plan before execution continues.""".stripMargin
 
-  /** browser 工具打开时注入；关掉工具时不注入，让网页 AI 用它自己的能力回答。 */
-  val browserToolsPolicy: String                                                    =
-    """You are answering this chat request in a real browser. The browser tools declared in this request are the only tools you may call.
+  /** browser 工具打开时的取证与答案规则。 */
+  private val browserToolsEvidencePolicy: String =
+    """You are answering this chat request in a real browser.
       |
       |Evidence
       |- Your own knowledge may be outdated. For anything that changes over time (news, prices, releases, schedules, versions, availability, people/company status), or whenever you are not confident a fact is still true, you are not allowed to answer from memory: gather evidence with the declared tools first.
@@ -35,6 +35,29 @@ object ChatScenario {
       |Answer
       |- Answer in the user's language, in markdown.
       |- End the answer with a short "Sources" list of the URLs you actually relied on. Omit it only when you relied on no external source at all.""".stripMargin
+
+  /** Positive capability policy for every PopCan-controlled request, including browser-tools off. */
+  def capabilityPolicy(snapshot: AgentCapabilitySnapshot): String                   = {
+    val declared   =
+      if (snapshot.toolNames.isEmpty) "No tools are declared for this turn."
+      else s"Only these tools are declared for this turn: ${snapshot.toolNames.toList.sorted.mkString(", ")}."
+    val otherTools =
+      if (snapshot.nonBrowserToolNames.isEmpty) ""
+      else
+        s"\nOther declared non-browser tools remain available: ${snapshot.nonBrowserToolNames.mkString(", ")}."
+    if (snapshot.browserToolsEnabled)
+      s"""Browser tools are enabled for this turn.
+         |$declared$otherTools
+         |Historical tool calls do not grant access to tools that are absent from this turn.
+         |
+         |$browserToolsEvidencePolicy""".stripMargin
+    else
+      s"""Browser tools are disabled for this session and this turn.
+         |Historical browser tool calls and results are conversation context only; they do not make browser tools available now.
+         |Do not emit any browser_* tool call or a tool_calls marker for a browser tool.
+         |If the provider has its own native search or browsing capability, execute it internally and return only the final content.
+         |$declared$otherTools""".stripMargin
+  }
   val planRequestPolicy: String                                                     =
     """You are creating an execution plan for the user's request.
       |
@@ -44,7 +67,8 @@ object ChatScenario {
       |- Completion criteria
       |- Relevant risks or assumptions
       |
-      |Do not execute the task yet and do not call tools. The plan will be shown to the user for approval.""".stripMargin
+      |Do not execute the task yet. The only tool allowed for this planning turn is submit_plan.
+      |The plan will be shown to the user for approval.""".stripMargin
   def approvedPlanPolicy(plan: String, note: String): String                        = {
     val revision = Option(note).getOrElse("").trim
     val extra    = if (revision.isEmpty) "" else s"\nUser revision request: $revision"

@@ -12,9 +12,9 @@ import scala.scalajs.js
  */
 object AgentBody {
 
-  /** 场景 system 提示词（只在声明工具时加）：不对应任何会话消息，id 记空串。 */
-  def scenarioMessage: js.Any =
-    JsBridge.obj("role" -> ("system"), "content" -> (ChatScenario.browserToolsPolicy))
+  /** Transient capability system message; it does not correspond to a persisted chat message. */
+  def systemMessage(content: String): js.Any =
+    JsBridge.obj("role" -> ("system"), "content" -> (content))
 
   /** 工具声明（OpenAI `tools` 数组）；没声明工具时返回空数组。 */
   def toolsJson(toolDefs: List[AgentToolSpec]): js.Array[js.Any] =

@@ -52,6 +52,9 @@ final private[background] class Runtime(val tabId: Int) {
   /** Exact tool names declared to the provider for this turn; empty means final-answer-only. */
   var turnAllowedTools: Set[String] = Set.empty
 
+  /** Browser capability state for this turn; other groups are represented by turnAllowedTools. */
+  var turnBrowserTools: Boolean = false
+
   /** 劫持时截下来的用户原话。 */
   var hijackUserText: String  = ""
   var lastErrorId: String     = ""

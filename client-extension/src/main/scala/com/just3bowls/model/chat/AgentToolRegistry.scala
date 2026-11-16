@@ -65,6 +65,15 @@ final case class AgentToolSpec(
   }
 }
 
+/** Exact tools visible to one agent turn. Browser tools are one optional group, not the whole tool set. */
+final case class AgentCapabilitySnapshot(toolDefs: List[AgentToolSpec]) {
+  val toolNames: Set[String]            = toolDefs.map(_.name).toSet
+  val browserTools: List[AgentToolSpec] = toolDefs.filter(_.kind == ToolKind.BrowserUse)
+  val browserToolsEnabled: Boolean      = browserTools.nonEmpty
+  val nonBrowserToolNames: List[String] =
+    toolDefs.filterNot(_.kind == ToolKind.BrowserUse).map(_.name).distinct.sorted
+}
+
 /** 全部浏览器工具的唯一声明处。 */
 object AgentToolRegistry {
   private val BrowserSearch = AgentToolSpec(
@@ -210,9 +219,15 @@ object AgentToolRegistry {
     BrowserUseTab
   )
 
-  /** chat agent 暴露的全部工具（目前等于浏览器工具全集）。 */
-  val chatTools: List[AgentToolSpec] = browserTools
+  /** Non-browser tools that remain available regardless of the browser-tools session switch. */
+  val alwaysOnChatTools: List[AgentToolSpec] = Nil
 
-  private val byName: Map[String, AgentToolSpec] = browserTools.map(tool => tool.name -> tool).toMap
+  def chatToolsFor(browserToolsEnabled: Boolean): List[AgentToolSpec] =
+    alwaysOnChatTools ++ (if (browserToolsEnabled) browserTools else Nil)
+
+  /** chat agent 默认暴露的全部工具。 */
+  val chatTools: List[AgentToolSpec] = chatToolsFor(browserToolsEnabled = true)
+
+  private val byName: Map[String, AgentToolSpec] = chatTools.map(tool => tool.name -> tool).toMap
   def find(name: String): Option[AgentToolSpec]  = byName.get(name)
 }
