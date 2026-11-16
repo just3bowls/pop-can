@@ -2889,8 +2889,8 @@ object PopCanPage {
                             }
                           } --> { _ => cancelCurrentSessionTitleEdit() },
                           input(
-                            `type`          := "text",
-                            maxLength       := 120,
+                            `type`       := "text",
+                            maxLength    := 120,
                             onMountFocus,
                             onMountCallback { context =>
                               val input = context.thisNode.ref
@@ -2899,14 +2899,14 @@ object PopCanPage {
                                 input.select()
                               }
                             },
-                            minWidth        := "0",
-                            width           := "120px",
-                            maxWidth        := "120px",
-                            padding         := "2px 6px",
-                            fontSize        := "12px",
-                            border          := "1px solid #93c5fd",
-                            borderRadius    := "4px",
-                            outline         := "none",
+                            minWidth     := "0",
+                            width        := "120px",
+                            maxWidth     := "120px",
+                            padding      := "2px 6px",
+                            fontSize     := "12px",
+                            border       := "1px solid #93c5fd",
+                            borderRadius := "4px",
+                            outline      := "none",
                             disabled <-- currentSessionTitleBusyVar.signal,
                             controlled(
                               value <-- currentSessionTitleDraftVar,
@@ -2925,51 +2925,17 @@ object PopCanPage {
                               }
                             }
                           ),
-                          button(
+                          NeutralIconButton.render(
                             "✓",
-                            `type`          := "button",
-                            display         := "inline-flex",
-                            alignItems      := "center",
-                            justifyContent  := "center",
-                            width           := "22px",
-                            height          := "22px",
-                            padding         := "0",
-                            fontSize        := "11px",
-                            lineHeight      := "1",
-                            color           := "#15803d",
-                            backgroundColor := "transparent",
-                            border          := "1px solid #bbf7d0",
-                            borderRadius    := "4px",
-                            cursor.pointer,
-                            disabled <-- currentSessionTitleBusyVar.signal,
-                            title           := "Save session name",
-                            onClick --> { event =>
-                              event.stopPropagation()
-                              saveCurrentSessionTitle()
-                            }
+                            "Save session name",
+                            saveCurrentSessionTitle,
+                            disabledSignal = currentSessionTitleBusyVar.signal
                           ),
-                          button(
+                          NeutralIconButton.render(
                             "×",
-                            `type`          := "button",
-                            display         := "inline-flex",
-                            alignItems      := "center",
-                            justifyContent  := "center",
-                            width           := "22px",
-                            height          := "22px",
-                            padding         := "0",
-                            fontSize        := "11px",
-                            lineHeight      := "1",
-                            color           := "#b91c1c",
-                            backgroundColor := "transparent",
-                            border          := "1px solid #fecaca",
-                            borderRadius    := "4px",
-                            cursor.pointer,
-                            disabled <-- currentSessionTitleBusyVar.signal,
-                            title           := "Cancel session rename",
-                            onClick --> { event =>
-                              event.stopPropagation()
-                              cancelCurrentSessionTitleEdit()
-                            }
+                            "Cancel session rename",
+                            cancelCurrentSessionTitleEdit,
+                            disabledSignal = currentSessionTitleBusyVar.signal
                           )
                         )
                     }

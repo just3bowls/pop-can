@@ -296,32 +296,14 @@ private[ui] object ConfigPanel {
       textSize: String = "11px",
       spacing: String = "4px 9px",
       displaySignal: Signal[String] = Val("inline-flex")
-  ): HtmlElement        =
-    button(
+  ): HtmlElement =
+    NeutralActionButton.render(
       label,
-      display <-- displaySignal,
-      alignItems.center,
-      justifyContent.center,
-      fontSize        := textSize,
-      padding         := spacing,
-      cursor <-- disabledSignal.map(if (_) "not-allowed" else "pointer"),
-      whiteSpace.nowrap,
-      backgroundColor := "#ffffff",
-      color           := "#374151",
-      border          := "1px solid #d1d5db",
-      borderRadius    := "4px",
-      disabled <-- disabledSignal,
-      opacity <-- disabledSignal.map(if (_) "0.5" else "1"),
-      transition      := "background-color 120ms ease",
-      onMouseEnter --> { event =>
-        val target = event.currentTarget.asInstanceOf[dom.HTMLButtonElement]
-        if (!target.disabled) target.style.backgroundColor = "#f8fafc"
-      },
-      onMouseLeave --> { event =>
-        val target = event.currentTarget.asInstanceOf[dom.HTMLButtonElement]
-        if (!target.disabled) target.style.backgroundColor = "#ffffff"
-      },
-      onClick --> { _ => onClickAction() }
+      onClickAction,
+      disabledSignal = disabledSignal,
+      textSize = textSize,
+      spacing = spacing,
+      displaySignal = displaySignal
     )
 
   /** Shared section toolbar: status/help on the left, section-level actions on the right. */

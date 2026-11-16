@@ -395,18 +395,16 @@ private[ui] object ParserPanel {
           ),
           child <-- confirmDeleteVar.signal.map { confirmingId =>
             if (confirmingId == local.id)
-              div(
-                display.flex,
-                alignItems.center,
-                gap        := "6px",
-                span("Delete?", fontSize := "11px", color := "#b91c1c"),
-                flashButton(
-                  key = s"${local.id}:delete",
-                  idleLabel = "Yes",
-                  doneLabel = "Deleted ✓",
-                  onClickAction = () => deleteProvider(local.id)
-                ),
-                panelButton("No", () => confirmDeleteVar.set(""))
+              InlineDeleteConfirmation.render(
+                onConfirm = () => deleteProvider(local.id),
+                onCancel = () => confirmDeleteVar.set(""),
+                confirmLabel = flashVar.signal
+                  .map(_.getOrElse(s"${local.id}:delete", ""))
+                  .map {
+                    case "done"   => "Deleted ✓"
+                    case "failed" => "Failed"
+                    case _        => "Yes"
+                  }
               )
             else
               div(
