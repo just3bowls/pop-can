@@ -32,7 +32,7 @@
     "@crxjs/vite-plugin": "^2.2.1",
     "@scala-js/vite-plugin-scalajs": "^1.1.0",
     "typescript": "^5.8.3",
-    "vite": "^7.3.8"
+    "vite": "^8.3.8"
   },
   "author": "just3bowls",
   "license": "MIT"
