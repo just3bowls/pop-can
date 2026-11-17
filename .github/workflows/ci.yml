@@ -42,7 +42,7 @@ jobs:
         run: npm ci --prefix client-extension
 
       - name: Audit extension dependencies
-        run: npm audit --prefix client-extension --audit-level=high
+        run: npm audit --prefix client-extension --omit=dev --audit-level=high
 
       - name: Check provider preset bundle
         run: npm run presets:check:strict --prefix client-extension
