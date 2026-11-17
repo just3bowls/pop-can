@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 import scala.collection.mutable
 
-import com.just3bowls.api.protocol.NativeFragments
+import com.just3bowls.api.protocol.{JsonEnvelope, NativeFragments}
 import zio._
 import zio.http.Server
 import zio.json._
@@ -94,7 +94,7 @@ object ThinServerIntegrationSpec extends ZIOSpecDefault {
     }
 
     bridge.outbound.runForeach { text =>
-      if (text.contains("\"type\":\"client_request_chunk\"")) {
+      if (JsonEnvelope.typeOf(text).contains("client_request_chunk")) {
         text.fromJson[WorkerClientRequestChunk] match {
           case Left(_)          => ZIO.unit
           case Right(chunkPart) =>
