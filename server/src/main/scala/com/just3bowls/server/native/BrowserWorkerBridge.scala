@@ -7,7 +7,7 @@ import zio.stream.ZStream
 import com.just3bowls.api.memory.MemoryExtractionResult
 import com.just3bowls.api.memory.MemoryRequestEnvelope
 import com.just3bowls.api.memory.MemoryResponseEnvelope
-import com.just3bowls.api.protocol.NativeFragments
+import com.just3bowls.api.protocol.{JsonEnvelope, NativeFragments}
 
 /**
  * 极薄通道：Server 把完整 HTTP OpenAI 请求转给插件。
@@ -207,56 +207,61 @@ final case class BrowserWorkerBridge(
    * 只认 `client_response_*`；别的类型记一条 debug 就丢（协议里没有 ping/hello，连接可用性看 transport 的断开事件）。
    */
   def onMessage(text: String): Task[Unit] =
-    if (text.contains("\"type\":\"client_response_head\"")) {
-      text.fromJson[WorkerClientHead] match {
-        case Right(head) => clientHead(head)
-        case Left(error) => ZIO.logWarning(s"Ignoring invalid client response head: $error").unit
-      }
-    } else if (text.contains("\"type\":\"client_response_chunk\"")) {
-      text.fromJson[WorkerClientChunk] match {
-        case Right(chunk) => clientChunk(chunk.requestId, chunk.data)
-        case Left(error)  => ZIO.logWarning(s"Ignoring invalid client response chunk: $error").unit
-      }
-    } else if (text.contains("\"type\":\"shutdown\"")) {
-      // 扩展主动关服务（Stop / 重连前清理旧 host）：直接硬退 —— netty 的 shutdown hook 会卡住 System.exit。
-      ZIO.logInfo("shutdown requested by extension") *>
-        ZIO.succeed(java.lang.Runtime.getRuntime.halt(0))
-    } else if (text.contains("\"type\":\"client_response_end\"")) {
-      text.fromJson[WorkerClientEnd] match {
-        case Right(end)  => clientEnd(end.requestId)
-        case Left(error) => ZIO.logWarning(s"Ignoring invalid client response end: $error").unit
-      }
-    } else if (text.contains("\"type\":\"memory_request\"")) {
-      text.fromJson[MemoryRequestEnvelope] match {
-        case Right(request) =>
-          runtimeHooks.get.flatMap {
-            case Some(hooks) => hooks.memoryRequest(request)
-            case None        =>
-              emit(MemoryResponseEnvelope(request.requestId, ok = false, error = "Memory runtime is not ready").toJson)
-          }
-        case Left(error)    => ZIO.logWarning(s"Ignoring invalid memory request: $error")
-      }
-    } else if (text.contains("\"type\":\"memory_extract_result\"")) {
-      text.fromJson[MemoryExtractionResult] match {
-        case Right(result) =>
-          runtimeHooks.get.flatMap {
-            case Some(hooks) => hooks.memoryExtractionResult(result)
-            case None        =>
-              ZIO.logWarning(s"Memory extraction result arrived before runtime was ready: ${result.requestId}")
-          }
-        case Left(error)   => ZIO.logWarning(s"Ignoring invalid memory extraction result: $error")
-      }
-    } else if (text.contains("\"type\":\"server_start\"")) {
-      runtimeHooks.get.flatMap {
-        case Some(hooks) => hooks.serverStart
-        case None        => ZIO.logWarning("server_start arrived before runtime hooks were installed")
-      }
-    } else if (text.contains("\"type\":\"server_stop\"")) {
-      runtimeHooks.get.flatMap {
-        case Some(hooks) => hooks.serverStop
-        case None        => ZIO.unit
-      }
-    } else ZIO.logDebug(s"Ignoring non-thin worker message: ${text.take(120)}")
+    JsonEnvelope.typeOf(text) match {
+      case Some("client_response_head")  =>
+        text.fromJson[WorkerClientHead] match {
+          case Right(head) => clientHead(head)
+          case Left(error) => ZIO.logWarning(s"Ignoring invalid client response head: $error").unit
+        }
+      case Some("client_response_chunk") =>
+        text.fromJson[WorkerClientChunk] match {
+          case Right(chunk) => clientChunk(chunk.requestId, chunk.data)
+          case Left(error)  => ZIO.logWarning(s"Ignoring invalid client response chunk: $error").unit
+        }
+      case Some("shutdown")              =>
+        // 扩展主动关服务（Stop / 重连前清理旧 host）：直接硬退 —— netty 的 shutdown hook 会卡住 System.exit。
+        ZIO.logInfo("shutdown requested by extension") *>
+          ZIO.succeed(java.lang.Runtime.getRuntime.halt(0))
+      case Some("client_response_end")   =>
+        text.fromJson[WorkerClientEnd] match {
+          case Right(end)  => clientEnd(end.requestId)
+          case Left(error) => ZIO.logWarning(s"Ignoring invalid client response end: $error").unit
+        }
+      case Some("memory_request")        =>
+        text.fromJson[MemoryRequestEnvelope] match {
+          case Right(request) =>
+            runtimeHooks.get.flatMap {
+              case Some(hooks) => hooks.memoryRequest(request)
+              case None        =>
+                emit(
+                  MemoryResponseEnvelope(request.requestId, ok = false, error = "Memory runtime is not ready").toJson
+                )
+            }
+          case Left(error)    => ZIO.logWarning(s"Ignoring invalid memory request: $error")
+        }
+      case Some("memory_extract_result") =>
+        text.fromJson[MemoryExtractionResult] match {
+          case Right(result) =>
+            runtimeHooks.get.flatMap {
+              case Some(hooks) => hooks.memoryExtractionResult(result)
+              case None        =>
+                ZIO.logWarning(s"Memory extraction result arrived before runtime was ready: ${result.requestId}")
+            }
+          case Left(error)   => ZIO.logWarning(s"Ignoring invalid memory extraction result: $error")
+        }
+      case Some("server_start")          =>
+        runtimeHooks.get.flatMap {
+          case Some(hooks) => hooks.serverStart
+          case None        => ZIO.logWarning("server_start arrived before runtime hooks were installed")
+        }
+      case Some("server_stop")           =>
+        runtimeHooks.get.flatMap {
+          case Some(hooks) => hooks.serverStop
+          case None        => ZIO.unit
+        }
+      case _                             =>
+        ZIO.logDebug(s"Ignoring non-thin worker message: ${text.take(120)}")
+    }
 
 }
 
