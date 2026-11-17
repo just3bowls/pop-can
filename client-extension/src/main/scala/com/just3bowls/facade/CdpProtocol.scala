@@ -218,6 +218,8 @@ trait BrowserScrollResult extends js.Object:
   def windowX: js.UndefOr[Double] = js.native
   def windowY: js.UndefOr[Double] = js.native
 
+final case class InputTargetProbe(status: String, x: Double, y: Double)
+
 object CdpCommandResults {
 
   /** Normalize a chrome.debugger command result without stripping a protocol-level field. */
@@ -256,6 +258,18 @@ object CdpCommandResults {
         .identifier
         .toOption
         .filter(_.nonEmpty)
+
+  def inputTargetProbe(raw: String): InputTargetProbe =
+    try {
+      val parsed = JsBridge.asObject(js.JSON.parse(Option(raw).getOrElse("")))
+      InputTargetProbe(
+        status = JsBridge.undefinedString(parsed.status).getOrElse("notfound"),
+        x = JsBridge.undefinedDouble(parsed.x).getOrElse(0.0),
+        y = JsBridge.undefinedDouble(parsed.y).getOrElse(0.0)
+      )
+    } catch {
+      case _: Throwable => InputTargetProbe("notfound", 0.0, 0.0)
+    }
 
   private def evaluationFailure(details: CdpExceptionDetails): String = {
     val description = details.exception.toOption.flatMap(_.description.toOption)
