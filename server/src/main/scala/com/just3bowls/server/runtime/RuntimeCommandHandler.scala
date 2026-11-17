@@ -1,6 +1,7 @@
 package com.just3bowls.server.runtime
 
 import com.just3bowls.api.memory.{MemoryExtractionResult, MemoryRequestEnvelope, MemoryResponseEnvelope}
+import com.just3bowls.api.protocol.JsonEnvelope
 import com.just3bowls.server.native.StdioFrames
 
 import zio.json._
@@ -16,7 +17,7 @@ final private[server] case class RuntimeCommandHandler(
 ) {
 
   def handle(raw: String, out: OutputStream): Unit =
-    messageTypeOf(raw) match {
+    JsonEnvelope.typeOf(raw).getOrElse("") match {
       case "memory_request"        =>
         raw.fromJson[MemoryRequestEnvelope] match {
           case Right(request) => writeFrame(out, memoryRequest(request).toJson)
@@ -54,10 +55,4 @@ final private[server] case class RuntimeCommandHandler(
     out.flush()
   }
 
-  private def messageTypeOf(raw: String): String =
-    raw.fromJson[Json].toOption
-      .collect { case Json.Obj(fields) =>
-        fields.toMap.get("type").collect { case Json.Str(value) => value }.getOrElse("")
-      }
-      .getOrElse("")
 }

@@ -1,5 +1,6 @@
 package com.just3bowls.server.runtime
 
+import com.just3bowls.api.protocol.JsonEnvelope
 import com.just3bowls.server.native.StdioFrames
 
 import zio.json._
@@ -97,7 +98,10 @@ object RuntimeIpcServer {
                         fields.toMap.get("token").collect { case Json.Str(value) => value }.getOrElse("")
                       }
                       .getOrElse("")
-                  if (messageTypeOf(raw) == "runtime_auth" && constantTimeEquals(supplied, endpoint.token)) {
+                  if (
+                    JsonEnvelope.typeOf(raw).contains("runtime_auth") &&
+                    constantTimeEquals(supplied, endpoint.token)
+                  ) {
                     authenticated = true
                   } else running = false
                 } else if (!verified) {
@@ -106,7 +110,7 @@ object RuntimeIpcServer {
                       .collect { case Json.Obj(values) => values.toMap }
                       .getOrElse(Map.empty)
                   val valid  =
-                    messageTypeOf(raw) == "runtime_probe" &&
+                    JsonEnvelope.typeOf(raw).contains("runtime_probe") &&
                       fieldString(fields, "leaderId") == endpoint.leaderId &&
                       fieldInt(fields, "protocolVersion") == RuntimeEndpoint.ProtocolVersion
                   if (valid) {
@@ -131,13 +135,6 @@ object RuntimeIpcServer {
       catch { case _: Throwable => () }
     }
   }
-
-  private def messageTypeOf(raw: String): String =
-    raw.fromJson[Json].toOption
-      .collect { case Json.Obj(fields) =>
-        fields.toMap.get("type").collect { case Json.Str(value) => value }.getOrElse("")
-      }
-      .getOrElse("")
 
   private def fieldString(fields: Map[String, Json], name: String): String =
     fields.get(name).collect { case Json.Str(value) => value }.getOrElse("")

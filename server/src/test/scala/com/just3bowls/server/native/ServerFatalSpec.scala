@@ -1,4 +1,5 @@
 package com.just3bowls.server.native
+import com.just3bowls.api.protocol.JsonEnvelope
 import com.just3bowls.server.runtime.*
 
 import zio.test._
@@ -33,9 +34,9 @@ object ServerFatalSpec extends ZIOSpecDefault {
       val messages = new StdioFrames.Decoder().feed(sink.toByteArray).getOrElse(Nil)
       assertTrue(
         messages.length == 1,
-        messages.head.contains(""""type":"server_fatal""""),
-        messages.head.contains(""""code":"port_in_use""""),
-        messages.head.contains("127.0.0.1:8080 is already in use")
+        JsonEnvelope.typeOf(messages.head).contains("server_fatal"),
+        JsonEnvelope.stringField(messages.head, "code").contains("port_in_use"),
+        JsonEnvelope.stringField(messages.head, "message").contains("127.0.0.1:8080 is already in use")
       )
     },
     test("runtime_fatal 是一条独立的可解码帧") {
@@ -47,9 +48,9 @@ object ServerFatalSpec extends ZIOSpecDefault {
       val messages = new StdioFrames.Decoder().feed(sink.toByteArray).getOrElse(Nil)
       assertTrue(
         messages.length == 1,
-        messages.head.contains(""""type":"runtime_fatal""""),
-        messages.head.contains(""""code":"runtime_owner_unverified""""),
-        messages.head.contains("pid 42 is not PopCanHost")
+        JsonEnvelope.typeOf(messages.head).contains("runtime_fatal"),
+        JsonEnvelope.stringField(messages.head, "code").contains("runtime_owner_unverified"),
+        JsonEnvelope.stringField(messages.head, "message").contains("pid 42 is not PopCanHost")
       )
     },
     test("runtime_retry 告诉扩展这是可重连的 leader 更替") {
@@ -58,8 +59,8 @@ object ServerFatalSpec extends ZIOSpecDefault {
       val messages = new StdioFrames.Decoder().feed(sink.toByteArray).getOrElse(Nil)
       assertTrue(
         messages.length == 1,
-        messages.head.contains(""""type":"runtime_retry""""),
-        messages.head.contains("runtime leader closed")
+        JsonEnvelope.typeOf(messages.head).contains("runtime_retry"),
+        JsonEnvelope.stringField(messages.head, "message").contains("runtime leader closed")
       )
     }
   )
