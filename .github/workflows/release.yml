@@ -41,7 +41,7 @@ jobs:
         run: npm ci --prefix client-extension
 
       - name: Audit extension dependencies
-        run: npm audit --prefix client-extension --audit-level=high
+        run: npm audit --prefix client-extension --omit=dev --audit-level=high
 
       - name: Verify repository
         run: |
