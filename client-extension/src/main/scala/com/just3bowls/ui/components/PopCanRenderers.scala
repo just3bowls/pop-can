@@ -302,7 +302,9 @@ private[ui] object PopCanRenderers {
    */
   private[ui] def reasonDetails(text: String, running: Boolean): HtmlElement =
     detailsTag(
-      htmlAttr("open", StringAsIsCodec) := (if (running) "open" else ""),
+      htmlAttr("open", StringAsIsCodec).maybe(
+        Option.when(ProcessPresentation.reasonOpen(running))("open")
+      ),
       summaryTag(cursor.pointer, fontSize := "11px", color := "#b45309", "Reason"),
       div(
         marginTop                         := "4px",
@@ -452,8 +454,8 @@ private[ui] object PopCanRenderers {
   ): HtmlElement =
     if (turn.kind == "human") renderHumanProcessTurn(turn)
     else {
-      val turnRunning       = turn.status == "running"
-      val showContent       = turn.content.nonEmpty
+      val turnRunning        = turn.status == "running"
+      val presentation       = ProcessPresentation.turn(turn.content, turn.finalAnswer)
       div(
         marginTop       := "6px",
         padding         := "6px 8px",
@@ -486,7 +488,15 @@ private[ui] object PopCanRenderers {
         turn.toolCalls.zipWithIndex.map { case (call, callIndex) =>
           renderProcessToolCall(processKey, turn, call, callIndex)
         },
-        if (showContent) processContent(turn.content) else new CommentNode(""),
+        if (presentation.contentVisible) processContent(turn.content)
+        else if (presentation.showAnswerHint)
+          div(
+            marginTop := "6px",
+            fontSize  := "11px",
+            color     := "#9ca3af",
+            "Answer shown below."
+          )
+        else new CommentNode(""),
         if (turn.error.trim.nonEmpty) processErrorDetails(turn.error)
         else new CommentNode(""),
         if (turn.retryAvailable && onRetryTurn.nonEmpty)
