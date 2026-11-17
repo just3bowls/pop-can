@@ -147,11 +147,15 @@ private[background] object BrowserUseExecutor {
     if (sessionId.trim.isEmpty) {
       Future.failed(new Exception(s"$name needs a browser session id"))
     } else {
-      val params = JsBridge.asDictionary(args)
+      val params      = JsBridge.asDictionary(args)
+      val extractUrls =
+        if (name == "browser_extract") stringListArg(params, "urls")
+        else Nil
       withSessionLock(sessionId) {
         withTimeout(name, ToolTimeoutMs) {
           val prepared =
-            if (name == "browser_use_tab") ensureSessionRecord(sessionId, sessionTitle)
+            if (name == "browser_use_tab" || (name == "browser_extract" && extractUrls.nonEmpty))
+              ensureSessionRecord(sessionId, sessionTitle)
             else ensureSession(sessionId, sessionTitle)
           prepared.flatMap { handle =>
             val action =
@@ -185,7 +189,7 @@ private[background] object BrowserUseExecutor {
                     boolArg(params, "snapshot")
                   )
                 case "browser_extract"  =>
-                  runExtract(handle, stringListArg(params, "urls"))
+                  runExtract(handle, extractUrls)
                 case "browser_use_tab"  =>
                   runUseReferencedTab(handle, stringArg(params, "ref").getOrElse(""))
                 case other              =>
@@ -643,7 +647,7 @@ private[background] object BrowserUseExecutor {
       newTab: Boolean,
       withSnapshot: Boolean
   ): Future[JsObject] =
-    normalizeUrl(rawUrl) match {
+    BrowserUrl.normalize(rawUrl) match {
       case None      =>
         Future.failed(new Exception(s"browser_navigate needs an http(s) URL, got '$rawUrl'"))
       case Some(url) =>
@@ -1030,11 +1034,11 @@ private[background] object BrowserUseExecutor {
   private def readUrls(handle: SessionHandle, rawUrls: List[String]): Future[JsObject] = {
     val seen    = mutable.Set.empty[String]
     val targets = rawUrls.map(_.trim).filter(_.nonEmpty).flatMap { raw =>
-      canonicalHttpUrl(raw) match {
-        case Some((key, _)) if seen.add("url:" + key) => Some((raw, Some(key)))
-        case Some(_)                                  => None
-        case None if seen.add("raw:" + raw)           => Some((raw, None))
-        case None                                     => None
+      BrowserUrl.canonicalHttp(raw) match {
+        case Some(key) if seen.add("url:" + key) => Some((raw, Some(key)))
+        case Some(_)                             => None
+        case None if seen.add("raw:" + raw)      => Some((raw, None))
+        case None                                => None
       }
     }.take(MaxReadUrls)
     if (targets.isEmpty) {
@@ -1047,10 +1051,10 @@ private[background] object BrowserUseExecutor {
             case Some(key) =>
               val current  = availableTabs.find(tab =>
                 tab.id.toOption.contains(handle.get.tabId) &&
-                  tab.url.toOption.flatMap(canonicalHttpUrl).exists(_._1 == key)
+                  tab.url.toOption.flatMap(BrowserUrl.canonicalHttp).contains(key)
               )
               val reused   = current.orElse(availableTabs.find(tab =>
-                tab.url.toOption.flatMap(canonicalHttpUrl).exists(_._1 == key)
+                tab.url.toOption.flatMap(BrowserUrl.canonicalHttp).contains(key)
               ))
               val selected =
                 reused match {
@@ -1064,11 +1068,11 @@ private[background] object BrowserUseExecutor {
                         }
                         Future.successful((tabId, status, tab.title.toOption.getOrElse("")))
                       case None        =>
-                        openReadTab(handle, canonicalHttpUrl(raw).map(_._2).getOrElse(raw))
+                        openReadTab(handle, BrowserUrl.canonicalHttp(raw).getOrElse(raw))
                           .map(tabId => (tabId, "opened", ""))
                     }
                   case None      =>
-                    openReadTab(handle, canonicalHttpUrl(raw).map(_._2).getOrElse(raw))
+                    openReadTab(handle, BrowserUrl.canonicalHttp(raw).getOrElse(raw))
                       .map(tabId => (tabId, "opened", ""))
                 }
               selected
@@ -1111,25 +1115,6 @@ private[background] object BrowserUseExecutor {
       }
     }
   }
-
-  /** HTTP(S) URL 的匹配键；忽略 fragment、默认端口和末尾 `/`，保留 query。 */
-  private def canonicalHttpUrl(rawUrl: String): Option[(String, String)] =
-    normalizeUrl(rawUrl).flatMap { normalized =>
-      try {
-        val parsed = JsBridge.asObject(JsBridge.newInstance(JsBridge.urlConstructor)(normalized))
-        val scheme = JsBridge.asString(parsed.protocol).toLowerCase
-        if (scheme != "http:" && scheme != "https:") None
-        else {
-          parsed.hash = ""
-          val path = JsBridge.asString(parsed.pathname)
-          if (path.length > 1 && path.endsWith("/")) parsed.pathname = path.dropRight(1)
-          val href = JsBridge.asString(parsed.href)
-          Some(href -> href)
-        }
-      } catch {
-        case _: Throwable => None
-      }
-    }
 
   /** tab 当前的真实地址；还在 about:blank 或取不到（tab 没了）时给 None。 */
   private def tabUrlOf(tabId: Int): Future[Option[String]] =
@@ -1572,19 +1557,6 @@ private[background] object BrowserUseExecutor {
         case other   => Some(s"checked=$other")
       }
   // ---------------------------------------------------------------- 工具函数
-  private def normalizeUrl(rawUrl: String): Option[String]                        = {
-    val trimmed = rawUrl.trim
-    if (trimmed.isEmpty) None
-    else {
-      val withScheme =
-        if (trimmed.matches("(?i)^[a-z][a-z0-9+.-]*://.*")) trimmed
-        else if (trimmed.startsWith("about:") || trimmed.startsWith("data:")) trimmed
-        else s"https://$trimmed"
-      if (withScheme.matches("(?i)^https?://.+")) Some(withScheme)
-      else if (withScheme.startsWith("about:") || withScheme.startsWith("data:")) Some(withScheme)
-      else None
-    }
-  }
   private def normalizeDirection(rawDirection: String): Option[String]            =
     rawDirection.trim.toLowerCase.replace("page_", "").replace("scroll_", "") match {
       case "up" | "upwards"     => Some("up")
