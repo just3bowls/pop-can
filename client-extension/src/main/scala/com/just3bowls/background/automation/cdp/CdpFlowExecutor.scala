@@ -292,25 +292,22 @@ private[background] object CdpFlowExecutor {
         attempt()
       }
       def focusInputViaCdp(): Future[String]   =
-        retryStatus(inputTargetExpr, _.contains("\"status\":\"found\""))
+        retryStatus(inputTargetExpr, raw => CdpCommandResults.inputTargetProbe(raw).status == "found")
           .flatMap { raw =>
-            val parsed = js.JSON.parse(raw)
-            val status = JsBridge.undefinedString(parsed.status).getOrElse("notfound")
-            if (status != "found") {
-              Future.successful(status)
+            val target = CdpCommandResults.inputTargetProbe(raw)
+            if (target.status != "found") {
+              Future.successful(target.status)
             } else {
-              val x = JsBridge.undefinedDouble(parsed.x).getOrElse(0.0)
-              val y = JsBridge.undefinedDouble(parsed.y).getOrElse(0.0)
               cdp(
                 "Input.dispatchMouseEvent",
-                JsBridge.obj("type" -> ("mouseMoved"), "x" -> (x), "y" -> (y))
+                JsBridge.obj("type" -> ("mouseMoved"), "x" -> (target.x), "y" -> (target.y))
               ).flatMap { _ =>
                 cdp(
                   "Input.dispatchMouseEvent",
                   JsBridge.obj(
                     "type"       -> ("mousePressed"),
-                    "x"          -> (x),
-                    "y"          -> (y),
+                    "x"          -> (target.x),
+                    "y"          -> (target.y),
                     "button"     -> ("left"),
                     "clickCount" -> (1)
                   )
@@ -319,13 +316,13 @@ private[background] object CdpFlowExecutor {
                     "Input.dispatchMouseEvent",
                     JsBridge.obj(
                       "type"       -> ("mouseReleased"),
-                      "x"          -> (x),
-                      "y"          -> (y),
+                      "x"          -> (target.x),
+                      "y"          -> (target.y),
                       "button"     -> ("left"),
                       "clickCount" -> (1)
                     )
                   ).map { _ =>
-                    captureLog.debug(s"CDP mouse clicked input at x=$x y=$y")
+                    captureLog.debug(s"CDP mouse clicked input at x=${target.x} y=${target.y}")
                     if (!inputSignalSent) {
                       inputSignalSent = true
                       LocationSignals.trigger(tabId, "input")
