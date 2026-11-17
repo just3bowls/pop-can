@@ -65,4 +65,20 @@ class CdpCommandResultsSpec extends munit.FunSuite {
 
     assertEquals(CdpCommandResults.identifier(result), Some("script-2"))
   }
+
+  test("inputTargetProbe parses formatted JSON without depending on key order") {
+    val raw = """
+      {
+        "y": 42.5,
+        "status": "found",
+        "x": 12.25
+      }
+    """
+
+    assertEquals(CdpCommandResults.inputTargetProbe(raw), InputTargetProbe("found", 12.25, 42.5))
+  }
+
+  test("inputTargetProbe treats malformed JSON as not found") {
+    assertEquals(CdpCommandResults.inputTargetProbe("not-json"), InputTargetProbe("notfound", 0.0, 0.0))
+  }
 }
