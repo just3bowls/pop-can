@@ -61,6 +61,19 @@ git diff --check
 
 Do not use a new sbt server when an existing sbt client service is already available.
 
+## Branch Workflow
+
+- `master` is the stable release branch. Only release PRs from `develop` merge into it.
+- `develop` is the protected integration branch for ordinary development.
+- Work branches use `<type>/<kebab-case-summary>`, such as `feat/provider-routing`,
+  `fix/session-rename`, `refactor/json-envelope`, or `ci/audit-runtime-dependencies`.
+- Open pull requests against `develop`. Pull-request checks must pass before merging.
+- Use rebase-and-merge to keep `develop` linear while preserving clean logical commits.
+- Merged work branches are deleted automatically and must not remain as long-lived branches.
+- Dependabot targets `develop`; major toolchain upgrades are tracked separately from routine
+  minor/patch updates.
+- Published tags are immutable. A new build after publication uses a new version and tag.
+
 ## Extension Development
 
 Install dependencies:
