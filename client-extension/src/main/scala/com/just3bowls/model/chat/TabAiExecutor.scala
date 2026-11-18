@@ -4,7 +4,7 @@ import com.just3bowls.facade.JsBridge
 import com.just3bowls.model.provider.*
 import com.just3bowls.model.localapi.*
 
-import com.just3bowls.facade.{ChromeAPI, MessageSender}
+import com.just3bowls.facade.{ChromeAPI, MessageSender, TabAiProgressMessage}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
@@ -47,7 +47,8 @@ object TabAiEvent {
   ) extends TabAiEvent
 
   /** 后台的一次性提示（例如"这家 provider 不支持注入，本轮按整段模版发送"）。 */
-  final case class Notice(text: String) extends TabAiEvent
+  final case class Notice(text: String)            extends TabAiEvent
+  final case class Progress(progress: RunProgress) extends TabAiEvent
 
   /** Human-in-the-loop 输入，例如 Plan 审批期间对计划的修改请求。 */
   final case class HumanInput(label: String, text: String) extends TabAiEvent
@@ -81,7 +82,8 @@ object TabAiExecutor {
       promise: Promise[TabAiResult],
       onEvent: TabAiEvent => Unit,
       provider: String,
-      var rawChars: Int = 0
+      var rawChars: Int = 0,
+      var responseStarted: Boolean = false
   )
   private val pending     = scala.collection.mutable.Map.empty[String, Pending]
   private var initialized = false
@@ -113,6 +115,17 @@ object TabAiExecutor {
                     // 解析器的正文过滤回退了已下发内容：先清空这一轮累积的正文，再接着收。
                     val reset = JsBridge.undefinedBoolean(dynamic.resetContent).getOrElse(false)
                     if (chars > state.rawChars) state.rawChars = chars
+                    if (!state.responseStarted) {
+                      state.responseStarted = true
+                      state.onEvent(TabAiEvent.Progress(RunProgress(
+                        RunPhase.LocatingResponse,
+                        provider = state.provider
+                      )))
+                    }
+                    if (done && error.isEmpty)
+                      state.onEvent(TabAiEvent.Progress(
+                        RunProgress(RunPhase.ValidatingResponse, provider = state.provider)
+                      ))
                     handleChunk(id, state, delta, done, error, reset)
                     true
                   // 收尾之后的在途分片：只回执（页面确实接住了这一轮），不再喂 producer。
@@ -123,6 +136,26 @@ object TabAiExecutor {
                   case Some(state) =>
                     val text = asString(dynamic.text)
                     if (text.nonEmpty) state.onEvent(TabAiEvent.Notice(text))
+                    true
+                  case None        => settled.contains(id)
+                }
+              case "TAB_AI_PROGRESS"  =>
+                pending.get(id) match {
+                  case Some(state) =>
+                    val progress = dynamic.asInstanceOf[TabAiProgressMessage]
+                    val phase    = progress.phase.toOption.flatMap(RunPhase.fromWire)
+                    phase.foreach(value =>
+                      state.onEvent(TabAiEvent.Progress(
+                        RunProgress(
+                          phase = value,
+                          provider = progress.provider.toOption.getOrElse(""),
+                          detail = progress.detail.toOption.getOrElse(""),
+                          attempt = progress.attempt.toOption.getOrElse(0),
+                          recoveryIndex = progress.recoveryIndex.toOption.getOrElse(0),
+                          recoveryBudget = progress.recoveryBudget.toOption.getOrElse(0)
+                        )
+                      ))
+                    )
                     true
                   case None        => settled.contains(id)
                 }

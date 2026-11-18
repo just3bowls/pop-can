@@ -7,6 +7,7 @@ import com.just3bowls.background.automation.provider.*
 import com.just3bowls.background.webchat.*
 
 import com.just3bowls.model.localapi.Msg
+import com.just3bowls.model.chat.{RunPhase, RunProgress}
 import com.just3bowls.model.provider.PromptAttachment
 import com.just3bowls.model.provider.ProviderRequestRule
 import com.just3bowls.model.diagnostics.PopCanLog
@@ -45,6 +46,7 @@ private[background] object CdpFlowExecutor {
       onInputStatus: String => Unit = _ => (),
       onTypeStatus: (Boolean, String) => Unit = (_, _) => (),
       onResultStatus: (Boolean, String) => Unit = (_, _) => (),
+      onProgress: RunProgress => Unit = _ => (),
       apiPatterns: Option[List[String]] = None,
       onRequest: (String, String, String) => Unit = (_, _, _) => (),
       onCandidate: (String, String, String) => Unit = (_, _, _) => (),
@@ -624,13 +626,20 @@ private[background] object CdpFlowExecutor {
           }
           .flatMap(_ => logPageState())
           // 页面控制面可能刚经历导航 / 扩展重载；在碰选择器之前先确保 marker runtime 真的活着。
-          .flatMap(_ => PageMarkers.ensure(tabId, provider, List("input")))
+          .flatMap { _ =>
+            onProgress(RunProgress(RunPhase.PreparingPage, provider, detail = "input"))
+            PageMarkers.ensure(tabId, provider, List("input"))
+          }
           // 页面在生成中时输入框通常被锁：先等它空闲，别把文本打进去然后干等回车（那种状态回车必然没反应）。
-          .flatMap(_ => waitUntilInputUsable())
+          .flatMap { _ =>
+            onProgress(RunProgress(RunPhase.WaitingForInput, provider))
+            waitUntilInputUsable()
+          }
           // Slate（qianwen）这类编辑器会检查页面可见性；HiddenPageLease 已统一处理 shim、focus 和 lifecycle。
           .flatMap(_ => new CdpInputActions(evaluate, cdp, delayMarker).ensureInteractive(tabId))
           .flatMap { _ =>
             log.debug("focusing input element")
+            onProgress(RunProgress(RunPhase.PreparingPrompt, provider))
             PhaseTiming.timedFuture(generationId, "focusInput")(focusInputViaCdp())
           }
           .flatMap { focusResult =>
@@ -660,6 +669,7 @@ private[background] object CdpFlowExecutor {
             attachment match {
               case None         => Future.successful(())
               case Some(attach) =>
+                onProgress(RunProgress(RunPhase.AttachingFile, provider, detail = attach.name))
                 PhaseTiming.timedFuture(generationId, "attachFile")(
                   FileAttachment
                     .attach(
@@ -733,12 +743,11 @@ private[background] object CdpFlowExecutor {
                     ()
                   }
               )
-              // 注入必须在回车之前挂上：请求一发出就被 Fetch 暂停，改完正文再放行。
-              .flatMap(_ =>
-                PhaseTiming.timedFuture(generationId, "send")(armInjection().flatMap(_ =>
-                  pressEnterAndWaitForRequest()
-                ))
-              )
+          }
+          // 注入必须在回车之前挂上：请求一发出就被 Fetch 暂停，改完正文再放行。
+          .flatMap { _ =>
+            onProgress(RunProgress(RunPhase.SendingPrompt, provider))
+            PhaseTiming.timedFuture(generationId, "send")(armInjection().flatMap(_ => pressEnterAndWaitForRequest()))
           }
           .flatMap { _ =>
             captureLog.info("send confirmed by observed request")
@@ -751,6 +760,7 @@ private[background] object CdpFlowExecutor {
               )
               .map { _ =>
                 onSendStatus("sent")
+                onProgress(RunProgress(RunPhase.WaitingForResponse, provider))
                 waitingForResponse = true
                 captureLog.info("waiting for network response")
                 PhaseTiming.timedFuture(generationId, "stream")(session.waitForResponse())

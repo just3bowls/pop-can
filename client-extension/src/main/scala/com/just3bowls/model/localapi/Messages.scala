@@ -1,6 +1,13 @@
 package com.just3bowls.model.localapi
 
-import com.just3bowls.facade.{InputPromptMessage, NormalizedChunk, PromptResponse, TabAiNoticeMessage}
+import com.just3bowls.facade.{
+  InputPromptMessage,
+  NormalizedChunk,
+  PromptResponse,
+  TabAiNoticeMessage,
+  TabAiProgressMessage
+}
+import com.just3bowls.model.chat.RunProgress
 import scala.scalajs.js
 
 /** 插件内 runtime message 的构造器；DTO 形状统一定义在 `com.just3bowls.facade`。 */
@@ -62,6 +69,8 @@ object Msg {
     )
   def tabAiNotice(generationId: String, text: String): TabAiNoticeMessage =
     RuntimeMessageFactory.tabAiNotice(generationId, text)
+  def tabAiProgress(generationId: String, progress: RunProgress): TabAiProgressMessage =
+    RuntimeMessageFactory.tabAiProgress(generationId, progress)
   def promptResponse(
       ok: Boolean,
       content: String,
