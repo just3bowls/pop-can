@@ -854,6 +854,15 @@ object PopCanPage {
       refreshChatDerivedState()
       path
     }
+    def scrollWindowToBottom(): Unit                             =
+      dom.window.history.scrollRestoration = dom.ScrollRestoration.manual
+      js.timers.setTimeout(0) {
+        dom.window.requestAnimationFrame { _ =>
+          dom.window.requestAnimationFrame { _ =>
+            dom.window.scrollTo(0, dom.document.documentElement.scrollHeight.toInt)
+          }
+        }
+      }
 
     /**
      * 从存储重读会话消息并重算可见链。
@@ -864,7 +873,8 @@ object PopCanPage {
     def refreshSessionMessages(
         sessionId: String,
         preferredLeaf: Option[String] = None,
-        dropPendingIds: List[String] = Nil
+        dropPendingIds: List[String] = Nil,
+        scrollToBottom: Boolean = false
     ): Unit =
       ChatStore
         .listMessages(sessionId)
@@ -884,6 +894,7 @@ object PopCanPage {
             .orElse(ChatStore.tipOf(all).map(_.id))
             .orElse(activeLeafIdVar.now().filter(known.contains))
           setActiveLeaf(leaf)
+          if (scrollToBottom) scrollWindowToBottom()
         }
         .recover { case e =>
           PopCanLog.error("chat", "refresh session messages failed", e)
@@ -1463,7 +1474,7 @@ object PopCanPage {
             chatRunningVar.set(false)
             syncAgentModeForSession(id)
             syncSessionSource()
-            refreshSessionMessages(id)
+            refreshSessionMessages(id, scrollToBottom = true)
             refreshUndoDepth()
           }
         }
@@ -1511,7 +1522,7 @@ object PopCanPage {
       syncAgentModeForSession(id)
       syncSessionSource()
       persistCurrentSessionId(id)
-      refreshSessionMessages(id)
+      refreshSessionMessages(id, scrollToBottom = true)
       refreshUndoDepth()
     }
     onWebChatUpdated = (updated: String) => {
