@@ -122,11 +122,11 @@ object TabAiExecutor {
                         provider = state.provider
                       )))
                     }
+                    handleChunk(id, state, delta, done, error, reset)
                     if (done && error.isEmpty)
                       state.onEvent(TabAiEvent.Progress(
                         RunProgress(RunPhase.ValidatingResponse, provider = state.provider)
                       ))
-                    handleChunk(id, state, delta, done, error, reset)
                     true
                   // 收尾之后的在途分片：只回执（页面确实接住了这一轮），不再喂 producer。
                   case None        => settled.contains(id)

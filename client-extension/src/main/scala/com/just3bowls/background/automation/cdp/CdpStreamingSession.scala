@@ -15,6 +15,7 @@ import com.just3bowls.facade.{
   NetworkWebSocketFrame
 }
 import com.just3bowls.model.provider.JsonPath
+import com.just3bowls.model.chat.{RunPhase, RunProgress}
 import com.just3bowls.model.diagnostics.PopCanLog
 import com.just3bowls.model.diagnostics.TraceStore
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
@@ -61,7 +62,8 @@ final class CdpStreamingSession(
     /** 窗口内多久没有新的补充响应就收尾（规则的完成信号会立刻收尾，这是兜底）。 */
     followUpIdleMs: Int = 15000,
     /** 规则是否已判定这轮完成；由调用方接上解析器（引擎不认识规则语义）。 */
-    isTurnComplete: () => Boolean = () => false
+    isTurnComplete: () => Boolean = () => false,
+    onProgress: RunProgress => Unit = _ => ()
 ) extends CdpResponseSession {
   private val target                                                        = CdpTargets.tabTarget(tabId)
   private val promise                                                       = Promise[ParsedPrompt]()
@@ -483,6 +485,7 @@ final class CdpStreamingSession(
   private def openFollowUpWindow(): Unit                = {
     if (followUpWindowOpen || completed || promise.isCompleted) return
     followUpWindowOpen = true
+    onProgress(RunProgress(RunPhase.WaitingForFollowUp, provider))
     TraceStore.noteEvidence(generationId, s"follow-up window open patterns=${followUpPatterns.mkString(",")}")
     log.info(s"follow-up window open patterns=${followUpPatterns.mkString(",")} primary=${PopCanLog.short(matchedUrl)}")
     armFollowUpIdle()
