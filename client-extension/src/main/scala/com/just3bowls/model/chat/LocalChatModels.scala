@@ -21,7 +21,12 @@ final case class SessionFolder(
     updatedAt: Double
 )
 
-/** 一次用户可见的完整 Chat Run；自动 repair / fallback 是 Attempt 内部的 Turn，不新增 Attempt。 */
+/**
+ * 一次可查看的 Chat Run。
+ *
+ * `parentAttemptId` 为空时是用户可见的 Attempt（A1/A2）；非空时是该 Attempt 内的自动 Recovery（R1/R2）。内部 protocol repair 仍属于当前 Run
+ * 的执行细节，不新增记录。
+ */
 final case class ChatAttempt(
     id: String,
     index: Int,
@@ -31,10 +36,13 @@ final case class ChatAttempt(
     content: String,
     thinking: String,
     steps: String,
+    toolCalls: String,
+    toolCallId: String,
+    toolResults: String,
     error: String,
-    internalRecoveries: Int,
     createdAt: Double,
     updatedAt: Double,
+    parentAttemptId: String = "",
     requestedMode: String = "",
     effectiveMode: String = "",
     modePath: String = "",
@@ -55,8 +63,10 @@ object ChatAttempt     {
       content = message.content,
       thinking = message.thinking,
       steps = message.steps,
+      toolCalls = message.toolCalls,
+      toolCallId = message.toolCallId,
+      toolResults = message.toolResults,
       error = if (message.status == "error") message.content else "",
-      internalRecoveries = message.retries,
       createdAt = message.createdAt,
       updatedAt = message.updatedAt,
       requestedMode = message.requestedMode,
@@ -83,12 +93,6 @@ final case class ChatMessage(
     updatedAt: Double,
     mode: String = "chat",
     steps: String = "",
-    /**
-     * 这条回答一共重试了几次（0 = 一次就成）。
-     *
-     * 只有"同一轮失败后自动/手动重跑"才会累加：每次重试 = 换一段 provider 对话 + 投完整模版；UI 在回答上显示 `retried ×N`。
-     */
-    retries: Int = 0,
     /** 消息的来源：空 = 老数据/本地；`plugin` = 插件页跑出来的；`web:<tabId>` = 某个 provider tab 上的原生轮次。 */
     origin: String = "",
     /** assistant 的历史 Run；旧消息为空，读取时自动迁移为单个 initial Attempt。 */
@@ -108,7 +112,9 @@ final case class ChatMessage(
     tabRefs: List[BrowserTabRef] = Nil
 ) {
   def activeAttemptIdOrLegacy: String =
-    if (activeAttemptId.nonEmpty) activeAttemptId else if (attempts.nonEmpty) attempts.last.id else s"$id:1"
+    if (activeAttemptId.nonEmpty && attempts.exists(_.id == activeAttemptId)) activeAttemptId
+    else if (attempts.nonEmpty) attempts.last.id
+    else s"$id:1"
 }
 object ChatMessage     {
   def withAttempts(message: ChatMessage): ChatMessage =

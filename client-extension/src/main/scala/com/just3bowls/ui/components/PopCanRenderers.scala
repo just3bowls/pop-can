@@ -33,9 +33,14 @@ private[ui] object PopCanRenderers {
   )
   final private[ui] case class AttemptTabView(
       id: String,
-      index: Int,
+      label: String,
       status: String,
-      title: String
+      title: String,
+      recovery: Boolean
+  )
+  final private[ui] case class AttemptGroupView(
+      attempt: AttemptTabView,
+      recoveries: List[AttemptTabView]
   )
   sealed private[ui] trait AttemptSwitcherLayout
   private[ui] object AttemptSwitcherLayout {
@@ -66,39 +71,49 @@ private[ui] object PopCanRenderers {
       Var(defaultOpen)
     )
 
-  /** 无状态 Attempt 切换器；选中状态归调用方所有。 */
+  /** 按 Attempt 分行、A/R 同排的无状态运行切换器；选中状态归调用方所有。 */
   private[ui] def renderAttemptSwitcher(
-      tabs: List[AttemptTabView],
+      groups: List[AttemptGroupView],
       selectedId: Signal[String],
       onSelect: String => Unit,
       layout: AttemptSwitcherLayout = AttemptSwitcherLayout.Horizontal
   ): HtmlElement =
-    if (tabs.size <= 1) div()
+    if (groups.map(group => 1 + group.recoveries.size).sum <= 1) div()
     else {
-      val vertical = layout == AttemptSwitcherLayout.Vertical
       div(
         display.flex,
-        alignItems.center,
-        flexDirection := (if (vertical) "column" else "row"),
+        flexDirection := (if (layout == AttemptSwitcherLayout.Vertical) "column" else "row"),
+        alignItems    := "flex-start",
+        flexWrap      := "wrap",
         gap           := "4px",
-        overflowX     := (if (vertical) "visible" else "auto"),
-        overflowY     := (if (vertical) "auto" else "visible"),
-        maxHeight     := (if (vertical) "120px" else "none"),
-        paddingBottom := (if (vertical) "0" else "4px"),
-        tabs.map { tab =>
-          val selected   = selectedId.map(_ == tab.id)
-          button(
-            s"A${tab.index}",
-            flexShrink   := "0",
-            fontSize     := "10px",
-            padding      := "1px 7px",
-            cursor.pointer,
-            borderRadius := "999px",
-            border       := "1px solid #d1d5db",
-            color <-- selected.map(if (_) "#ffffff" else "#475569"),
-            backgroundColor <-- selected.map(if (_) "#475569" else "#ffffff"),
-            title        := tab.title,
-            onClick --> { _ => onSelect(tab.id) }
+        overflowX     := "auto",
+        overflowY     := "auto",
+        maxHeight     := "120px",
+        groups.map { group =>
+          div(
+            display.flex,
+            alignItems.center,
+            gap        := "4px",
+            flexShrink := "0",
+            (group.attempt :: group.recoveries).map { tab =>
+              val selected    = selectedId.map(_ == tab.id)
+              val idleColor   =
+                if (tab.recovery) ("#b45309", "#fffbeb", "#fcd34d")
+                else ("#475569", "#ffffff", "#d1d5db")
+              button(
+                tab.label,
+                flexShrink   := "0",
+                fontSize     := "10px",
+                padding      := "1px 7px",
+                cursor.pointer,
+                borderRadius := "999px",
+                border       := s"1px solid ${idleColor._3}",
+                color <-- selected.map(if (_) "#ffffff" else idleColor._1),
+                backgroundColor <-- selected.map(if (_) "#475569" else idleColor._2),
+                title        := tab.title,
+                onClick --> { _ => onSelect(tab.id) }
+              )
+            }
           )
         }
       )
@@ -402,12 +417,16 @@ private[ui] object PopCanRenderers {
             padding := "0 10px 10px",
             if (attempts.size > 1)
               renderAttemptSwitcher(
-                tabs = groups.map { case (attempt, attemptTurns) =>
-                  AttemptTabView(
-                    id = attempt.toString,
-                    index = attempt,
-                    status = attemptStatus(attemptTurns),
-                    title = attemptTitle(attempt, lastAttempt, attemptTurns)
+                groups = groups.map { case (attempt, attemptTurns) =>
+                  AttemptGroupView(
+                    attempt = AttemptTabView(
+                      id = attempt.toString,
+                      label = s"A$attempt",
+                      status = attemptStatus(attemptTurns),
+                      title = attemptTitle(attempt, lastAttempt, attemptTurns),
+                      recovery = false
+                    ),
+                    recoveries = Nil
                   )
                 },
                 selectedId = selectedAttempt.signal.map(_.toString),

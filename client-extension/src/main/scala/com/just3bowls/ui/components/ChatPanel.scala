@@ -17,8 +17,10 @@ private[ui] object ChatPanel {
       onUndo: String => Unit,
       onRegenerate: ChatMessage => Unit,
       chatRunActive: Signal[Boolean],
+      chatRunStatus: Signal[String],
       onStop: () => Unit,
-      onActivateTab: BrowserTabRef => Unit
+      onActivateTab: BrowserTabRef => Unit,
+      onSelectAttempt: (String, String) => Unit
   ): HtmlElement    =
     div(
       width    := "100%",
@@ -30,8 +32,10 @@ private[ui] object ChatPanel {
         onUndo,
         onRegenerate,
         chatRunActive,
+        chatRunStatus,
         onStop,
-        onActivateTab
+        onActivateTab,
+        onSelectAttempt
       )
     )
   private def renderMessages(
@@ -41,8 +45,10 @@ private[ui] object ChatPanel {
       onUndo: String => Unit,
       onRegenerate: ChatMessage => Unit,
       chatRunActive: Signal[Boolean],
+      chatRunStatus: Signal[String],
       onStop: () => Unit,
-      onActivateTab: BrowserTabRef => Unit
+      onActivateTab: BrowserTabRef => Unit,
+      onSelectAttempt: (String, String) => Unit
   ): HtmlElement =
     div(
       children <-- messages.signal
@@ -58,7 +64,9 @@ private[ui] object ChatPanel {
                 followLatestAttempt(normalized, selected)
                 val shown      = attemptDisplay(normalized, selectedAttempt)
                 val aside      =
-                  if (normalized.attempts.size > 1) selected.map(attemptTabs(normalized, _)) else None
+                  if (normalized.attempts.size > 1)
+                    selected.map(attemptTabs(normalized, _, normalized.id, onSelectAttempt))
+                  else None
                 div(
                   onMouseEnter --> { _ => hovered.set(true) },
                   onMouseLeave --> { _ => hovered.set(false) },
@@ -72,6 +80,7 @@ private[ui] object ChatPanel {
                   else
                     messageWithFooter(
                       shown,
+                      normalized,
                       hovered,
                       regenerableMessageId,
                       onFork,
@@ -79,6 +88,7 @@ private[ui] object ChatPanel {
                       onRegenerate,
                       aside,
                       chatRunActive,
+                      chatRunStatus,
                       onStop,
                       onActivateTab
                     )
@@ -117,8 +127,10 @@ private[ui] object ChatPanel {
           content = active.content,
           thinking = active.thinking,
           steps = active.steps,
+          toolCalls = active.toolCalls,
+          toolCallId = active.toolCallId,
+          toolResults = active.toolResults,
           status = active.status,
-          retries = active.internalRecoveries,
           activeAttemptId = active.id,
           requestedMode = active.requestedMode,
           effectiveMode = active.effectiveMode,
@@ -128,24 +140,47 @@ private[ui] object ChatPanel {
         )
     }
   }
-  private def attemptTabs(message: ChatMessage, selected: Var[String]): HtmlElement =
-    PopCanRenderers.renderAttemptSwitcher(
-      tabs = message.attempts.map(attempt =>
-        PopCanRenderers.AttemptTabView(
-          id = attempt.id,
-          index = attempt.index,
-          status = attempt.status,
-          title = s"Attempt ${attempt.index} · ${attempt.trigger} · ${attempt.status}"
+  private def attemptTabs(
+      message: ChatMessage,
+      selected: Var[String],
+      messageId: String,
+      onSelectAttempt: (String, String) => Unit
+  ): HtmlElement =
+    def tab(
+        attempt: ChatAttempt,
+        label: String,
+        recovery: Boolean,
+        owningAttemptIndex: Option[Int] = None
+    ): PopCanRenderers.AttemptTabView =
+      PopCanRenderers.AttemptTabView(
+        id = attempt.id,
+        label = label,
+        status = attempt.status,
+        title =
+          if (recovery)
+            s"Attempt ${owningAttemptIndex.getOrElse(0)} · recovery ${attempt.index} · ${attempt.status}"
+          else s"Attempt ${attempt.index} · ${attempt.trigger} · ${attempt.status}",
+        recovery = recovery
+      )
+    val groups = ChatRuns.grouped(message.attempts).map { case (attempt, recoveries) =>
+      PopCanRenderers.AttemptGroupView(
+        attempt = tab(attempt, s"A${attempt.index}", recovery = false),
+        recoveries = recoveries.map(recovery =>
+          tab(recovery, s"R${recovery.index}", recovery = true, owningAttemptIndex = Some(attempt.index))
         )
-      ),
+      )
+    }
+    PopCanRenderers.renderAttemptSwitcher(
+      groups = groups,
       selectedId = selected.signal,
-      onSelect = selected.set,
+      onSelect = runId => {
+        selected.set(runId)
+        onSelectAttempt(messageId, runId)
+      },
       layout = PopCanRenderers.AttemptSwitcherLayout.Vertical
     )
 
   /**
-   * 助手消息底部操作：常驻 `retried ×N` 徽标（重试过才显示，不受 hover 影响）+ 操作行。
-   *
    * 操作行平时 hover 才显示；**失败（`status == error`）时整行常驻**，重试按钮文案用 `Retry`（成功回答仍是 `Regenerate`）。
    */
   private def assistantActions(
@@ -155,10 +190,8 @@ private[ui] object ChatPanel {
       onFork: String => Unit,
       onRegenerate: ChatMessage => Unit
   ): HtmlElement = {
-    val regenerable        = regenerableMessageId.signal.map(_.contains(message.id))
-    val isError            = message.status == "error"
-    val normalized         = ChatMessage.withAttempts(message)
-    val attemptCount       = normalized.attempts.size
+    val regenerable       = regenerableMessageId.signal.map(_.contains(message.id))
+    val isError           = message.status == "error"
     div(
       display.flex,
       alignItems.center,
@@ -166,28 +199,11 @@ private[ui] object ChatPanel {
       gap       := "6px",
       width     := "100%",
       marginTop := "2px",
-      // 重试次数徽标：只有这一轮真的重试过才显示，hover 说明次数与策略。
-      span(
-        display <-- Val(if (attemptCount > 1 || message.retries > 0) "inline-block" else "none"),
-        fontSize        := "10px",
-        lineHeight      := "1.6",
-        padding         := "0 6px",
-        borderRadius    := "8px",
-        color           := "#b45309",
-        backgroundColor := "#fef3c7",
-        border          := "1px solid #fde68a",
-        flexShrink      := "0",
-        title           := (
-          if (attemptCount > 1) s"This answer has $attemptCount user-visible runs. Switch attempts on the right."
-          else s"This run used ${message.retries} internal recoveries; they remain Turns inside Attempt 1."
-        ),
-        if (attemptCount > 1) s"$attemptCount runs" else s"recovered ×${message.retries}"
-      ),
       div(
         display.flex,
         alignItems.center,
-        gap             := "4px",
-        flexGrow        := "1",
+        gap      := "4px",
+        flexGrow := "1",
         opacity <-- hovered.signal.map(value => if (value || isError) "1" else "0"),
         pointerEvents <-- hovered.signal.map(value => if (value || isError) "auto" else "none"),
         actionButton("Fork", () => onFork(message.id), titleText = "Fork into a new session"),
@@ -203,6 +219,7 @@ private[ui] object ChatPanel {
   }
   private def runtimeFooter(
       chatRunActive: Signal[Boolean],
+      chatRunStatus: Signal[String],
       onStop: () => Unit
   ): HtmlElement =
     div(
@@ -214,7 +231,7 @@ private[ui] object ChatPanel {
       color      := "#6b7280",
       role       := "status",
       aria.live  := "polite",
-      span("Generating…"),
+      span(child.text <-- chatRunStatus),
       stopButton(onStop)
     )
   private def stopButton(onStop: () => Unit): HtmlElement   =
@@ -271,6 +288,7 @@ private[ui] object ChatPanel {
   }
   private def messageWithFooter(
       message: ChatMessage,
+      sourceMessage: ChatMessage,
       hovered: Var[Boolean],
       regenerableMessageId: Var[Option[String]],
       onFork: String => Unit,
@@ -278,12 +296,13 @@ private[ui] object ChatPanel {
       onRegenerate: ChatMessage => Unit,
       aside: Option[HtmlElement],
       chatRunActive: Signal[Boolean],
+      chatRunStatus: Signal[String],
       onStop: () => Unit,
       onActivateTab: BrowserTabRef => Unit
   ): HtmlElement =
     val footer =
-      if (message.role == "assistant" && message.status == "running")
-        runtimeFooter(chatRunActive, onStop)
+      if (message.role == "assistant" && (message.status == "running" || message.status == "repairing"))
+        runtimeFooter(chatRunActive, chatRunStatus, onStop)
       else if (message.role == "user") {
         div(
           display.flex,
@@ -298,7 +317,7 @@ private[ui] object ChatPanel {
           actionButton("Undo", () => onUndo(message.id), titleText = "Undo from this question")
         )
       } else {
-        assistantActions(message, hovered, regenerableMessageId, onFork, onRegenerate)
+        assistantActions(sourceMessage, hovered, regenerableMessageId, onFork, onRegenerate)
       }
     PopCanRenderers.renderChatMessageWithFooter(message, footer, aside, onActivateTab)
 }

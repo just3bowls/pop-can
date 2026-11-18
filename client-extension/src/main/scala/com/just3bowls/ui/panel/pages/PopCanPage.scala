@@ -1149,64 +1149,92 @@ object PopCanPage {
     /** Chat agent 的工具轮数预算。 */
     def maxStepsFor(mode: String): Int                            = 8
     def applyTabEvent(messageId: String)(event: TabAiEvent): Unit =
+      def updateRun(update: ChatAttempt => ChatAttempt): Unit =
+        updateChatMessage(messageId)(message => ChatRuns.updateActive(message)(update))
       event match {
-        case TabAiEvent.StepStarted                =>
+        case TabAiEvent.StepStarted                     =>
+          updateRun(_.copy(status = "running", error = "", updatedAt = js.Date.now()))
+        case TabAiEvent.StepFinished(_)                 =>
           ()
-        case TabAiEvent.StepFinished(_)            =>
-          ()
-        case TabAiEvent.InternalRecoveryStarted(_) =>
-          updateChatMessage(messageId)(message =>
-            message.copy(content = "", thinking = "", toolCalls = "", status = "running")
-          )
-        case TabAiEvent.Thinking(delta)            =>
-          updateChatMessage(messageId)(message => message.copy(thinking = message.thinking + delta))
-        case TabAiEvent.Content(delta)             =>
-          updateChatMessage(messageId)(message => message.copy(content = message.content + delta))
-        case TabAiEvent.ContentReset               =>
-          updateChatMessage(messageId)(message => message.copy(content = ""))
-        case TabAiEvent.ToolCall(name, _)          =>
-          val call = js.JSON.stringify(JsBridge.obj("name" -> (name), "arguments" -> ("")))
-          updateChatMessage(messageId)(message =>
-            message.copy(
-              toolCalls = if (message.toolCalls.isEmpty) call else message.toolCalls + "," + call
+        case TabAiEvent.InternalRecoveryStarted(_)      =>
+          chatRunStatusVar.set("Repairing invalid response…")
+          updateRun(
+            _.copy(
+              content = "",
+              thinking = "",
+              toolCalls = "",
+              error = "",
+              status = "repairing",
+              updatedAt = js.Date.now()
             )
           )
-        case TabAiEvent.ToolFinished(_, _, _, _)   =>
+        case TabAiEvent.Thinking(delta)                 =>
+          chatRunStatusVar.set("Generating…")
+          updateRun(run =>
+            run.copy(
+              thinking = run.thinking + delta,
+              status = "running",
+              error = "",
+              updatedAt = js.Date.now()
+            )
+          )
+        case TabAiEvent.Content(delta)                  =>
+          chatRunStatusVar.set("Generating…")
+          updateRun(run =>
+            run.copy(
+              content = run.content + delta,
+              status = "running",
+              error = "",
+              updatedAt = js.Date.now()
+            )
+          )
+        case TabAiEvent.ContentReset                    =>
+          updateRun(_.copy(content = "", updatedAt = js.Date.now()))
+        case TabAiEvent.ToolCall(name, _)               =>
+          chatRunStatusVar.set("Generating…")
+          val call = js.JSON.stringify(JsBridge.obj("name" -> (name), "arguments" -> ("")))
+          updateRun(run =>
+            run.copy(
+              toolCalls = if (run.toolCalls.isEmpty) call else run.toolCalls + "," + call,
+              status = "running",
+              error = "",
+              updatedAt = js.Date.now()
+            )
+          )
+        case TabAiEvent.ToolFinished(_, _, _, _)        =>
           ()
-        case TabAiEvent.StepFailed(_)              =>
+        case TabAiEvent.StepFailed(error)               =>
+          updateRun(_.copy(status = "error", error = error, updatedAt = js.Date.now()))
+        case TabAiEvent.TurnFailed(_, _, _, _, message) =>
+          updateRun(_.copy(status = "error", error = message, updatedAt = js.Date.now()))
+        case TabAiEvent.HumanInput(_, _)                =>
           ()
-        case TabAiEvent.TurnFailed(_, _, _, _, _)  =>
-          ()
-        case TabAiEvent.HumanInput(_, _)           =>
-          ()
-        case TabAiEvent.PlanProposed(planId, plan) =>
+        case TabAiEvent.PlanProposed(planId, plan)      =>
           presentAgentPlan(planId, plan)
-        case TabAiEvent.Notice(text)               =>
+        case TabAiEvent.Notice(text)                    =>
           Toast.info(text)
-        case TabAiEvent.ProcessUpdated(stepsJson)  =>
-          updateChatMessage(messageId)(message => message.copy(steps = stepsJson))
+        case TabAiEvent.ProcessUpdated(stepsJson)       =>
+          updateRun(_.copy(steps = stepsJson, updatedAt = js.Date.now()))
       }
     def completedAttempt(
-        base: ChatMessage,
         attemptId: String,
         index: Int,
         trigger: String,
-        actual: ChatMessage,
-        auto: Boolean,
-        reason: String
+        parentAttemptId: String,
+        actual: ChatMessage
     ): ChatAttempt =
-      AgentAttemptProjection.completedAttempt(base, attemptId, index, trigger, actual, auto, reason)
+      AgentAttemptProjection.completedAttempt(attemptId, index, trigger, parentAttemptId, actual)
 
-    /** 气泡上的 Regenerate / Retry：手动触发一次重试（次数不限，计数落在回答消息的 `retries` 上）。 */
+    /** 气泡上的 Regenerate / Retry：始终创建一个新的顶层 Attempt。 */
     def regenerate(message: ChatMessage): Unit =
       if (regenerableMessageIdVar.now().contains(message.id))
         retryTurn(message, reason = "manual retry", auto = false)
 
     /**
-     * 手动 / 自动共用的重试：把这一轮**换一段 provider 对话**（New Chat + 完整模版）重跑一遍，并在同一条消息位置上替换回答。
+     * 手动 / 自动共用：换一段 provider 对话（New Chat + 完整模版）重跑。
      *
-     *   - `auto = true`（marker 类失败后的自动重试）：provider 固定用这条消息当时的 provider、不抢焦点；
-     *   - `auto = false`（气泡上的 Regenerate / Retry）：沿用"当前选中优先"，focus 按 session 偏好。
+     *   - `auto = true`：在当前顶层 Attempt 下创建 R1/R2；
+     *   - `auto = false`：创建新的顶层 A2/A3。
      *
      * 一律以 `message.sessionId` 为准（后台会话也能重试），user 从存储里回溯（不依赖页面当前显示的是哪条会话）。
      */
@@ -1237,11 +1265,14 @@ object PopCanPage {
     ): Future[Unit] = {
       val sessionId = message.sessionId
       val base      = ChatMessage.withAttempts(message)
-      val previous  = base.attempts.find(_.id == base.activeAttemptIdOrLegacy).getOrElse(ChatAttempt.fromMessage(base))
-      val attemptIndex = if (auto) previous.index else base.attempts.map(_.index).maxOption.getOrElse(0) + 1
-      val providers    = parserProvidersVar.now()
-      val current      = providerVar.now()
-      val providerF    =
+      val previous  = ChatRuns.active(base).getOrElse(ChatAttempt.fromMessage(base))
+      val root      = ChatRuns.rootOf(base, previous.id).getOrElse(previous)
+      val runIndex  =
+        if (auto) ChatRuns.nextRecoveryIndex(base, root.id)
+        else ChatRuns.nextAttemptIndex(base)
+      val providers = parserProvidersVar.now()
+      val current   = providerVar.now()
+      val providerF =
         if (auto && message.provider.nonEmpty) Future.successful(message.provider)
         else if (providers.exists(p => p.id == current && p.status == "active")) Future.successful(current)
         else if (providers.exists(p => p.id == message.provider && p.status == "active"))
@@ -1253,38 +1284,42 @@ object PopCanPage {
           for {
             _ <- Future.successful(())
             generationId   = s"regen-${js.Date.now()}-${Math.round(js.Math.random() * 1000000)}"
-            attemptId      = if (auto) previous.id else generationId
+            attemptId      = if (auto) s"${root.id}:r$runIndex" else generationId
             runningAttempt = ChatAttempt(
               id = attemptId,
-              index = attemptIndex,
-              trigger = if (auto) previous.trigger else ChatAttempt.Regenerate,
+              index = runIndex,
+              trigger = if (auto) ChatAttempt.AutoRecovery else ChatAttempt.Regenerate,
               status = "running",
               provider = provider,
               content = "",
               thinking = "",
               steps = "",
+              toolCalls = "",
+              toolCallId = "",
+              toolResults = "",
               error = "",
-              internalRecoveries = previous.internalRecoveries,
-              createdAt = if (auto) previous.createdAt else js.Date.now(),
+              createdAt = js.Date.now(),
               updatedAt = js.Date.now(),
+              parentAttemptId = if (auto) root.id else "",
+              requestedMode = message.requestedMode,
+              effectiveMode = message.effectiveMode,
+              modePath = message.modePath,
+              agentRunId = message.agentRunId,
               browserTools = previous.browserTools
             )
-            runningMessage = base.copy(
-              provider = provider,
-              content = "",
-              thinking = "",
-              steps = "",
-              status = "running",
-              attempts = base.attempts.filterNot(_.id == attemptId) :+ runningAttempt,
-              activeAttemptId = attemptId,
-              browserTools = previous.browserTools,
-              updatedAt = js.Date.now()
+            runningMessage = ChatRuns.mirror(
+              base.copy(
+                attempts = base.attempts.filterNot(_.id == attemptId) :+ runningAttempt,
+                browserTools = previous.browserTools
+              ),
+              runningAttempt
             )
             _ <- Future.successful {
               consumeUndoNew(sessionId)
               // 重试 = 换一段新对话重新问一遍：先结束这个 provider 的当前 URL（tab 不动，这一轮 New Chat + 不受水位线影响 ⇒ 投完整模版）。
               // 所以它固定用 `new + inline`，不读固定值也不读行内参数。
               endSessionProviderUrl(sessionId, provider)
+              chatRunStatusVar.set(if (auto) s"Recovering with R$runIndex…" else "Generating…")
               if (!auto && message.provider.nonEmpty && message.provider != provider)
                 Toast.info(s"Retrying on $provider (this answer was from ${message.provider})")
             }
@@ -1311,7 +1346,8 @@ object PopCanPage {
                 promptMode = ProviderChatSettings.Inline,
                 conversation = "fresh",
                 assistantId = Some(message.id),
-                retries = previous.internalRecoveries + (if (auto) 1 else 0),
+                attempts = runningMessage.attempts,
+                activeAttemptId = attemptId,
                 agentMode =
                   Option(message.effectiveMode).filter(_.nonEmpty).getOrElse(AgentModePolicy.React),
                 requestedMode =
@@ -1323,7 +1359,13 @@ object PopCanPage {
                 abortCurrentChat = None
                 chatRunningVar.set(false)
                 val attempt =
-                  completedAttempt(base, attemptId, attemptIndex, ChatAttempt.Regenerate, assistant, auto, reason)
+                  completedAttempt(
+                    attemptId,
+                    runIndex,
+                    if (auto) ChatAttempt.AutoRecovery else ChatAttempt.Regenerate,
+                    if (auto) root.id else "",
+                    assistant
+                  )
                 ChatStore
                   .saveAttempt(base, attempt)
                   .map(_ => refreshSessionMessages(sessionId, preferredLeaf = Some(assistant.id)))
@@ -1338,7 +1380,13 @@ object PopCanPage {
                   .flatMap {
                     case Some(failed) =>
                       val attempt =
-                        completedAttempt(base, attemptId, attemptIndex, ChatAttempt.Regenerate, failed, auto, reason)
+                        completedAttempt(
+                          attemptId,
+                          runIndex,
+                          if (auto) ChatAttempt.AutoRecovery else ChatAttempt.Regenerate,
+                          if (auto) root.id else "",
+                          failed
+                        )
                       ChatStore.saveAttempt(base, attempt).map(_ => ())
                     case None         => Future.successful(())
                   }
@@ -1350,7 +1398,7 @@ object PopCanPage {
     }
 
     /**
-     * 失败收口后的统一判定：只有 marker/协议类失败、且这条回答的自动预算没用完（`retries < 2`）时才再自动重试一次。
+     * 失败收口后的统一判定：只有 marker/协议类失败、且当前 Attempt 的 Recovery 预算没用完时才创建下一条 R。
      *
      * 传输 / 超时 / 工具 / 取消失败都不自动重试（气泡上的 Retry 兜底）。
      */
@@ -1362,15 +1410,21 @@ object PopCanPage {
           .listMessages(sessionId)
           .flatMap(messages =>
             messages.find(_.id == assistantId) match {
-              case Some(assistant) if assistant.role == "assistant" && assistant.retries < 2 =>
-                PopCanLog.info(
-                  "agent",
-                  s"auto-retry #${assistant.retries + 1}: ${Option(failure.getMessage).getOrElse("marker failure")}"
-                )
-                retryTurn(assistant, reason = Option(failure.getMessage).getOrElse("marker failure"), auto = true)
+              case Some(assistant) if assistant.role == "assistant" =>
+                val normalized = ChatMessage.withAttempts(assistant)
+                val active     = ChatRuns.active(normalized).getOrElse(ChatAttempt.fromMessage(normalized))
+                val root       = ChatRuns.rootOf(normalized, active.id).getOrElse(active)
+                val used       = ChatRuns.recoveries(normalized.attempts, root.id).size
+                if (used < 2) {
+                  PopCanLog.info(
+                    "agent",
+                    s"auto-recovery R${used + 1}: ${Option(failure.getMessage).getOrElse("marker failure")}"
+                  )
+                  chatRunStatusVar.set(s"Preparing recovery R${used + 1}…")
+                  retryTurn(assistant, reason = Option(failure.getMessage).getOrElse("marker failure"), auto = true)
+                }
                 Future.successful(())
-              case _                                                                         =>
-                Future.successful(())
+              case _                                                => Future.successful(())
             }
           )
     // SW 在原生轮 marker 解析失败后把这一轮交过来：按预算自动重试（后台会话也能跑，一切都以 message.sessionId 为准）。
@@ -1386,10 +1440,18 @@ object PopCanPage {
           .listMessages(sessionId)
           .map(_.find(_.id == assistantId))
           .foreach {
-            case Some(assistant) if assistant.role == "assistant" && assistant.retries < 2 =>
-              PopCanLog.info("agent", s"native turn marker failure -> auto retry: $reason")
-              retryTurn(assistant, reason, auto = true, protocolRepair = protocolRepair)
-            case _                                                                         => ()
+            case Some(assistant) if assistant.role == "assistant" =>
+              val normalized = ChatMessage.withAttempts(assistant)
+              val active     = ChatRuns.active(normalized).getOrElse(ChatAttempt.fromMessage(normalized))
+              val root       = ChatRuns.rootOf(normalized, active.id).getOrElse(active)
+              if (ChatRuns.recoveries(normalized.attempts, root.id).size < 2) {
+                PopCanLog.info("agent", s"native turn marker failure -> auto recovery: $reason")
+                chatRunStatusVar.set(
+                  s"Preparing recovery R${ChatRuns.recoveries(normalized.attempts, root.id).size + 1}…"
+                )
+                retryTurn(assistant, reason, auto = true, protocolRepair = protocolRepair)
+              }
+            case _                                                => ()
           }
     }
     def loadCurrentSession(): Unit                                                               =
@@ -1526,6 +1588,16 @@ object PopCanPage {
         }
     def updateChatMessage(id: String)(update: ChatMessage => ChatMessage): Unit                  =
       chatMessagesVar.update(_.map(message => if (message.id == id) update(message) else message))
+    def selectChatRun(messageId: String, runId: String): Unit                                    = {
+      updateChatMessage(messageId)(message => ChatRuns.activate(message, runId))
+      pendingMessagesVar.update(_.map(message =>
+        if (message.id == messageId) ChatRuns.activate(message, runId) else message
+      ))
+      ChatStore
+        .setActiveAttempt(messageId, runId)
+        .recover { case e => PopCanLog.warn("chat", s"select chat run failed: ${e.getMessage}") }
+        .foreach(_ => ())
+    }
     def abortRunningChat(): Unit                                                                 = {
       abortCurrentChat.foreach(_())
       abortCurrentChat = None
@@ -2276,51 +2348,12 @@ object PopCanPage {
             sessionFuture
               .flatMap { sessionId =>
                 chatRunningVar.set(true)
+                chatRunStatusVar.set("Generating…")
                 // 先按清除/Undo 的强制状态算出本轮设置，再作废 redo；否则 clear 的 new 会被提前消费掉。
                 val sendSettings                = sendSettingsFor(chosenProvider)
                 // 重新发送新消息后，之前 undo 掉的内容不再可 redo。
                 clearRedoStack(sessionId)
-                val onEvent: TabAiEvent => Unit = {
-                  case TabAiEvent.StepStarted                =>
-                    ()
-                  case TabAiEvent.StepFinished(_)            =>
-                    ()
-                  case TabAiEvent.InternalRecoveryStarted(_) =>
-                    updateChatMessage(generationId + "-assistant")(message =>
-                      message.copy(content = "", thinking = "", toolCalls = "", status = "running")
-                    )
-                  case TabAiEvent.Thinking(delta)            =>
-                    updateChatMessage(generationId + "-assistant")(message =>
-                      message.copy(thinking = message.thinking + delta)
-                    )
-                  case TabAiEvent.Content(delta)             =>
-                    updateChatMessage(generationId + "-assistant")(message =>
-                      message.copy(content = message.content + delta)
-                    )
-                  case TabAiEvent.ContentReset               =>
-                    updateChatMessage(generationId + "-assistant")(message => message.copy(content = ""))
-                  case TabAiEvent.ToolCall(name, _)          =>
-                    val call = js.JSON.stringify(JsBridge.obj("name" -> (name), "arguments" -> ("")))
-                    updateChatMessage(generationId + "-assistant")(message =>
-                      message.copy(
-                        toolCalls = if (message.toolCalls.isEmpty) call else message.toolCalls + "," + call
-                      )
-                    )
-                  case TabAiEvent.ToolFinished(_, _, _, _)   =>
-                    ()
-                  case TabAiEvent.StepFailed(_)              =>
-                    ()
-                  case TabAiEvent.TurnFailed(_, _, _, _, _)  =>
-                    ()
-                  case TabAiEvent.HumanInput(_, _)           =>
-                    ()
-                  case TabAiEvent.PlanProposed(planId, plan) =>
-                    presentAgentPlan(planId, plan)
-                  case TabAiEvent.Notice(text)               =>
-                    Toast.info(text)
-                  case TabAiEvent.ProcessUpdated(stepsJson)  =>
-                    updateChatMessage(generationId + "-assistant")(message => message.copy(steps = stepsJson))
-                }
+                val onEvent: TabAiEvent => Unit = applyTabEvent(generationId + "-assistant")
                 // 这一次发送的设置 = 行内参数 > 固定值 > 会话推导默认（与 `@` 面板显示同源）；用掉就作废这份一次性覆盖。
                 consumePendingSend(chosenProvider)
                 consumeUndoNew(sessionId)
@@ -2712,8 +2745,10 @@ object PopCanPage {
             undoAt,
             regenerate,
             chatRunActive,
+            chatRunStatusVar.signal,
             abortRunningChat,
-            activateReferencedTab
+            activateReferencedTab,
+            selectChatRun
           ),
           new CommentNode("")
         ),

@@ -299,19 +299,22 @@ object ChatStore {
     val attempts = current.attempts.filterNot(_.id == attempt.id) :+ attempt
     val activeId = if (makeActive) attempt.id else current.activeAttemptIdOrLegacy
     val active   = attempts.find(_.id == activeId).getOrElse(attempt)
-    val updated  = current.copy(
-      provider = active.provider,
-      content = active.content,
-      thinking = active.thinking,
-      steps = active.steps,
-      status = active.status,
-      retries = active.internalRecoveries,
-      attempts = attempts,
-      activeAttemptId = active.id,
-      updatedAt = active.updatedAt
-    )
+    val updated  = ChatRuns.mirror(current.copy(attempts = attempts), active)
     addMessage(updated).map(_ => updated)
   }
+
+  /** Persist the user's selected A/R view without changing the answer itself. */
+  def setActiveAttempt(messageId: String, attemptId: String): Future[Option[ChatMessage]] =
+    getMessage(messageId).flatMap {
+      case Some(message) =>
+        val normalized = ChatMessage.withAttempts(message)
+        if (!normalized.attempts.exists(_.id == attemptId)) Future.successful(Some(normalized))
+        else {
+          val updated = ChatRuns.activate(normalized, attemptId)
+          addMessage(updated).map(_ => Some(updated))
+        }
+      case None          => Future.successful(None)
+    }
 
   /** 网页原生会话：来源标记写 `web`（只作展示，插件页也能继续聊）。 */
   def createWebSession(title: String, provider: String): Future[ChatSession] =
@@ -574,11 +577,13 @@ object ChatStore {
       }
 
   /** 和插件页 chat 同一条 agent 内核：collector 聚合过程、节流写进度、结束写最终回答（带 steps）。 */
-  private def listAllMessages(): Future[List[ChatMessage]] =
+  private def listAllMessages(): Future[List[ChatMessage]]        =
     readValues(MessageKeyPrefix).map(_.map(value => parseMessage(JsBridge.asObject(value))))
-  private def sessionKey(id: String): String               = s"$SessionKeyPrefix$id"
-  private def folderKey(id: String): String                = s"$FolderKeyPrefix$id"
-  private def messageKey(id: String): String               = s"$MessageKeyPrefix$id"
+  private def getMessage(id: String): Future[Option[ChatMessage]] =
+    BrowserAPIStorage.get(messageKey(id)).map(_.map(value => parseMessage(JsBridge.asObject(value))))
+  private def sessionKey(id: String): String                      = s"$SessionKeyPrefix$id"
+  private def folderKey(id: String): String                       = s"$FolderKeyPrefix$id"
+  private def messageKey(id: String): String                      = s"$MessageKeyPrefix$id"
 
   /** 按 key 前缀取出所有记录：只读匹配到的 key，不把整份 storage（provider 配置 / trace 正文）拖过来。 */
   private def readValues(prefix: String): Future[List[js.Any]]                  =
@@ -637,7 +642,6 @@ object ChatStore {
       updatedAt = JsBridge.doubleField(item, "updatedAt").getOrElse(0.0),
       mode = "chat",
       steps = JsBridge.stringField(item, "steps").getOrElse(""),
-      retries = JsBridge.intField(item, "retries").getOrElse(0),
       origin = JsBridge.stringField(item, "origin").getOrElse(""),
       attempts = jsArray(JsBridge.field(item, "attempts")).map(attemptFromJs),
       activeAttemptId = JsBridge.stringField(item, "activeAttemptId").getOrElse(""),
@@ -696,7 +700,6 @@ object ChatStore {
       "updatedAt"       -> (m.updatedAt),
       "mode"            -> (m.mode),
       "steps"           -> (m.steps),
-      "retries"         -> (m.retries),
       "origin"          -> (m.origin),
       "attempts"        -> (js.Array(m.attempts.map(attemptToJs)*)),
       "activeAttemptId" -> (m.activeAttemptIdOrLegacy),
@@ -752,10 +755,13 @@ object ChatStore {
       content = JsBridge.undefinedString(m.content).getOrElse(""),
       thinking = JsBridge.undefinedString(m.thinking).getOrElse(""),
       steps = JsBridge.undefinedString(m.steps).getOrElse(""),
+      toolCalls = JsBridge.undefinedString(m.toolCalls).getOrElse(""),
+      toolCallId = JsBridge.undefinedString(m.toolCallId).getOrElse(""),
+      toolResults = JsBridge.undefinedString(m.toolResults).getOrElse(""),
       error = JsBridge.undefinedString(m.error).getOrElse(""),
-      internalRecoveries = JsBridge.undefinedInt(m.internalRecoveries).getOrElse(0),
       createdAt = JsBridge.undefinedDouble(m.createdAt).getOrElse(0.0),
       updatedAt = JsBridge.undefinedDouble(m.updatedAt).getOrElse(0.0),
+      parentAttemptId = JsBridge.undefinedString(m.parentAttemptId).getOrElse(""),
       requestedMode = JsBridge.undefinedString(m.requestedMode).getOrElse(""),
       effectiveMode = JsBridge.undefinedString(m.effectiveMode).getOrElse(""),
       modePath = JsBridge.undefinedString(m.modePath).getOrElse(""),
@@ -765,23 +771,26 @@ object ChatStore {
   }
   private def attemptToJs(attempt: ChatAttempt): js.Any                         =
     JsBridge.obj(
-      "id"                 -> (attempt.id),
-      "index"              -> (attempt.index),
-      "trigger"            -> (attempt.trigger),
-      "status"             -> (attempt.status),
-      "provider"           -> (attempt.provider),
-      "content"            -> (attempt.content),
-      "thinking"           -> (attempt.thinking),
-      "steps"              -> (attempt.steps),
-      "error"              -> (attempt.error),
-      "internalRecoveries" -> (attempt.internalRecoveries),
-      "createdAt"          -> (attempt.createdAt),
-      "updatedAt"          -> (attempt.updatedAt),
-      "requestedMode"      -> (attempt.requestedMode),
-      "effectiveMode"      -> (attempt.effectiveMode),
-      "modePath"           -> (attempt.modePath),
-      "agentRunId"         -> (attempt.agentRunId),
-      "browserTools"       -> (attempt.browserTools)
+      "id"              -> (attempt.id),
+      "index"           -> (attempt.index),
+      "trigger"         -> (attempt.trigger),
+      "status"          -> (attempt.status),
+      "provider"        -> (attempt.provider),
+      "content"         -> (attempt.content),
+      "thinking"        -> (attempt.thinking),
+      "steps"           -> (attempt.steps),
+      "toolCalls"       -> (attempt.toolCalls),
+      "toolCallId"      -> (attempt.toolCallId),
+      "toolResults"     -> (attempt.toolResults),
+      "error"           -> (attempt.error),
+      "createdAt"       -> (attempt.createdAt),
+      "updatedAt"       -> (attempt.updatedAt),
+      "parentAttemptId" -> (attempt.parentAttemptId),
+      "requestedMode"   -> (attempt.requestedMode),
+      "effectiveMode"   -> (attempt.effectiveMode),
+      "modePath"        -> (attempt.modePath),
+      "agentRunId"      -> (attempt.agentRunId),
+      "browserTools"    -> (attempt.browserTools)
     )
   private def loadUndoStacks(): Future[Map[String, List[UndoStep]]]             =
     BrowserAPIStorage.get(UndoStacksKey).map {
