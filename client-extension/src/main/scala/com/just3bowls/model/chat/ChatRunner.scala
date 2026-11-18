@@ -38,8 +38,9 @@ object ChatRunner {
       promptMode: String = ProviderChatSettings.Inline,
       /** 插件页给这条新回答留的占位 id：落库复用同一个 id（同 `runChat`）。 */
       assistantId: Option[String] = None,
-      /** 这条回答是第几次尝试（0 = 一次就成）：重试入口传 `上次 + 1`。 */
-      retries: Int = 0,
+      /** Existing top-level Attempts and recoveries, preserved while the selected run is executing. */
+      attempts: List[ChatAttempt] = Nil,
+      activeAttemptId: String = "",
       agentMode: String = AgentModePolicy.React,
       requestedMode: String = AgentModePolicy.React,
       modeReason: String = "retry",
@@ -92,7 +93,8 @@ object ChatRunner {
               updatedAt = answerAt,
               mode = user.mode,
               steps = collector.stepsJson,
-              retries = retries,
+              attempts = attempts,
+              activeAttemptId = activeAttemptId,
               requestedMode = AgentModePolicy.normalize(requestedMode),
               effectiveMode = AgentModePolicy.normalize(agentMode),
               modePath = routePathJson(requestedMode, agentMode, modeReason),
@@ -119,7 +121,8 @@ object ChatRunner {
               updatedAt = answerAt,
               mode = user.mode,
               steps = collector.stepsJson,
-              retries = retries,
+              attempts = attempts,
+              activeAttemptId = activeAttemptId,
               requestedMode = AgentModePolicy.normalize(requestedMode),
               effectiveMode = AgentModePolicy.normalize(agentMode),
               modePath = routePathJson(requestedMode, agentMode, modeReason),
@@ -152,8 +155,6 @@ object ChatRunner {
        */
       userId: Option[String] = None,
       assistantId: Option[String] = None,
-      /** 这条回答是第几次尝试（0 = 一次就成）；重试入口会把它写进消息。 */
-      retries: Int = 0,
       /** User-referenced tabs attached to this run only. */
       tabRefs: List[BrowserTabRef] = Nil,
       /** Hidden persistent-memory context for this run only. */
@@ -211,7 +212,6 @@ object ChatRunner {
         conversation,
         promptMode,
         assistantId.getOrElse(ChatStore.nextId()),
-        retries = retries,
         tabRefs = tabRefs,
         memoryContext = memoryContext,
         agentMode = agentMode,
@@ -244,8 +244,6 @@ object ChatRunner {
       conversation: String,
       promptMode: String,
       assistantId: String,
-      /** 这条回答是第几次尝试（0 = 一次就成）；重试入口会把它写进消息，UI 据此显示 `retried ×N`。 */
-      retries: Int,
       tabRefs: List[BrowserTabRef],
       memoryContext: String,
       agentMode: String,
@@ -299,7 +297,6 @@ object ChatRunner {
             updatedAt = answerAt,
             mode = user.mode,
             steps = collector.stepsJson,
-            retries = retries,
             requestedMode = AgentModePolicy.normalize(requestedMode),
             effectiveMode = AgentModePolicy.normalize(agentMode),
             modePath = routePathJson(requestedMode, agentMode, modeReason),
@@ -326,7 +323,6 @@ object ChatRunner {
         updatedAt = answerAt,
         mode = user.mode,
         steps = collector.stepsJson,
-        retries = retries,
         requestedMode = AgentModePolicy.normalize(requestedMode),
         effectiveMode = assistantMode,
         modePath = routePathJson(requestedMode, assistantMode, modeReason, outcome.handoffs),
