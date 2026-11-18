@@ -76,6 +76,7 @@ object ChatRunner {
             initialProtocolRepair = initialProtocolRepair
           )
           .flatMap { outcome =>
+            onEvent(TabAiEvent.Progress(RunProgress(RunPhase.SavingAnswer, provider = provider)))
             val assistant = ChatMessage(
               id = answerId,
               sessionId = sessionId,
@@ -306,6 +307,7 @@ object ChatRunner {
           ChatStore.addMessage(errorAssistant).flatMap(_ => Future.failed(e))
         }
       assistantMode = outcome.handoffs.lastOption.map(_.mode).getOrElse(AgentModePolicy.normalize(agentMode))
+      _         = collector.onEvent(TabAiEvent.Progress(RunProgress(RunPhase.SavingAnswer, provider = provider)))
       assistant = ChatMessage(
         id = assistantId,
         sessionId = sessionId,
