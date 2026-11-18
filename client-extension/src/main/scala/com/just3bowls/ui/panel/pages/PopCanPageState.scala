@@ -14,6 +14,7 @@ private[pages] object PopCanPageState {
   val chatSessionsVar              = Var(List.empty[ChatSession])
   val chatFoldersVar               = Var(List.empty[SessionFolder])
   val chatRunningVar               = Var(false)
+  val chatRunStatusVar             = Var("Generating…")
   val parserProvidersVar           = Var(List.empty[ParserProviderInfo])
   val configDrawerOpenVar          = Var(false)
   val configDrawerMountedVar       = Var(false)
