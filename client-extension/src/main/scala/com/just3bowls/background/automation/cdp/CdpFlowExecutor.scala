@@ -126,6 +126,7 @@ private[background] object CdpFlowExecutor {
           followUpPatterns = followUpPatterns,
           followUpIdentityPath = followUpIdentityPath,
           followUpWindowMs = followUpWindowMs,
+          onProgress = onProgress,
           isTurnComplete = () =>
             BackgroundState.localRawParsers.get(generationId).flatten.exists(_.hasFinishSignal)
         )
