@@ -1588,6 +1588,17 @@ object PopCanPage {
         }
     def updateChatMessage(id: String)(update: ChatMessage => ChatMessage): Unit                  =
       chatMessagesVar.update(_.map(message => if (message.id == id) update(message) else message))
+    def scrollToMessage(messageId: String): Unit                                                 =
+      js.timers.setTimeout(0) {
+        Option(dom.document.getElementById(s"chat-message-$messageId")).foreach { message =>
+          JsBridge.call(
+            message,
+            "scrollIntoView",
+            JsBridge.obj("block" -> ("start"), "behavior" -> ("smooth"))
+          )
+          ()
+        }
+      }
     def selectChatRun(messageId: String, runId: String): Unit                                    = {
       updateChatMessage(messageId)(message => ChatRuns.activate(message, runId))
       pendingMessagesVar.update(_.map(message =>
@@ -2318,6 +2329,7 @@ object PopCanPage {
               pending = List(pendingUser, pendingAssistant),
               leaf = Some(pendingAssistant.id)
             )
+            scrollToMessage(generationId)
             val sessionFuture: Future[String] =
               if (currentSessionIdVar.now().isEmpty) {
                 val folderId = Option(newSessionFolderIdVar.now())

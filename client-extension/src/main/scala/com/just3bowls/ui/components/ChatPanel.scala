@@ -4,6 +4,7 @@ import com.just3bowls.facade.JsBridge
 import com.just3bowls.model.chat.*
 
 import com.just3bowls.api.chat.BrowserTabRef
+import com.raquo.laminar.codecs.StringAsIsCodec
 import com.raquo.laminar.api.L._
 import scala.scalajs.js
 import scala.collection.mutable
@@ -53,9 +54,10 @@ private[ui] object ChatPanel {
     div(
       children <-- messages.signal
         .map(_.filterNot(_.role == "tool"))
-        .split(_.id) { (_, initial, signal) =>
+        .split(_.id) { (messageId, initial, signal) =>
           val selection = attemptSelection(initial)
           div(
+            htmlAttr("id", StringAsIsCodec) := s"chat-message-$messageId",
             child <-- Signal.combine(signal, selection.map(_.signal).getOrElse(Val(""))).map {
               case (message, selectedAttempt) =>
                 val hovered    = Var(false)
