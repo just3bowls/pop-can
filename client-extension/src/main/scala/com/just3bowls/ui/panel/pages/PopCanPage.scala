@@ -874,7 +874,8 @@ object PopCanPage {
         sessionId: String,
         preferredLeaf: Option[String] = None,
         dropPendingIds: List[String] = Nil,
-        scrollToBottom: Boolean = false
+        scrollToBottom: Boolean = false,
+        afterRender: () => Unit = () => ()
     ): Unit =
       ChatStore
         .listMessages(sessionId)
@@ -895,6 +896,7 @@ object PopCanPage {
             .orElse(activeLeafIdVar.now().filter(known.contains))
           setActiveLeaf(leaf)
           if (scrollToBottom) scrollWindowToBottom()
+          afterRender()
         }
         .recover { case e =>
           PopCanLog.error("chat", "refresh session messages failed", e)
@@ -911,7 +913,8 @@ object PopCanPage {
         upsert: Option[ChatMessage] = None,
         pending: List[ChatMessage],
         dropPendingIds: List[String] = Nil,
-        leaf: Option[String]
+        leaf: Option[String],
+        afterRender: () => Unit = () => ()
     ): Unit = {
       if (dropPendingIds.nonEmpty)
         pendingMessagesVar.update(_.filterNot(message => dropPendingIds.contains(message.id)))
@@ -936,7 +939,11 @@ object PopCanPage {
         .recover { case e => showError(s"Save message failed: ${e.getMessage}") }
         .foreach { _ =>
           upsert.foreach(message => pendingMessagesVar.update(_.filterNot(_.id == message.id)))
-          refreshSessionMessages(sessionId, preferredLeaf = leaf.orElse(upsert.map(_.id)))
+          refreshSessionMessages(
+            sessionId,
+            preferredLeaf = leaf.orElse(upsert.map(_.id)),
+            afterRender = afterRender
+          )
         }
     }
 
@@ -1601,13 +1608,17 @@ object PopCanPage {
       chatMessagesVar.update(_.map(message => if (message.id == id) update(message) else message))
     def scrollToMessage(messageId: String): Unit                                                 =
       js.timers.setTimeout(0) {
-        Option(dom.document.getElementById(s"chat-message-$messageId")).foreach { message =>
-          JsBridge.call(
-            message,
-            "scrollIntoView",
-            JsBridge.obj("block" -> ("start"), "behavior" -> ("smooth"))
-          )
-          ()
+        dom.window.requestAnimationFrame { _ =>
+          dom.window.requestAnimationFrame { _ =>
+            Option(dom.document.getElementById(s"chat-message-$messageId")).foreach { message =>
+              JsBridge.call(
+                message,
+                "scrollIntoView",
+                JsBridge.obj("block" -> ("start"), "behavior" -> ("smooth"))
+              )
+              ()
+            }
+          }
         }
       }
     def selectChatRun(messageId: String, runId: String): Unit                                    = {
@@ -2338,9 +2349,9 @@ object PopCanPage {
             commitMessages(
               sessionId = currentSessionIdVar.now(),
               pending = List(pendingUser, pendingAssistant),
-              leaf = Some(pendingAssistant.id)
+              leaf = Some(pendingAssistant.id),
+              afterRender = () => scrollToMessage(generationId)
             )
-            scrollToMessage(generationId)
             val sessionFuture: Future[String] =
               if (currentSessionIdVar.now().isEmpty) {
                 val folderId = Option(newSessionFolderIdVar.now())
