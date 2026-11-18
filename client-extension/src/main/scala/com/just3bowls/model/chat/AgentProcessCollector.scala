@@ -126,6 +126,8 @@ final class AgentProcessCollector(emit: TabAiEvent => Unit) {
         emit(event)
       case TabAiEvent.Notice(text)                               =>
         emit(TabAiEvent.Notice(text))
+      case event @ TabAiEvent.Progress(_)                        =>
+        emit(event)
       case TabAiEvent.ProcessUpdated(_)                          =>
         ()
     }

@@ -1166,6 +1166,12 @@ object PopCanPage {
 
     /** Chat agent 的工具轮数预算。 */
     def maxStepsFor(mode: String): Int                                           = 8
+    def startRunClock(): Unit                                                    = {
+      chatRunStartedAtVar.set(js.Date.now())
+      chatRunElapsedVar.set("")
+    }
+    def setRunProgress(progress: RunProgress): Unit                              =
+      chatRunProgressVar.set(Some(progress))
     def applyTabEvent(messageId: String, runId: String)(event: TabAiEvent): Unit =
       def updateRun(update: ChatAttempt => ChatAttempt): Unit =
         updateChatMessage(messageId)(message => ChatRuns.update(message, runId)(update))
@@ -1175,7 +1181,7 @@ object PopCanPage {
         case TabAiEvent.StepFinished(_)                 =>
           ()
         case TabAiEvent.InternalRecoveryStarted(_)      =>
-          chatRunStatusVar.set("Repairing invalid response…")
+          setRunProgress(RunProgress(RunPhase.RepairingResponse, attempt = 1))
           updateRun(
             _.copy(
               content = "",
@@ -1187,7 +1193,7 @@ object PopCanPage {
             )
           )
         case TabAiEvent.Thinking(delta)                 =>
-          chatRunStatusVar.set("Generating…")
+          setRunProgress(RunProgress(RunPhase.Thinking))
           updateRun(run =>
             run.copy(
               thinking = run.thinking + delta,
@@ -1197,7 +1203,7 @@ object PopCanPage {
             )
           )
         case TabAiEvent.Content(delta)                  =>
-          chatRunStatusVar.set("Generating…")
+          setRunProgress(RunProgress(RunPhase.GeneratingAnswer))
           updateRun(run =>
             run.copy(
               content = run.content + delta,
@@ -1209,7 +1215,7 @@ object PopCanPage {
         case TabAiEvent.ContentReset                    =>
           updateRun(_.copy(content = "", updatedAt = js.Date.now()))
         case TabAiEvent.ToolCall(name, _)               =>
-          chatRunStatusVar.set("Generating…")
+          setRunProgress(RunProgress(RunPhase.RunningTool, detail = name))
           val call = js.JSON.stringify(JsBridge.obj("name" -> (name), "arguments" -> ("")))
           updateRun(run =>
             run.copy(
@@ -1220,7 +1226,7 @@ object PopCanPage {
             )
           )
         case TabAiEvent.ToolFinished(_, _, _, _)        =>
-          ()
+          setRunProgress(RunProgress(RunPhase.WaitingForResponse))
         case TabAiEvent.StepFailed(error)               =>
           updateRun(_.copy(status = "error", error = error, updatedAt = js.Date.now()))
         case TabAiEvent.TurnFailed(_, _, _, _, message) =>
@@ -1231,6 +1237,8 @@ object PopCanPage {
           presentAgentPlan(planId, plan)
         case TabAiEvent.Notice(text)                    =>
           Toast.info(text)
+        case TabAiEvent.Progress(progress)              =>
+          setRunProgress(progress)
         case TabAiEvent.ProcessUpdated(stepsJson)       =>
           updateRun(_.copy(steps = stepsJson, updatedAt = js.Date.now()))
       }
@@ -1344,7 +1352,17 @@ object PopCanPage {
               // 重试 = 换一段新对话重新问一遍：先结束这个 provider 的当前 URL（tab 不动，这一轮 New Chat + 不受水位线影响 ⇒ 投完整模版）。
               // 所以它固定用 `new + inline`，不读固定值也不读行内参数。
               endSessionProviderUrl(sessionId, provider)
-              chatRunStatusVar.set(if (auto) s"Recovering with R$runIndex…" else "Generating…")
+              startRunClock()
+              setRunProgress(
+                if (auto)
+                  RunProgress(
+                    RunPhase.Recovering,
+                    provider = provider,
+                    recoveryIndex = runIndex,
+                    recoveryBudget = 2
+                  )
+                else RunProgress(RunPhase.PreparingRequest, provider = provider)
+              )
               if (!auto && message.provider.nonEmpty && message.provider != provider)
                 Toast.info(s"Retrying on $provider (this answer was from ${message.provider})")
             }
@@ -1457,7 +1475,12 @@ object PopCanPage {
                     "agent",
                     s"auto-recovery R${used + 1}: ${Option(failure.getMessage).getOrElse("marker failure")}"
                   )
-                  chatRunStatusVar.set(s"Preparing recovery R${used + 1}…")
+                  setRunProgress(RunProgress(
+                    RunPhase.Recovering,
+                    provider = assistant.provider,
+                    recoveryIndex = used + 1,
+                    recoveryBudget = 2
+                  ))
                   retryTurn(assistant, reason = Option(failure.getMessage).getOrElse("marker failure"), auto = true)
                 }
                 Future.successful(())
@@ -1483,9 +1506,13 @@ object PopCanPage {
               val root       = ChatRuns.rootOf(normalized, active.id).getOrElse(active)
               if (ChatRuns.recoveries(normalized.attempts, root.id).size < 2) {
                 PopCanLog.info("agent", s"native turn marker failure -> auto recovery: $reason")
-                chatRunStatusVar.set(
-                  s"Preparing recovery R${ChatRuns.recoveries(normalized.attempts, root.id).size + 1}…"
-                )
+                val next = ChatRuns.recoveries(normalized.attempts, root.id).size + 1
+                setRunProgress(RunProgress(
+                  RunPhase.Recovering,
+                  provider = assistant.provider,
+                  recoveryIndex = next,
+                  recoveryBudget = 2
+                ))
                 retryTurn(assistant, reason, auto = true, protocolRepair = protocolRepair)
               }
             case _                                                => ()
@@ -2401,7 +2428,8 @@ object PopCanPage {
             sessionFuture
               .flatMap { sessionId =>
                 chatRunningVar.set(true)
-                chatRunStatusVar.set("Generating…")
+                startRunClock()
+                setRunProgress(RunProgress(RunPhase.PreparingRequest, provider = chosenProvider))
                 // 先按清除/Undo 的强制状态算出本轮设置，再作废 redo；否则 clear 的 new 会被提前消费掉。
                 val sendSettings                = sendSettingsFor(chosenProvider)
                 // 重新发送新消息后，之前 undo 掉的内容不再可 redo。
@@ -2771,7 +2799,18 @@ object PopCanPage {
         )
       ()
     }
+    def refreshRunElapsed(): Unit                     =
+      chatRunElapsedVar.set(
+        if (chatRunningVar.now())
+          RunProgressPresentation.elapsed(chatRunStartedAtVar.now(), js.Date.now())
+        else ""
+      )
+    val runElapsedTimer                               = js.timers.setInterval(1000)(refreshRunElapsed())
+    renderDisposers += (() => js.timers.clearInterval(runElapsedTimer))
     val chatRunActive                                 = chatRunningVar.signal
+    val chatRunStatus                                 = chatRunProgressVar.signal
+      .combineWith(chatRunElapsedVar.signal)
+      .map { case (progress, elapsed) => RunProgressPresentation.footer(progress, elapsed) }
     renderOnDomContentLoaded(
       dom.document.getElementById("app"),
       div(
@@ -2799,7 +2838,7 @@ object PopCanPage {
             undoAt,
             regenerate,
             chatRunActive,
-            chatRunStatusVar.signal,
+            chatRunStatus,
             abortRunningChat,
             activateReferencedTab,
             selectChatRun

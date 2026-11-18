@@ -2,7 +2,14 @@ package com.just3bowls.model.localapi
 
 import com.just3bowls.facade.JsBridge
 
-import com.just3bowls.facade.{InputPromptMessage, NormalizedChunk, PromptResponse, TabAiNoticeMessage}
+import com.just3bowls.facade.{
+  InputPromptMessage,
+  NormalizedChunk,
+  PromptResponse,
+  TabAiNoticeMessage,
+  TabAiProgressMessage
+}
+import com.just3bowls.model.chat.RunProgress
 
 import scala.scalajs.js
 
@@ -57,6 +64,20 @@ object RuntimeMessageFactory {
     JsBridge.obj("type" -> ("TAB_AI_NOTICE"), "generationId" -> (generationId), "text" -> (text)).asInstanceOf[
       TabAiNoticeMessage
     ]
+
+  def tabAiProgress(generationId: String, progress: RunProgress): TabAiProgressMessage =
+    JsBridge
+      .obj(
+        "type"           -> ("TAB_AI_PROGRESS"),
+        "generationId"   -> (generationId),
+        "phase"          -> (progress.phase.wire),
+        "provider"       -> (progress.provider),
+        "detail"         -> (progress.detail),
+        "attempt"        -> (progress.attempt),
+        "recoveryIndex"  -> (progress.recoveryIndex),
+        "recoveryBudget" -> (progress.recoveryBudget)
+      )
+      .asInstanceOf[TabAiProgressMessage]
 
   def promptResponse(
       ok: Boolean,
