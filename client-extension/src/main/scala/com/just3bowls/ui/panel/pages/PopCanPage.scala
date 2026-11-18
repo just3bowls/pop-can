@@ -1165,10 +1165,10 @@ object PopCanPage {
         }
 
     /** Chat agent 的工具轮数预算。 */
-    def maxStepsFor(mode: String): Int                            = 8
-    def applyTabEvent(messageId: String)(event: TabAiEvent): Unit =
+    def maxStepsFor(mode: String): Int                                           = 8
+    def applyTabEvent(messageId: String, runId: String)(event: TabAiEvent): Unit =
       def updateRun(update: ChatAttempt => ChatAttempt): Unit =
-        updateChatMessage(messageId)(message => ChatRuns.updateActive(message)(update))
+        updateChatMessage(messageId)(message => ChatRuns.update(message, runId)(update))
       event match {
         case TabAiEvent.StepStarted                     =>
           updateRun(_.copy(status = "running", error = "", updatedAt = js.Date.now()))
@@ -1281,16 +1281,23 @@ object PopCanPage {
         auto: Boolean,
         protocolRepair: Option[String]
     ): Future[Unit] = {
-      val sessionId = message.sessionId
-      val base      = ChatMessage.withAttempts(message)
-      val previous  = ChatRuns.active(base).getOrElse(ChatAttempt.fromMessage(base))
-      val root      = ChatRuns.rootOf(base, previous.id).getOrElse(previous)
-      val runIndex  =
+      val sessionId                  = message.sessionId
+      val base                       = ChatMessage.withAttempts(message)
+      val previous                   = ChatRuns.active(base).getOrElse(ChatAttempt.fromMessage(base))
+      val root                       = ChatRuns.rootOf(base, previous.id).getOrElse(previous)
+      val runIndex                   =
         if (auto) ChatRuns.nextRecoveryIndex(base, root.id)
         else ChatRuns.nextAttemptIndex(base)
-      val providers = parserProvidersVar.now()
-      val current   = providerVar.now()
-      val providerF =
+      def currentBase(): ChatMessage =
+        chatMessagesVar
+          .now()
+          .find(_.id == message.id)
+          .orElse(pendingMessagesVar.now().find(_.id == message.id))
+          .map(ChatMessage.withAttempts)
+          .getOrElse(base)
+      val providers                  = parserProvidersVar.now()
+      val current                    = providerVar.now()
+      val providerF                  =
         if (auto && message.provider.nonEmpty) Future.successful(message.provider)
         else if (providers.exists(p => p.id == current && p.status == "active")) Future.successful(current)
         else if (providers.exists(p => p.id == message.provider && p.status == "active"))
@@ -1355,7 +1362,7 @@ object PopCanPage {
                 sessionId,
                 user,
                 provider,
-                applyTabEvent(message.id),
+                applyTabEvent(message.id, attemptId),
                 registerCancel = cancel => abortCurrentChat = Some(cancel),
                 maxSteps = maxStepsFor(user.mode),
                 useBrowserTools = previous.browserTools,
@@ -1384,8 +1391,13 @@ object PopCanPage {
                     if (auto) root.id else "",
                     assistant
                   )
+                val current = currentBase()
                 ChatStore
-                  .saveAttempt(base, attempt)
+                  .saveAttempt(
+                    current,
+                    attempt,
+                    makeActive = current.activeAttemptIdOrLegacy == attemptId
+                  )
                   .map(_ => refreshSessionMessages(sessionId, preferredLeaf = Some(assistant.id)))
                   .recover { case e => showError(s"Save attempt failed: ${e.getMessage}") }
               }
@@ -1405,7 +1417,14 @@ object PopCanPage {
                           if (auto) root.id else "",
                           failed
                         )
-                      ChatStore.saveAttempt(base, attempt).map(_ => ())
+                      val current = currentBase()
+                      ChatStore
+                        .saveAttempt(
+                          current,
+                          attempt,
+                          makeActive = current.activeAttemptIdOrLegacy == attemptId
+                        )
+                        .map(_ => ())
                     case None         => Future.successful(())
                   }
                   .map(_ => refreshSessionMessages(sessionId, dropPendingIds = List(message.id)))
@@ -2387,7 +2406,8 @@ object PopCanPage {
                 val sendSettings                = sendSettingsFor(chosenProvider)
                 // 重新发送新消息后，之前 undo 掉的内容不再可 redo。
                 clearRedoStack(sessionId)
-                val onEvent: TabAiEvent => Unit = applyTabEvent(generationId + "-assistant")
+                val onEvent: TabAiEvent => Unit =
+                  applyTabEvent(generationId + "-assistant", s"$generationId-assistant:1")
                 // 这一次发送的设置 = 行内参数 > 固定值 > 会话推导默认（与 `@` 面板显示同源）；用掉就作废这份一次性覆盖。
                 consumePendingSend(chosenProvider)
                 consumeUndoNew(sessionId)

@@ -83,6 +83,20 @@ class ChatRunsSpec extends munit.FunSuite {
     assertEquals(updated.attempts.find(_.id == "r1").map(_.status), Some("repairing"))
   }
 
+  test("stream updates target their run without changing the viewed run") {
+    val a1      = run("a1", 1, "", "error", "failed", 1.0)
+    val r1      = run("r1", 1, "a1", "running", "partial", 2.0)
+    val viewed  = ChatRuns.activate(message(List(a1, r1), "a1"), "a1")
+    val updated = ChatRuns.update(viewed, "r1")(
+      _.copy(content = "partial stream", status = "running")
+    )
+
+    assertEquals(updated.activeAttemptIdOrLegacy, "a1")
+    assertEquals(updated.content, "failed")
+    assertEquals(updated.status, "error")
+    assertEquals(updated.attempts.find(_.id == "r1").map(_.content), Some("partial stream"))
+  }
+
   test("finds the owning attempt for a recovery") {
     val a1 = run("a1", 1, "", "error", "failed", 1.0)
     val r1 = run("r1", 1, "a1", "success", "recovered", 2.0)

@@ -42,12 +42,20 @@ object ChatRuns {
 
   def updateActive(message: ChatMessage)(update: ChatAttempt => ChatAttempt): ChatMessage = {
     val normalized = ChatMessage.withAttempts(message)
-    val runId      = normalized.activeAttemptIdOrLegacy
+    ChatRuns.update(normalized, normalized.activeAttemptIdOrLegacy)(update)
+  }
+
+  /** Update the run that owns the stream, independent of which run the user is currently viewing. */
+  def update(message: ChatMessage, runId: String)(update: ChatAttempt => ChatAttempt): ChatMessage = {
+    val normalized = ChatMessage.withAttempts(message)
     normalized.attempts.find(_.id == runId) match {
       case Some(run) =>
         val nextAttempts = normalized.attempts.map(attempt => if (attempt.id == run.id) update(attempt) else attempt)
         val nextRun      = nextAttempts.find(_.id == run.id).getOrElse(run)
-        mirror(normalized.copy(attempts = nextAttempts, activeAttemptId = run.id), nextRun)
+        val selectedId   = normalized.activeAttemptIdOrLegacy
+        val nextMessage  = normalized.copy(attempts = nextAttempts, updatedAt = nextRun.updatedAt)
+        if (selectedId == run.id) mirror(nextMessage.copy(activeAttemptId = run.id), nextRun)
+        else nextMessage
       case None      => normalized
     }
   }
