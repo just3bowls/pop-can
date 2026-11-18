@@ -144,7 +144,6 @@ object PopCanPage {
     val sessionMessagesVar = Var(List.empty[ChatMessage])
 
     /** 只在屏幕上显示、尚未落库的占位消息（研究的回复占位、chat 的 pending 提问/回复）。 */
-    val pendingMessagesVar      = Var(List.empty[ChatMessage])
     val regenerableMessageIdVar = Var(Option.empty[String])
     val undoDepthVar            = Var(0)
 
@@ -674,7 +673,7 @@ object PopCanPage {
       val manual   = preferredProviderForSession(currentSessionIdVar.now())
       val followed = manual.orElse(Option(provider).filter(activeChatProvider))
       if (followed.exists(_ != providerVar.now())) {
-        val busy = pendingMessagesVar.now().nonEmpty
+        val busy = liveMessagesVar.now().nonEmpty
         if (!busy) {
           followed.foreach { next =>
             providerVar.set(next)
@@ -826,15 +825,12 @@ object PopCanPage {
     /**
      * 存储 + pending 占位的合并视图（同 id 以已落库的为准）。 这就是"用户屏幕上能看到的消息集合"，也是 undo 的目标域： 屏幕上有的就一定撤得掉。
      */
-    def visibleMessages(): List[ChatMessage]              = {
-      val stored = sessionMessagesVar.now()
-      val ids    = stored.map(_.id).toSet
-      stored ++ pendingMessagesVar.now().filterNot(message => ids.contains(message.id))
-    }
+    def visibleMessages(): List[ChatMessage]              =
+      ConversationProjection(sessionMessagesVar.now(), liveMessagesVar.now()).visible
     def sessionById(): Map[String, ChatMessage]           =
-      ChatMessageTree.byId(visibleMessages())
+      ConversationProjection(sessionMessagesVar.now(), liveMessagesVar.now()).byId
     def pathTo(leafId: Option[String]): List[ChatMessage] =
-      ChatMessageTree.pathTo(visibleMessages(), leafId)
+      ConversationProjection(sessionMessagesVar.now(), liveMessagesVar.now()).pathTo(leafId)
     def refreshChatDerivedState(): Unit                   = {
       val all           = visibleMessages()
       val grouped       = all.filter(_.parentId.isDefined).groupBy(_.parentId.get)
@@ -867,13 +863,13 @@ object PopCanPage {
     /**
      * 从存储重读会话消息并重算可见链。
      *
-     * `dropPendingIds` 用于"落库侧自己生成了新 id（user / error assistant）"的失败收尾：这些占位既不在存储里、
+     * `dropLiveIds` 用于成功/失败落库后的显式收尾：移除对应 live overlay，再让 stored snapshot 接管显示。
      * 又永远匹配不掉，留着会变成幽灵消息；当存储确实有内容时把它们撤掉，叶子回落到存储里的最后一条。
      */
     def refreshSessionMessages(
         sessionId: String,
         preferredLeaf: Option[String] = None,
-        dropPendingIds: List[String] = Nil,
+        dropLiveIds: List[String] = Nil,
         scrollToBottom: Boolean = false,
         afterRender: () => Unit = () => ()
     ): Unit =
@@ -881,12 +877,9 @@ object PopCanPage {
         .listMessages(sessionId)
         .map { all =>
           sessionMessagesVar.set(all)
-          // 已落库的占位从 pending 里清掉：同一个 id 不该同时躺在"存储"和"占位"两层里。
-          val storedIds  = all.map(_.id).toSet
-          val extraDrops = if (all.nonEmpty) dropPendingIds.toSet else Set.empty[String]
-          pendingMessagesVar.update(_.filterNot(message =>
-            storedIds.contains(message.id) || extraDrops.contains(message.id)
-          ))
+          val extraDrops = if (all.nonEmpty) dropLiveIds.toSet else Set.empty[String]
+          if (extraDrops.nonEmpty)
+            liveMessagesVar.update(messages => messages -- extraDrops)
           val known      = sessionById()
           val leaf       = preferredLeaf
             .filter(known.contains)
@@ -908,43 +901,22 @@ object PopCanPage {
      *
      * 所有"改消息"的路径（提交提问、落回复、取消清占位、undo/redo）都必须走这里， 否则存储快照、屏幕上渲染的列表、active leaf 会分叉。
      */
-    def commitMessages(
+    def stageLiveMessages(
         sessionId: String,
-        upsert: Option[ChatMessage] = None,
-        pending: List[ChatMessage],
-        dropPendingIds: List[String] = Nil,
+        messages: List[ChatMessage],
+        dropIds: List[String] = Nil,
         leaf: Option[String],
         afterRender: () => Unit = () => ()
     ): Unit = {
-      if (dropPendingIds.nonEmpty)
-        pendingMessagesVar.update(_.filterNot(message => dropPendingIds.contains(message.id)))
-      if (pending.nonEmpty) {
-        val pendingIds = pending.map(_.id).toSet
-        pendingMessagesVar.update(list => list.filterNot(message => pendingIds.contains(message.id)) ++ pending)
+      liveMessagesVar.update { current =>
+        val retained = current -- dropIds.toSet
+        retained ++ messages.map(message => message.id -> message)
       }
-      val writeF =
-        if (sessionId.isEmpty) Future.successful(())
-        else
-          upsert match {
-            case None          => Future.successful(())
-            case Some(message) =>
-              ChatStore
-                .listMessages(sessionId)
-                .flatMap { all =>
-                  if (all.exists(_.id == message.id)) ChatStore.updateMessage(message)
-                  else ChatStore.addMessage(message)
-                }
-          }
-      writeF
-        .recover { case e => showError(s"Save message failed: ${e.getMessage}") }
-        .foreach { _ =>
-          upsert.foreach(message => pendingMessagesVar.update(_.filterNot(_.id == message.id)))
-          refreshSessionMessages(
-            sessionId,
-            preferredLeaf = leaf.orElse(upsert.map(_.id)),
-            afterRender = afterRender
-          )
-        }
+      refreshSessionMessages(
+        sessionId,
+        preferredLeaf = leaf,
+        afterRender = afterRender
+      )
     }
 
     /** 把从根到指定消息的这段对话复制成一个新的 session，并切换过去继续。 */
@@ -1023,7 +995,7 @@ object PopCanPage {
         if (kind == ChatStore.ClearKind || removed.exists(_.mode == "chat"))
           undoForcesNewSessions.update(_ + sessionId)
         val removedIds = removed.map(_.id).toSet
-        pendingMessagesVar.update(_.filterNot(message => removedIds.contains(message.id)))
+        liveMessagesVar.update(messages => messages -- removedIds)
         commandStageVar.set(ChatCommandStage.Closed)
         commandItemsVar.set(Nil)
         pendingTabRefsVar.set(restoredTabs)
@@ -1146,7 +1118,7 @@ object PopCanPage {
                 _ <- loadChatSessions()
               } yield {
                 val restoredIds = step.messages.map(_.id).toSet
-                pendingMessagesVar.update(_.filterNot(message => restoredIds.contains(message.id)))
+                liveMessagesVar.update(messages => messages -- restoredIds)
                 refreshUndoDepth()
                 refreshSessionMessages(sessionId, preferredLeaf = step.messages.lastOption.map(_.id))
               }
@@ -1300,7 +1272,7 @@ object PopCanPage {
         chatMessagesVar
           .now()
           .find(_.id == message.id)
-          .orElse(pendingMessagesVar.now().find(_.id == message.id))
+          .orElse(liveMessagesVar.now().get(message.id))
           .map(ChatMessage.withAttempts)
           .getOrElse(base)
       val providers                  = parserProvidersVar.now()
@@ -1367,10 +1339,10 @@ object PopCanPage {
                 Toast.info(s"Retrying on $provider (this answer was from ${message.provider})")
             }
             _ <- Future.successful {
-              commitMessages(
+              stageLiveMessages(
                 sessionId = sessionId,
-                pending = List(runningMessage),
-                dropPendingIds = List(message.id),
+                messages = List(runningMessage),
+                dropIds = List(message.id),
                 leaf = Some(message.id)
               )
               chatRunningVar.set(true)
@@ -1416,7 +1388,13 @@ object PopCanPage {
                     attempt,
                     makeActive = current.activeAttemptIdOrLegacy == attemptId
                   )
-                  .map(_ => refreshSessionMessages(sessionId, preferredLeaf = Some(assistant.id)))
+                  .map(_ =>
+                    refreshSessionMessages(
+                      sessionId,
+                      preferredLeaf = Some(assistant.id),
+                      dropLiveIds = List(message.id)
+                    )
+                  )
                   .recover { case e => showError(s"Save attempt failed: ${e.getMessage}") }
               }
               .recover { case e =>
@@ -1445,7 +1423,7 @@ object PopCanPage {
                         .map(_ => ())
                     case None         => Future.successful(())
                   }
-                  .map(_ => refreshSessionMessages(sessionId, dropPendingIds = List(message.id)))
+                  .map(_ => refreshSessionMessages(sessionId, dropLiveIds = List(message.id)))
                   .flatMap(_ => maybeAutoRetry(sessionId, message.id, e))
               }
           } yield ()
@@ -1590,7 +1568,7 @@ object PopCanPage {
       manualProviderOverridesVar.update(_ - deleted)
       chatSessionsVar.update(_.filterNot(_.id == deleted))
       undoForcesNewSessions.update(_ - deleted)
-      pendingMessagesVar.update(_.filterNot(_.sessionId == deleted))
+      liveMessagesVar.update(_.filterNot((_, message) => message.sessionId == deleted))
       if (currentSessionIdVar.now() == deleted) {
         cancelCurrentSessionTitleEdit()
         agentModeVar.set(AgentModePolicy.React)
@@ -1625,7 +1603,7 @@ object PopCanPage {
           manualProviderOverridesVar.update(_ - id)
           chatSessionsVar.update(_.filterNot(_.id == id))
           undoForcesNewSessions.update(_ - id)
-          pendingMessagesVar.update(_.filterNot(_.sessionId == id))
+          liveMessagesVar.update(_.filterNot((_, message) => message.sessionId == id))
           if (currentSessionIdVar.now() == id) {
             cancelCurrentSessionTitleEdit()
             agentModeVar.set(AgentModePolicy.React)
@@ -1650,8 +1628,17 @@ object PopCanPage {
           PopCanLog.error("chat", "delete chat session failed", e)
           ()
         }
-    def updateChatMessage(id: String)(update: ChatMessage => ChatMessage): Unit                  =
-      chatMessagesVar.update(_.map(message => if (message.id == id) update(message) else message))
+    def updateChatMessage(id: String)(update: ChatMessage => ChatMessage): Unit                  = {
+      val live = liveMessagesVar.now()
+      if (live.contains(id)) {
+        liveMessagesVar.update(messages => messages.updatedWith(id)(_.map(update)))
+      } else {
+        sessionMessagesVar.update(messages =>
+          messages.map(message => if (message.id == id) update(message) else message)
+        )
+      }
+      setActiveLeaf(activeLeafIdVar.now())
+    }
     def scrollToMessage(messageId: String): Unit                                                 =
       js.timers.setTimeout(0) {
         dom.window.requestAnimationFrame { _ =>
@@ -1668,14 +1655,13 @@ object PopCanPage {
         }
       }
     def selectChatRun(messageId: String, runId: String): Unit                                    = {
+      val liveRun = liveMessagesVar.now().contains(messageId)
       updateChatMessage(messageId)(message => ChatRuns.activate(message, runId))
-      pendingMessagesVar.update(_.map(message =>
-        if (message.id == messageId) ChatRuns.activate(message, runId) else message
-      ))
-      ChatStore
-        .setActiveAttempt(messageId, runId)
-        .recover { case e => PopCanLog.warn("chat", s"select chat run failed: ${e.getMessage}") }
-        .foreach(_ => ())
+      if (!liveRun)
+        ChatStore
+          .setActiveAttempt(messageId, runId)
+          .recover { case e => PopCanLog.warn("chat", s"select chat run failed: ${e.getMessage}") }
+          .foreach(_ => ())
     }
     def abortRunningChat(): Unit                                                                 = {
       abortCurrentChat.foreach(_())
@@ -1714,7 +1700,7 @@ object PopCanPage {
               session.folderId == folderId &&
               sessionMessagesVar.now().isEmpty &&
               chatMessagesVar.now().isEmpty &&
-              pendingMessagesVar.now().forall(_.sessionId != session.id) &&
+              liveMessagesVar.now().values.forall(_.sessionId != session.id) &&
               !chatRunningVar.now()
             }
       newSessionFolderIdVar.set(folderId)
@@ -2392,9 +2378,9 @@ object PopCanPage {
               browserTools = runBrowserTools
             )
             // 这两条只是屏幕上的占位（提问由 runChat 落库、回复在结束时落库）；统一进 pending 层并刷新。
-            commitMessages(
+            stageLiveMessages(
               sessionId = currentSessionIdVar.now(),
-              pending = List(pendingUser, pendingAssistant),
+              messages = List(pendingUser, pendingAssistant),
               leaf = Some(pendingAssistant.id),
               afterRender = () => scrollToMessage(generationId)
             )
@@ -2474,7 +2460,11 @@ object PopCanPage {
                   pendingAgentPlanVar.set(None)
                   abortCurrentChat = None
                   chatRunningVar.set(false)
-                  refreshSessionMessages(sessionId, preferredLeaf = Some(assistant.id))
+                  refreshSessionMessages(
+                    sessionId,
+                    preferredLeaf = Some(assistant.id),
+                    dropLiveIds = List(generationId, generationId + "-assistant")
+                  )
                   activeMemoryClient.foreach(
                     _.ingest(
                       MemoryTurn(
@@ -2509,7 +2499,7 @@ object PopCanPage {
                   refreshSessionMessages(
                     sessionId,
                     preferredLeaf = Some(generationId + "-assistant"),
-                    dropPendingIds = List(generationId, generationId + "-assistant")
+                    dropLiveIds = List(generationId, generationId + "-assistant")
                   )
                   // marker/协议类失败：预算内自动再重试一次（换新对话 + 完整模版）；其余失败留给气泡上的 Retry。
                   maybeAutoRetry(sessionId, generationId + "-assistant", e)

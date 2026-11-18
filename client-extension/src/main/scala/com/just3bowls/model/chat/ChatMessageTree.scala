@@ -1,9 +1,7 @@
-package com.just3bowls.ui.panel.pages
-
-import com.just3bowls.model.chat.ChatMessage
+package com.just3bowls.model.chat
 
 /** Read-only projections over the append-only chat message tree. */
-private[pages] object ChatMessageTree {
+object ChatMessageTree {
   def byId(messages: List[ChatMessage]): Map[String, ChatMessage] =
     messages.map(message => message.id -> message).toMap
 

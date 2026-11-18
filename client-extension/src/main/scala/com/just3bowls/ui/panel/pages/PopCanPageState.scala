@@ -11,6 +11,7 @@ import scala.collection.mutable
 private[pages] object PopCanPageState {
   val renderDisposers              = mutable.ArrayBuffer.empty[() => Unit]
   val chatMessagesVar              = Var(List.empty[ChatMessage])
+  val liveMessagesVar              = Var(Map.empty[String, ChatMessage])
   val chatSessionsVar              = Var(List.empty[ChatSession])
   val chatFoldersVar               = Var(List.empty[SessionFolder])
   val chatRunningVar               = Var(false)
