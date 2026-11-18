@@ -66,6 +66,17 @@ trait TabAiNoticeMessage extends RuntimeMessage:
   def generationId: js.UndefOr[String] = js.native
   def text: js.UndefOr[String]         = js.native
 
+/** Structured progress for the provider turn currently owned by this generation. */
+@js.native
+trait TabAiProgressMessage extends RuntimeMessage:
+  def generationId: js.UndefOr[String] = js.native
+  def phase: js.UndefOr[String]        = js.native
+  def provider: js.UndefOr[String]     = js.native
+  def detail: js.UndefOr[String]       = js.native
+  def attempt: js.UndefOr[Int]         = js.native
+  def recoveryIndex: js.UndefOr[Int]   = js.native
+  def recoveryBudget: js.UndefOr[Int]  = js.native
+
 /** INPUT_PROMPT 的响应 — Background → PopCan 主页面 */
 @js.native
 trait PromptResponse extends js.Object:

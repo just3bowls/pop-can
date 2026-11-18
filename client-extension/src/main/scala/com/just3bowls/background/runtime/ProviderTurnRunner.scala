@@ -6,6 +6,7 @@ import com.just3bowls.background.bootstrap.BackgroundState
 import com.just3bowls.background.webchat.WebChatService
 import com.just3bowls.facade.*
 import com.just3bowls.model.diagnostics.*
+import com.just3bowls.model.chat.{RunPhase, RunProgress}
 import com.just3bowls.model.localapi.*
 import com.just3bowls.model.provider.*
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
@@ -60,6 +61,13 @@ private[background] object ProviderTurnRunner {
     val taskSource                                =
       if (localTaskKind.nonEmpty) TaskSource.Local
       else TaskSource.Server
+    def report(progress: RunProgress): Unit       =
+      PageDelivery.deliverToPage(
+        generationId,
+        provider,
+        Msg.tabAiProgress(generationId, progress.copy(provider = provider)),
+        "progress"
+      )
     PopCanLog
       .withContext("cdp", "gen" -> generationId, "provider" -> provider)
       .info(
@@ -75,6 +83,7 @@ private[background] object ProviderTurnRunner {
         resolve(result)
       }
       val managedKeyId                                      = keyId.getOrElse(ApiKeyStore.SystemApiKeyId)
+      report(RunProgress(RunPhase.PreparingProvider))
       val tabFut: Future[Either[String, (Int, ManagedTab)]] = {
         val allocStartedAt = js.Date.now()
         val allocated      = for {
@@ -93,7 +102,8 @@ private[background] object ProviderTurnRunner {
                 toolProfileId = inputToolProfileId,
                 // 分配按会话归属：同一个会话继续用同一个 tab，只有 slot 里是别人会话的对话时才另找/新建。
                 sessionId = inputSessionId,
-                gen = generationId
+                gen = generationId,
+                onProgress = report
               )
                 .flatMap { case (tabId, managed) =>
                   if (inputSessionId.isEmpty) Future.successful(Right((tabId, managed)))
@@ -166,14 +176,15 @@ private[background] object ProviderTurnRunner {
                 )
                 .flatMap { _ =>
                   BackgroundState.activeCdpTasks.update(generationId, tabId)
-                  val flowLog   = PopCanLog.withContext(
+                  val flowLog    = PopCanLog.withContext(
                     "cdp",
                     "gen"      -> generationId,
                     "provider" -> provider,
                     "tab"      -> tabId.toString
                   )
                   flowLog.info("preparing managed tab for task")
-                  val cdpFuture =
+                  var rawStarted = false
+                  val cdpFuture  =
                     TabKeepAlive.ensureTabReady(tabId).flatMap { _ =>
                       ServerTabManager.loadProviderConfig(provider).flatMap { config =>
                         BackgroundState.localRawParsers.update(
@@ -257,6 +268,10 @@ private[background] object ProviderTurnRunner {
                             inputXPath,
                             generationId,
                             raw => {
+                              if (!rawStarted) {
+                                rawStarted = true
+                                report(RunProgress(RunPhase.LocatingResponse))
+                              }
                               PageDelivery.forwardRawChunk(generationId, provider, raw)
                               ()
                             },
@@ -291,6 +306,7 @@ private[background] object ProviderTurnRunner {
                                 TaskOperation.AwaitResponse,
                                 if (ok) Phase.Success else Phase.Failed(error)
                               ).foreach(_ => ()),
+                            onProgress = report,
                             // `file` 模式的全量附件由后台按水位线决定（增量轮没有附件）：调用方自己带的（server 转发）优先保留。
                             attachment = fileAttachment.orElse(inputAttachment),
                             attachmentStrategy = attachStrategy,

@@ -302,8 +302,10 @@ private[ui] object ChatPanel {
       onStop: () => Unit,
       onActivateTab: BrowserTabRef => Unit
   ): HtmlElement =
-    val footer =
-      if (message.role == "assistant" && (message.status == "running" || message.status == "repairing"))
+    val hasRunningRun =
+      sourceMessage.attempts.exists(run => run.status == "running" || run.status == "repairing")
+    val footer        =
+      if (message.role == "assistant" && hasRunningRun)
         runtimeFooter(chatRunActive, chatRunStatus, onStop)
       else if (message.role == "user") {
         div(

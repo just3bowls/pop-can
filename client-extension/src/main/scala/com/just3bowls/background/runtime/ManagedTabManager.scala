@@ -7,6 +7,7 @@ import com.just3bowls.background.webchat.*
 import com.just3bowls.api.provider.PageIdentity
 import com.just3bowls.facade.{ChromeAPI, Tab => ChromeTab}
 import com.just3bowls.model.diagnostics.PopCanLog
+import com.just3bowls.model.chat.{RunPhase, RunProgress}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
@@ -59,11 +60,12 @@ private[background] object ManagedTabManager {
       conversation: ConversationPolicy,
       sessionId: String = "",
       toolProfileId: String = "",
-      gen: String = ""
+      gen: String = "",
+      onProgress: RunProgress => Unit = _ => ()
   ): Future[(Int, ManagedTab)] =
     reconcileManagedTabs()
       .flatMap(_ => TabOwnership.reconcileAll())
-      .flatMap(_ => createOrReuseTab(modelName, keyId, url, conversation, sessionId, toolProfileId, gen))
+      .flatMap(_ => createOrReuseTab(modelName, keyId, url, conversation, sessionId, toolProfileId, gen, onProgress))
   private def createOrReuseTab(
       modelName: String,
       keyId: String,
@@ -71,12 +73,14 @@ private[background] object ManagedTabManager {
       conversation: ConversationPolicy,
       sessionId: String,
       toolProfileId: String,
-      gen: String
+      gen: String,
+      onProgress: RunProgress => Unit
   ): Future[(Int, ManagedTab)] =
     TabStore.load().flatMap { window =>
       TabStore.findSlot(window, modelName, keyId).flatMap(_.liveTabId) match {
         case Some(tabId) =>
           // **tab 固定 provider**：slot 里那个 tab 永远优先用；用之前把它的对话对齐到 (本会话, 这个 provider)。
+          onProgress(RunProgress(RunPhase.PreparingProvider, modelName, detail = "reuse"))
           val managed = TabStore.findSlot(window, modelName, keyId).get
           ChromeAPI.tabs.get(tabId).toFuture
             .flatMap { _ =>
@@ -92,13 +96,14 @@ private[background] object ManagedTabManager {
                         toolProfileId,
                         gen
                       ).flatMap { effective =>
-                        prepareExistingTab(modelName, tabId, current, effective, gen, sessionId).flatMap { _ =>
-                          TabStore.load().map { refreshed =>
-                            TabStore.findTab(refreshed, modelName, keyId)
-                              .map { case (id, updated) => (id, updated) }
-                              .getOrElse((tabId, current))
+                        prepareExistingTab(modelName, tabId, current, effective, gen, sessionId, onProgress)
+                          .flatMap { _ =>
+                            TabStore.load().map { refreshed =>
+                              TabStore.findTab(refreshed, modelName, keyId)
+                                .map { case (id, updated) => (id, updated) }
+                                .getOrElse((tabId, current))
+                            }
                           }
-                        }
                       }
                     case None          =>
                       Future.failed(new Exception(s"Managed tab disappeared while waiting: $tabId"))
@@ -116,11 +121,11 @@ private[background] object ManagedTabManager {
                 TabStore.update { currentWindow =>
                   (TabStore.detachSlot(currentWindow, tabId), ())
                 }.flatMap(_ =>
-                  adoptOrCreateTab(modelName, keyId, url, conversation, sessionId, toolProfileId, gen)
+                  adoptOrCreateTab(modelName, keyId, url, conversation, sessionId, toolProfileId, gen, onProgress)
                 )
             }
         case None        =>
-          adoptOrCreateTab(modelName, keyId, url, conversation, sessionId, toolProfileId, gen)
+          adoptOrCreateTab(modelName, keyId, url, conversation, sessionId, toolProfileId, gen, onProgress)
       }
     }
 
@@ -218,13 +223,15 @@ private[background] object ManagedTabManager {
       conversation: ConversationPolicy,
       sessionId: String,
       toolProfileId: String,
-      gen: String
+      gen: String,
+      onProgress: RunProgress => Unit
   ): Future[(Int, ManagedTab)] =
     ServerTabManager.hostWindow().flatMap { windowId =>
       candidatesFor(windowId, keyId, url).flatMap { candidates =>
         if (candidates.isEmpty) {
-          createAndSaveTab(modelName, keyId, url, conversation)
+          createAndSaveTab(modelName, keyId, url, conversation, onProgress)
         } else {
+          onProgress(RunProgress(RunPhase.PreparingProvider, modelName, detail = "reuse"))
           val keep               = candidates
             .find(tab =>
               sessionId.nonEmpty && tab.id.toOption.exists(id => WebChatService.hostSessionId(id).contains(sessionId))
@@ -272,11 +279,12 @@ private[background] object ManagedTabManager {
                       toolProfileId,
                       gen
                     ).flatMap { effective =>
-                      prepareExistingTab(modelName, keepId, adopted, effective, gen, sessionId).flatMap { _ =>
-                        TabStore.load().map { after =>
-                          TabStore.findTab(after, modelName, keyId).getOrElse((keepId, adopted))
+                      prepareExistingTab(modelName, keepId, adopted, effective, gen, sessionId, onProgress)
+                        .flatMap { _ =>
+                          TabStore.load().map { after =>
+                            TabStore.findTab(after, modelName, keyId).getOrElse((keepId, adopted))
+                          }
                         }
-                      }
                     }
                   case None          =>
                     Future.failed(new Exception("adopted slot disappeared"))
@@ -511,7 +519,8 @@ private[background] object ManagedTabManager {
       modelName: String,
       keyId: String,
       url: String,
-      conversation: ConversationPolicy
+      conversation: ConversationPolicy,
+      onProgress: RunProgress => Unit
   ): Future[(Int, ManagedTab)] =
     ServerTabManager.hostWindow().flatMap { windowId =>
       ChromeAPI.tabs
@@ -534,7 +543,7 @@ private[background] object ManagedTabManager {
                   (TabStore.upsertSlot(window, modelName, kept), kept)
                 }
               placeholderF.flatMap { placeholder =>
-                finishCreatingTab(modelName, tabId, placeholder, url, conversation).recoverWith { case e =>
+                finishCreatingTab(modelName, tabId, placeholder, url, conversation, onProgress).recoverWith { case e =>
                   // 失败也保留 slot（tabId 已在），只把状态标成失败：下一次复用同一个 tab 重试，不再多开。
                   TabStore.update { w =>
                     val current = TabStore.findSlot(w, modelName, keyId).getOrElse(placeholder)
@@ -558,14 +567,23 @@ private[background] object ManagedTabManager {
       tabId: Int,
       placeholder: ManagedTab,
       url: String,
-      conversation: ConversationPolicy
+      conversation: ConversationPolicy,
+      onProgress: RunProgress => Unit
   ): Future[(Int, ManagedTab)] =
     ProviderTabGroup
       .attach(tabId, placeholder.keyId)
       .flatMap(_ => waitForTabLoaded(tabId))
       // 新 tab 落在 provider 首页：把同一 URL 上的旧水位线记录清掉，这一轮必须全量投递。
       .flatMap(_ => TemplateInjection.clearConversation(tabId))
-      .flatMap(_ => PageMarkers.ensure(tabId, modelName, requiredRolesOf(conversation)))
+      .flatMap { _ =>
+        val roles = requiredRolesOf(conversation)
+        onProgress(RunProgress(
+          RunPhase.PreparingPage,
+          modelName,
+          detail = if (roles.contains("new-chat")) "new-chat" else "input"
+        ))
+        PageMarkers.ensure(tabId, modelName, roles)
+      }
       .flatMap { _ =>
         TabStore.update { window =>
           val current = TabStore.findSlot(window, modelName, placeholder.keyId).getOrElse(placeholder)
@@ -592,7 +610,8 @@ private[background] object ManagedTabManager {
       conversation: ConversationPolicy,
       gen: String,
       /** 这一轮属于哪条会话：New Chat 复位时只作废**本会话**那段对话的水位线，别人那段不动（见 `clearConversationOwnedBy`）。 */
-      ownerSessionId: String
+      ownerSessionId: String,
+      onProgress: RunProgress => Unit
   ): Future[Unit] =
     // 复用历史遗留 / 被用户拖出组的 tab 时，把它放回该 key 的分组。
     PhaseTiming.timedFuture(gen, "prepare") {
@@ -600,11 +619,17 @@ private[background] object ManagedTabManager {
         _ =>
           val requested   = requiredRolesOf(conversation)
           val shouldReset = conversation == ConversationPolicy.Fresh
+          onProgress(RunProgress(
+            RunPhase.PreparingPage,
+            modelName,
+            detail = if (requested.contains("new-chat")) "new-chat" else "input"
+          ))
           PageMarkers.ensure(tabId, modelName, requested).flatMap { _ =>
             if (shouldReset)
               ServerTabManager.loadNewChatXPath(modelName).flatMap { xpath =>
                 if (xpath.trim.isEmpty) Future.failed(new Exception("New Chat XPath is not configured"))
-                else
+                else {
+                  onProgress(RunProgress(RunPhase.StartingNewChat, modelName))
                   // 先按**点击前**的 URL 作废这段对话的水位线：New Chat 复位 = 换一段全新对话（URL 不变的 provider 靠它兜住）。
                   // tab 固定 provider 之后这里也可能是"别人那段对话"，所以只作废本会话（或没主）的那一段。
                   (if (ownerSessionId.nonEmpty) TemplateInjection.clearConversationOwnedBy(tabId, ownerSessionId)
@@ -616,6 +641,7 @@ private[background] object ManagedTabManager {
                       if (ok) {
                         val afterResetRoles = requested.filterNot(_ == "new-chat")
                         BackgroundState.invalidateMarkerRoles(tabId, afterResetRoles)
+                        onProgress(RunProgress(RunPhase.PreparingPage, modelName, detail = "input"))
                         PageMarkers.ensure(tabId, modelName, afterResetRoles)
                       } else {
                         Future.failed(new Exception(
@@ -624,6 +650,7 @@ private[background] object ManagedTabManager {
                         ))
                       }
                     }
+                }
               }
             else Future.successful(())
           }
