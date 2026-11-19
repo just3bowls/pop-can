@@ -1,11 +1,11 @@
 package com.just3bowls.server.http
 
 import com.just3bowls.server.native.*
+import com.just3bowls.api.protocol.ClientOperation
 
 import zio._
 import zio.http._
 import zio.json._
-import zio.json.ast.Json
 import zio.stream.ZStream
 
 private[server] object ThinHttpProxy {
@@ -22,13 +22,12 @@ private[server] object ThinHttpProxy {
 
   private def thinHttpResponse(
       bridge: BrowserWorkerBridge,
-      method: String,
-      path: String,
-      headers: String,
+      operation: ClientOperation,
+      authorization: String,
       body: String
   ): IO[Response, Response] =
     for {
-      handle     <- bridge.submitClientRequest(method, path, headers, body)
+      handle     <- bridge.submitClientRequest(operation, authorization, body)
       headOption <- handle.head.await
         .mapError(error =>
           openAiError(
@@ -56,7 +55,7 @@ private[server] object ThinHttpProxy {
         .takeWhile(_.nonEmpty)
         .ensuring(handle.chunks.shutdown)
       _          <- ZIO.logInfo(
-        s"Thin $method $path requestId=${handle.requestId} status=${head.status} chars=${head.contentType}"
+        s"Thin ${operation.wire} requestId=${handle.requestId} status=${head.status} chars=${head.contentType}"
       )
     } yield Response(
       status = Status.fromInt(head.status),
@@ -64,25 +63,25 @@ private[server] object ThinHttpProxy {
       body = Body.fromCharSequenceStreamChunked(bodyStream)
     )
 
-  def models(bridge: BrowserWorkerBridge): IO[Response, Response] =
-    thinHttpResponse(bridge, "GET", "/v1/models", "", "")
+  private def authorizationOf(request: Request): String =
+    request.headers
+      .get(Header.Authorization)
+      .map(_.renderedValue)
+      .getOrElse("")
+
+  def models(bridge: BrowserWorkerBridge, request: Request): IO[Response, Response] =
+    thinHttpResponse(bridge, ClientOperation.Models, authorizationOf(request), "")
 
   def chat(bridge: BrowserWorkerBridge, request: Request): IO[Response, Response] =
     for {
-      auth     <- ZIO.succeed(
-        request.headers
-          .get(Header.Authorization)
-          .map(_.renderedValue)
-          .getOrElse("")
-      )
+      auth     <- ZIO.succeed(authorizationOf(request))
       body     <- request.body.asString.orElseFail(
         openAiError(Status.BadRequest, "Missing request body")
       )
       response <- thinHttpResponse(
         bridge,
-        "POST",
-        "/v1/chat/completions",
-        s"""{"authorization":${Json.Str(auth).toJson}}""",
+        ClientOperation.ChatCompletion,
+        auth,
         body
       )
     } yield response

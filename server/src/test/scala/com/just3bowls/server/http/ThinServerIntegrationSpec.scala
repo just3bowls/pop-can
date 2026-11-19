@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 import scala.collection.mutable
 
-import com.just3bowls.api.protocol.{JsonEnvelope, NativeFragments}
+import com.just3bowls.api.protocol.{ClientOperation, JsonEnvelope, NativeFragments}
 import zio._
 import zio.http.Server
 import zio.json._
@@ -65,17 +65,16 @@ object ThinServerIntegrationSpec extends ZIOSpecDefault {
   }
 
   final private case class SeenClientRequest(
-      method: String,
-      path: String,
-      headers: String,
-      body: String
+      operation: String,
+      authorization: String,
+      body: String,
+      bodyFrames: Int
   )
 
   /**
    * 进程内假 worker：收 `client_request`（含分片）→ 记下来 → 按脚本回 head/chunks/end。
    *
-   * 读侧必须和扩展（`ServerWorkerClient`）**同一条契约**：`bodyFrames <= 1` 时正文内联在头消息里，多片才等 chunk 帧攒齐。 早先这里"无论几片都只从 chunk
-   * 帧装配"，正好把"小请求被当成空 body"的线上 bug 挡在测试外面 —— 契约要在这里被钉住。
+   * 读侧与扩展共用同一条契约：0 = 无 body；>=1 时 body 全部由 chunk 帧装配。
    */
   private def fakeWorker(
       bridge: BrowserWorkerBridge,
@@ -85,9 +84,9 @@ object ThinServerIntegrationSpec extends ZIOSpecDefault {
     val assemblies = mutable.Map.empty[String, (WorkerClientRequest, NativeFragments.Assembly)]
 
     def deliver(head: WorkerClientRequest, body: String): Task[Unit] = {
-      seen.set(SeenClientRequest(head.method, head.path, head.headers, body))
+      seen.set(SeenClientRequest(head.operation, head.authorization, body, head.bodyFrames))
       bridge.onMessage(WorkerClientHead(head.requestId).toJson) *>
-        ZIO.foreachDiscard(chunks(head.copy(body = body)))(data =>
+        ZIO.foreachDiscard(chunks(head))(data =>
           bridge.onMessage(WorkerClientChunk(head.requestId, data).toJson)
         ) *>
         bridge.onMessage(WorkerClientEnd(head.requestId).toJson)
@@ -112,7 +111,7 @@ object ThinServerIntegrationSpec extends ZIOSpecDefault {
         text.fromJson[WorkerClientRequest] match {
           case Left(_)     => ZIO.unit
           case Right(head) =>
-            if (head.bodyFrames <= 1) deliver(head, head.body)
+            if (head.bodyFrames == 0) deliver(head, "")
             else ZIO.succeed(assemblies.update(head.requestId, (head, new NativeFragments.Assembly(head.bodyFrames))))
         }
     }.fork
@@ -123,13 +122,22 @@ object ThinServerIntegrationSpec extends ZIOSpecDefault {
       test("thin /v1/models forwards the plugin model list") {
         val modelsPayload =
           """{"object":"list","data":[{"id":"deepseek","object":"model","owned_by":"plugin"}]}"""
+        val seen          = new AtomicReference[SeenClientRequest]()
         for {
           bridge <- createTestBridge()
           result <- withServer(bridge) { port =>
             for {
-              worker <- fakeWorker(bridge, new AtomicReference[SeenClientRequest](), _ => List(modelsPayload))
+              worker <- fakeWorker(bridge, seen, _ => List(modelsPayload))
               answer <- ZIO.attemptBlocking(getModels(port)).ensuring(worker.interrupt)
-            } yield assertTrue(answer._1 == 200, answer._2 == modelsPayload)
+            } yield assertTrue(
+              answer._1 == 200,
+              answer._2 == modelsPayload,
+              seen.get() != null,
+              seen.get().operation == ClientOperation.Models.wire,
+              seen.get().authorization == "Bearer th_test_secret",
+              seen.get().bodyFrames == 0,
+              seen.get().body.isEmpty
+            )
           }
         } yield result
       },
@@ -152,10 +160,10 @@ object ThinServerIntegrationSpec extends ZIOSpecDefault {
                 answer._1 == 200,
                 answer._2 == ssePayload,
                 captured != null,
-                captured.method == "POST",
-                captured.path == "/v1/chat/completions",
+                captured.operation == ClientOperation.ChatCompletion.wire,
                 captured.body == requestBody,
-                captured.headers.contains("Bearer th_test_secret")
+                captured.authorization == "Bearer th_test_secret",
+                captured.bodyFrames == 1
               )
             }
           }
@@ -175,7 +183,8 @@ object ThinServerIntegrationSpec extends ZIOSpecDefault {
             } yield assertTrue(
               answer._1 == 200,
               captured.get() != null,
-              captured.get().body.contains(bigBody)
+              captured.get().body.contains(bigBody),
+              captured.get().bodyFrames > 1
             )
           }
         } yield result

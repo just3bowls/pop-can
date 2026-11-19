@@ -7,7 +7,7 @@ import zio.stream.ZStream
 import com.just3bowls.api.memory.MemoryExtractionResult
 import com.just3bowls.api.memory.MemoryRequestEnvelope
 import com.just3bowls.api.memory.MemoryResponseEnvelope
-import com.just3bowls.api.protocol.{JsonEnvelope, NativeFragments}
+import com.just3bowls.api.protocol.{ClientOperation, JsonEnvelope, NativeFragments}
 
 /**
  * 极薄通道：Server 把完整 HTTP OpenAI 请求转给插件。
@@ -17,11 +17,9 @@ import com.just3bowls.api.protocol.{JsonEnvelope, NativeFragments}
  */
 final case class WorkerClientRequest(
     requestId: String,
-    method: String,
-    path: String,
-    headers: String = "",
-    body: String = "",
-    bodyFrames: Int = 1,
+    operation: String,
+    authorization: String,
+    bodyFrames: Int = 0,
     `type`: String = "client_request"
 )
 
@@ -94,9 +92,9 @@ final private[server] case class ClientHttpState(
 sealed trait WorkerCommand
 
 object WorkerCommand {
-  final case class ClientRequest(request: WorkerClientRequest) extends WorkerCommand
-  final case class ClientCancel(requestId: String)             extends WorkerCommand
-  final case class RawMessage(text: String)                    extends WorkerCommand
+  final case class ClientRequest(request: WorkerClientRequest, body: String) extends WorkerCommand
+  final case class ClientCancel(requestId: String)                           extends WorkerCommand
+  final case class RawMessage(text: String)                                  extends WorkerCommand
 }
 
 final case class BrowserRuntimeHooks(
@@ -114,9 +112,8 @@ final case class BrowserWorkerBridge(
 ) {
 
   def submitClientRequest(
-      method: String,
-      path: String,
-      headers: String,
+      operation: ClientOperation,
+      authorization: String,
       body: String
   ): UIO[ClientHttpHandle] =
     for {
@@ -124,15 +121,13 @@ final case class BrowserWorkerBridge(
       head      <- Promise.make[Throwable, WorkerClientHead]
       chunks    <- Queue.unbounded[String]
       _         <- clientHttp.update(_ + (requestId -> ClientHttpState(head, chunks)))
-      _         <- commandQueue.offer(WorkerCommand.ClientRequest(
-        WorkerClientRequest(
-          requestId = requestId,
-          method = method,
-          path = path,
-          headers = headers,
-          body = body
-        )
-      ))
+      request = WorkerClientRequest(
+        requestId = requestId,
+        operation = operation.wire,
+        authorization = authorization,
+        bodyFrames = NativeFragments.frameCount(body)
+      )
+      _ <- commandQueue.offer(WorkerCommand.ClientRequest(request, body))
     } yield ClientHttpHandle(requestId, head, chunks)
 
   def cancelClientRequest(requestId: String): UIO[Unit] =
@@ -184,19 +179,19 @@ final case class BrowserWorkerBridge(
    */
   val outbound: ZStream[Any, Nothing, String] =
     ZStream.fromQueue(commandQueue).flatMap {
-      case WorkerCommand.ClientRequest(request)  => ZStream.fromIterable(requestFrames(request))
-      case WorkerCommand.ClientCancel(requestId) =>
+      case WorkerCommand.ClientRequest(request, body) => ZStream.fromIterable(requestFrames(request, body))
+      case WorkerCommand.ClientCancel(requestId)      =>
         ZStream.succeed(WorkerClientCancel(requestId = requestId).toJson)
-      case WorkerCommand.RawMessage(text)        => ZStream.succeed(text)
+      case WorkerCommand.RawMessage(text)             => ZStream.succeed(text)
     }
 
   def emit(text: String): UIO[Unit] = commandQueue.offer(WorkerCommand.RawMessage(text)).unit
 
-  private def requestFrames(request: WorkerClientRequest): List[String] =
-    NativeFragments.outbound(request.body) match {
-      case (frames, Nil)   => List(request.copy(bodyFrames = frames).toJson)
+  private def requestFrames(request: WorkerClientRequest, body: String): List[String] =
+    NativeFragments.outbound(body) match {
+      case (0, Nil)        => List(request.copy(bodyFrames = 0).toJson)
       case (frames, parts) =>
-        request.copy(body = "", bodyFrames = frames).toJson :: parts.zipWithIndex.map { case (data, seq) =>
+        request.copy(bodyFrames = frames).toJson :: parts.zipWithIndex.map { case (data, seq) =>
           WorkerClientRequestChunk(requestId = request.requestId, seq = seq, data = data).toJson
         }
     }

@@ -16,11 +16,10 @@ object NativeFragmentsSpec extends ZIOSpecDefault {
         parts.forall(_.length <= 500)
       )
     },
-    test("空 body 也算一片") {
+    test("空 body 为零片") {
       assertTrue(
-        NativeFragments.frameCount("") == 1,
-        NativeFragments.split("").length == 1,
-        NativeFragments.split("").head.isEmpty
+        NativeFragments.frameCount("") == 0,
+        NativeFragments.split("").isEmpty
       )
     },
     test("刚好整除时不多出一片空片") {
@@ -49,17 +48,17 @@ object NativeFragmentsSpec extends ZIOSpecDefault {
         asm.accept(1, "b").contains("ab")
       )
     },
-    test("装配：单片的 head 场景（bodyFrames=1）") {
+    test("装配：单 chunk body") {
       val asm = new NativeFragments.Assembly(1)
       assertTrue(asm.accept(0, "hello").contains("hello"))
     },
-    test("出站：小 body 只有头（1 片内联，不发 chunk 帧）") {
+    test("出站：小 body 也通过一个 chunk 发送") {
       val (frames, chunks) = NativeFragments.outbound("""{"a":1}""")
-      assertTrue(frames == 1, chunks.isEmpty)
+      assertTrue(frames == 1, chunks == List("""{"a":1}"""))
     },
-    test("出站：空 body 也算 1 片内联") {
+    test("出站：空 body 没有 chunk") {
       val (frames, chunks) = NativeFragments.outbound("")
-      assertTrue(frames == 1, chunks.isEmpty)
+      assertTrue(frames == 0, chunks.isEmpty)
     },
     test("出站：超一片时头留空、正文按序跟在 chunk 帧里") {
       val body             = "x" * 1000
