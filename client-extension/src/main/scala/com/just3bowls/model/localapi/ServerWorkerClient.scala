@@ -6,6 +6,7 @@ import com.just3bowls.api.memory.MemoryExtractionResult
 import com.just3bowls.api.memory.MemoryResponseEnvelope
 import com.just3bowls.api.protocol.NativeFragments
 import com.just3bowls.api.protocol.OpenAiSse
+import com.just3bowls.api.protocol.ClientOperation
 import com.just3bowls.api.provider.RoutePromptMode
 import com.just3bowls.api.provider.ServerRouting
 import com.just3bowls.facade.{ChromeAPI, ClientRequestChunkMessage, ClientRequestMessage, ServerTaskMessage}
@@ -399,40 +400,71 @@ final class ServerWorkerClient(
   }
   private def handleClientRequest(msg: ClientRequestMessage): Unit                        = {
     val requestId = msg.requestId.getOrElse("")
-    val path      = msg.path.getOrElse("")
-    val method    = msg.method.getOrElse("GET")
+    handleClientRequestWithBody(
+      requestId,
+      msg.operation.getOrElse(""),
+      msg.authorization.getOrElse(""),
+      ""
+    )
+  }
+  private def handleClientRequestWithBody(
+      requestId: String,
+      rawOperation: String,
+      authorization: String,
+      body: String
+  ): Unit = {
     if (requestId.isEmpty) return
-    if (method == "GET" && path == "/v1/models") {
-      // 客户端永远只配这一个模型名；落到哪个 provider 由这个请求用的 API key 在 Config → API keys 里决定。
-      respondClientJson(requestId, 200, ThinOpenAi.modelsJson(List(ServerRouting.ModelName)))
-    } else if (method == "POST" && path == "/v1/chat/completions") {
-      val body = msg.body.getOrElse("")
-      if (body.trim.isEmpty) {
+    ClientOperation.fromWire(rawOperation) match {
+      case None                                 =>
         respondClientJson(
           requestId,
           400,
-          ThinOpenAi.errorJson("Missing request body", "invalid_request_error", "missing_body")
+          ThinOpenAi.errorJson(
+            s"Unknown client request operation: $rawOperation",
+            "invalid_request_error",
+            "invalid_operation"
+          )
         )
-      } else {
-        handleThinChatRequest(requestId, msg.headers.getOrElse(""), body)
-      }
-    } else {
-      respondClientJson(
-        requestId,
-        404,
-        ThinOpenAi.errorJson(s"Not found: $method $path", "invalid_request_error", "not_found")
-      )
+      case Some(ClientOperation.Models)         =>
+        if (body.nonEmpty)
+          respondClientJson(
+            requestId,
+            400,
+            ThinOpenAi.errorJson("Models request must not contain a body", "invalid_request_error", "unexpected_body")
+          )
+        else handleThinModelsRequest(requestId, authorization)
+      case Some(ClientOperation.ChatCompletion) =>
+        if (body.trim.isEmpty) {
+          respondClientJson(
+            requestId,
+            400,
+            ThinOpenAi.errorJson("Missing request body", "invalid_request_error", "missing_body")
+          )
+        } else handleThinChatRequest(requestId, authorization, body)
     }
   }
+  private def handleThinModelsRequest(requestId: String, authorization: String): Unit     =
+    ApiKeyStore.load().foreach { keys =>
+      ApiKeyAuth.findValid(keys, authorization) match {
+        case None    =>
+          respondClientJson(
+            requestId,
+            401,
+            ThinOpenAi.errorJson("Invalid API key", "invalid_request_error", "invalid_api_key")
+          )
+        case Some(_) =>
+          respondClientJson(requestId, 200, ThinOpenAi.modelsJson(List(ServerRouting.ModelName)))
+      }
+    }
   private def handleThinChatRequest(
       requestId: String,
-      rawHeaders: String,
+      authorization: String,
       body: String
   ): Unit = {
-    val parsed     =
+    val parsed =
       try Some(JsBridge.asObject(js.JSON.parse(body)))
       catch { case _: Throwable => None }
-    val model      =
+    val model  =
       parsed.flatMap(value => JsBridge.stringField(value, "model")).getOrElse("")
     if (model.isEmpty || model.trim.isEmpty) {
       respondClientJson(
@@ -442,14 +474,8 @@ final class ServerWorkerClient(
       )
       return
     }
-    val authHeader =
-      try {
-        val parsedHeaders = JsBridge.asObject(js.JSON.parse(rawHeaders))
-        JsBridge.undefinedString(parsedHeaders.authorization).getOrElse("")
-      } catch { case _: Throwable => "" }
     ApiKeyStore.load().foreach { keys =>
-      val token = authHeader.stripPrefix("Bearer").trim
-      keys.find(key => !key.revoked && key.secret == token) match {
+      ApiKeyAuth.findValid(keys, authorization) match {
         case None      =>
           respondClientJson(
             requestId,
@@ -637,13 +663,12 @@ final class ServerWorkerClient(
       val msgType = JsBridge.undefinedString(msg.`type`).getOrElse("")
       if (msgType == "client_request") {
         val head   = msg.asInstanceOf[ClientRequestMessage]
-        // 线格式契约（与 `api.NativeFragments.outbound` 对称）：`bodyFrames <= 1` ⇒ 正文就在 head.body 里（没有 chunk 帧）；
-        // `> 1` ⇒ head.body 留空，正文按 seq 跟在 client_request_chunk 帧里攒齐。缺字段按 1 算。
-        val frames = head.bodyFrames.toOption.getOrElse(1)
-        if (frames <= NativeFragments.MaxFrames) {
+        // 线格式契约：0 = 无 body；>=1 = 全部正文由 client_request_chunk 携带。
+        val frames = head.bodyFrames.toOption.getOrElse(0)
+        if (frames >= 0 && frames <= NativeFragments.MaxFrames) {
           val requestId = head.requestId.getOrElse("")
           if (requestId.nonEmpty) {
-            if (frames <= 1) handleClientRequest(head)
+            if (frames == 0) handleClientRequest(head)
             else pendingRequests.update(requestId, (head, new NativeFragments.Assembly(frames)))
           }
         } else {
@@ -668,15 +693,11 @@ final class ServerWorkerClient(
             case None       => ()
             case Some(body) =>
               pendingRequests.remove(id)
-              handleClientRequest(
-                JsBridge.obj(
-                  "type"      -> ("client_request"),
-                  "requestId" -> (id),
-                  "method"    -> (head.method.getOrElse("GET")),
-                  "path"      -> (head.path.getOrElse("")),
-                  "headers"   -> (head.headers.getOrElse("")),
-                  "body"      -> (body)
-                ).asInstanceOf[ClientRequestMessage]
+              handleClientRequestWithBody(
+                id,
+                head.operation.getOrElse(""),
+                head.authorization.getOrElse(""),
+                body
               )
           }
         }

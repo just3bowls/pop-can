@@ -7,9 +7,8 @@ package com.just3bowls.api.protocol
  * `client_request` 拆成"头 + N 个 `client_request_chunk`"，头里带 `bodyFrames`。
  *
  * **线格式契约**（读侧只有这一种解释，`outbound` 是写侧的唯一出处）：
- *   - `bodyFrames == 1`：正文就放在**头消息的 `body`** 里，后面没有 chunk 帧（小请求别多发一条）。
- *   - `bodyFrames > 1`：头的 `body` 留空，正文按 `seq = 0..bodyFrames-1` 跟在 chunk 帧里，全部到齐才算一条请求。
- *   - `bodyFrames` 缺失按 1 处理（兼容只有头的写法）。
+ *   - `bodyFrames == 0`：请求没有 body，不发送 chunk。
+ *   - `bodyFrames >= 1`：正文按 `seq = 0..bodyFrames-1` 全部跟在 chunk 帧里，全部到齐才算一条请求；单 chunk 也不例外。
  *
  * 分片按**字符**切（消息体本来就是 JSON 里的字符串字段，字符边界即安全边界），每片默认 128K 字符 —— 最坏情况（每个字符 4 字节 UTF-8） 约 512KB，加上 JSON 包装仍稳稳低于 1MB。
  */
@@ -21,29 +20,25 @@ object NativeFragments {
   /** 一次请求最多允许多少片（128K × 200 ≈ 25MB，与 HTTP 侧 20MB 上限同量级）。 */
   val MaxFrames: Int = 200
 
-  /** 需要几片（空 body 也算 1 片，避免"0 片"这种特例）。 */
+  /** 需要几片；没有 body 时为 0。 */
   def frameCount(body: String, chunkChars: Int = ChunkChars): Int = {
     val text = Option(body).getOrElse("")
     val size = math.max(1, math.max(1, chunkChars))
-    math.max(1, (text.length + size - 1) / size)
+    if (text.isEmpty) 0 else (text.length + size - 1) / size
   }
 
-  /** 按顺序切片；空 body 返回 `List("")`。 */
+  /** 按顺序切片；空 body 返回空列表。 */
   def split(body: String, chunkChars: Int = ChunkChars): List[String] = {
     val text = Option(body).getOrElse("")
     val size = math.max(1, math.max(1, chunkChars))
-    if (text.isEmpty) List("")
+    if (text.isEmpty) Nil
     else text.grouped(size).toList
   }
 
-  /**
-   * 写侧分帧：`(bodyFrames, chunks)`，语义见上面的线格式契约 —— 1 片时正文内联在头里（chunks 为空），多片时才跟在后面。
-   *
-   * 读侧（扩展 `ServerWorkerClient` / 测试里的 fake worker）只按这一个契约解释，两边不会再各写一套判断。
-   */
+  /** 写侧分帧：没有 body 为 `(0, Nil)`；有 body 时所有片都显式返回。 */
   def outbound(body: String, chunkChars: Int = ChunkChars): (Int, List[String]) = {
     val parts = split(body, chunkChars)
-    if (parts.length <= 1) (1, Nil) else (parts.length, parts)
+    (parts.length, parts)
   }
 
   /**
@@ -52,7 +47,7 @@ object NativeFragments {
    * 越界/重复片一律拒绝（返回 `None` 且不改变状态）—— 分片是协议的一部分，宁可失败也别拼出半截请求。
    */
   final class Assembly(bodyFrames: Int) {
-    private val frames = math.max(1, bodyFrames)
+    private val frames = math.max(0, bodyFrames)
     private val parts  = Array.fill[String](frames)("")
     private val filled = Array.fill[Boolean](frames)(false)
     private var seen   = 0
