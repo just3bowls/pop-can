@@ -160,13 +160,13 @@ private[ui] object ChatPanel {
         status = attempt.status,
         title =
           if (recovery)
-            s"Attempt ${owningAttemptIndex.getOrElse(0)} · recovery ${attempt.index} · ${attempt.status}"
-          else s"Attempt ${attempt.index} · ${attempt.trigger} · ${attempt.status}",
+            s"Generation ${owningAttemptIndex.getOrElse(0)} · recovery ${attempt.index} · ${attempt.status}"
+          else s"Generation ${attempt.index} · ${attempt.trigger} · ${attempt.status}",
         recovery = recovery
       )
     val groups = ChatRuns.grouped(message.attempts).map { case (attempt, recoveries) =>
       PopCanRenderers.AttemptGroupView(
-        attempt = tab(attempt, s"A${attempt.index}", recovery = false),
+        attempt = tab(attempt, s"G${attempt.index}", recovery = false),
         recoveries = recoveries.map(recovery =>
           tab(recovery, s"R${recovery.index}", recovery = true, owningAttemptIndex = Some(attempt.index))
         )
@@ -183,7 +183,7 @@ private[ui] object ChatPanel {
     )
 
   /**
-   * 操作行平时 hover 才显示；**失败（`status == error`）时整行常驻**，重试按钮文案用 `Retry`（成功回答仍是 `Regenerate`）。
+   * 操作行平时 hover 才显示；**失败（`status == error`）时整行常驻**，顶层操作统一叫 `Regenerate`。
    */
   private def assistantActions(
       message: ChatMessage,
@@ -211,10 +211,10 @@ private[ui] object ChatPanel {
         actionButton("Fork", () => onFork(message.id), titleText = "Fork into a new session"),
         copyButton(message),
         actionButton(
-          if (isError) "Retry" else "Regenerate",
+          "Regenerate",
           () => onRegenerate(message),
           visibleSignal = regenerable,
-          titleText = if (isError) "Retry this turn (fresh provider chat + full template)" else ""
+          titleText = "Create a new generation from this question (fresh provider chat + full context)"
         )
       )
     )

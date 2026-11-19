@@ -1,6 +1,6 @@
 package com.just3bowls.model.chat
 
-/** Attempt (A) 与自动 Recovery (R) 的分组、选择和顶层镜像规则。 */
+/** Generation (G) 与自动 Recovery (R) 的分组、选择和顶层镜像规则。 */
 object ChatRuns {
   def topLevel(attempts: List[ChatAttempt]): List[ChatAttempt] =
     attempts.filter(_.parentAttemptId.isEmpty).sortBy(attempt => (attempt.index, attempt.createdAt))
