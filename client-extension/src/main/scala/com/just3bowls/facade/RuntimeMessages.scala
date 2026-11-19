@@ -123,13 +123,11 @@ trait ServerTaskMessage    extends RuntimeMessage:
   def attachmentBody: js.UndefOr[String] = js.native
 @js.native
 trait ClientRequestMessage extends RuntimeMessage:
-  def requestId: js.UndefOr[String] = js.native
-  def method: js.UndefOr[String]    = js.native
-  def path: js.UndefOr[String]      = js.native
-  def headers: js.UndefOr[String]   = js.native
-  def body: js.UndefOr[String]      = js.native
+  def requestId: js.UndefOr[String]     = js.native
+  def operation: js.UndefOr[String]     = js.native
+  def authorization: js.UndefOr[String] = js.native
 
-  /** 请求体切成了几片（≥1）；body 随后的 `client_request_chunk` 里逐片到达。 */
+  /** 请求体片数；0 = 无 body，≥1 = body 全部由后续 client_request_chunk 携带。 */
   def bodyFrames: js.UndefOr[Int] = js.native
 
 /** host → 扩展的请求体分片（native messaging 的 host→扩展方向单条只有 ~1MB）。 */

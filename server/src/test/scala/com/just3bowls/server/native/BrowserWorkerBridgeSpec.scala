@@ -2,6 +2,10 @@ package com.just3bowls.server.native
 
 import zio.*
 import zio.test.*
+import zio.json.*
+import zio.json.ast.Json
+
+import com.just3bowls.api.protocol.ClientOperation
 
 object BrowserWorkerBridgeSpec extends ZIOSpecDefault {
 
@@ -61,6 +65,38 @@ object BrowserWorkerBridgeSpec extends ZIOSpecDefault {
         _      <- bridge.onMessage("not-json")
         action <- seen.get
       } yield assertTrue(action.isEmpty)
+    },
+    test("emits typed operation and always sends chat body through chunks") {
+      val body = """{"model":"pop-can"}"""
+      for {
+        bridge   <- BrowserWorkerBridge.create()
+        outFiber <- bridge.outbound.take(2).runCollect.fork
+        _        <- bridge.submitClientRequest(
+          ClientOperation.ChatCompletion,
+          "Bearer test-secret",
+          body
+        )
+        messages <- outFiber.join
+        headJson <- ZIO.fromEither(messages.head.fromJson[Json])
+        chunk    <- ZIO.fromEither(messages(1).fromJson[WorkerClientRequestChunk])
+      } yield {
+        val fields = headJson match {
+          case Json.Obj(values) => values.toMap
+          case _                => Map.empty[String, Json]
+        }
+        val keys   = fields.keySet
+        assertTrue(
+          fields("operation") == Json.Str(ClientOperation.ChatCompletion.wire),
+          fields("authorization") == Json.Str("Bearer test-secret"),
+          fields("bodyFrames") == Json.Num(1),
+          !keys.contains("method"),
+          !keys.contains("path"),
+          !keys.contains("headers"),
+          !keys.contains("body"),
+          chunk.seq == 0,
+          chunk.data == body
+        )
+      }
     }
   )
 }
