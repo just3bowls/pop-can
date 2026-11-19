@@ -24,7 +24,7 @@ final case class SessionFolder(
 /**
  * 一次可查看的 Chat Run。
  *
- * `parentAttemptId` 为空时是用户可见的 Attempt（A1/A2）；非空时是该 Attempt 内的自动 Recovery（R1/R2）。内部 protocol repair 仍属于当前 Run
+ * `parentAttemptId` 为空时是用户可见的 Generation（G1/G2）；非空时是该 Generation 内的自动 Recovery（R1/R2）。内部 protocol repair 仍属于当前 Run
  * 的执行细节，不新增记录。
  */
 final case class ChatAttempt(

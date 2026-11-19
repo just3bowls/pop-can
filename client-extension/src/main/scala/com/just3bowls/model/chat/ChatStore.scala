@@ -303,7 +303,7 @@ object ChatStore {
     addMessage(updated).map(_ => updated)
   }
 
-  /** Persist the user's selected A/R view without changing the answer itself. */
+  /** Persist the user's selected G/R view without changing the answer itself. */
   def setActiveAttempt(messageId: String, attemptId: String): Future[Option[ChatMessage]] =
     getMessage(messageId).flatMap {
       case Some(message) =>
