@@ -1223,7 +1223,7 @@ object PopCanPage {
     ): ChatAttempt =
       AgentAttemptProjection.completedAttempt(attemptId, index, trigger, parentAttemptId, actual)
 
-    /** 气泡上的 Regenerate / Retry：始终创建一个新的顶层 Attempt。 */
+    /** 气泡上的 Regenerate：始终创建一个新的顶层 Generation。 */
     def regenerate(message: ChatMessage): Unit =
       if (regenerableMessageIdVar.now().contains(message.id))
         retryTurn(message, reason = "manual retry", auto = false)
@@ -1231,8 +1231,8 @@ object PopCanPage {
     /**
      * 手动 / 自动共用：换一段 provider 对话（New Chat + 完整模版）重跑。
      *
-     *   - `auto = true`：在当前顶层 Attempt 下创建 R1/R2；
-     *   - `auto = false`：创建新的顶层 A2/A3。
+     *   - `auto = true`：在当前顶层 Generation 下创建 R1/R2；
+     *   - `auto = false`：创建新的顶层 G2/G3。
      *
      * 一律以 `message.sessionId` 为准（后台会话也能重试），user 从存储里回溯（不依赖页面当前显示的是哪条会话）。
      */
@@ -1431,7 +1431,7 @@ object PopCanPage {
     }
 
     /**
-     * 失败收口后的统一判定：只有 marker/协议类失败、且当前 Attempt 的 Recovery 预算没用完时才创建下一条 R。
+     * 失败收口后的统一判定：只有 marker/协议类失败、且当前 Generation 的 Recovery 预算没用完时才创建下一条 R。
      *
      * 传输 / 超时 / 工具 / 取消失败都不自动重试（气泡上的 Retry 兜底）。
      */

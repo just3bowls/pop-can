@@ -71,7 +71,7 @@ private[ui] object PopCanRenderers {
       Var(defaultOpen)
     )
 
-  /** 按 Attempt 分行、A/R 同排的无状态运行切换器；选中状态归调用方所有。 */
+  /** 按 Generation 分行、G/R 同排的无状态运行切换器；选中状态归调用方所有。 */
   private[ui] def renderAttemptSwitcher(
       groups: List[AttemptGroupView],
       selectedId: Signal[String],
@@ -421,7 +421,7 @@ private[ui] object PopCanRenderers {
                   AttemptGroupView(
                     attempt = AttemptTabView(
                       id = attempt.toString,
-                      label = s"A$attempt",
+                      label = s"G$attempt",
                       status = attemptStatus(attemptTurns),
                       title = attemptTitle(attempt, lastAttempt, attemptTurns),
                       recovery = false
@@ -460,7 +460,7 @@ private[ui] object PopCanRenderers {
   }
   private def attemptTitle(attempt: Int, latest: Int, turns: List[ProcessTurnView]): String         = {
     val status = attemptStatus(turns)
-    s"Attempt $attempt · $status${if (attempt == latest) " · latest" else " · history"}"
+    s"Generation $attempt · $status${if (attempt == latest) " · latest" else " · history"}"
   }
   private def attemptStatus(turns: List[ProcessTurnView]): String                                   =
     if (turns.exists(_.status == "running")) "running"
@@ -678,7 +678,7 @@ private[ui] object PopCanRenderers {
       }
     }
 
-  /** 气泡 + 底部 footer（Branch / chips）+ 可选右侧轨道（Attempt 切换）。 */
+  /** 气泡 + 底部 footer（Branch / chips）+ 可选右侧轨道（Generation 切换）。 */
   private[ui] def renderChatMessageWithFooter(
       message: ChatMessage,
       footer: HtmlElement,
