@@ -97,6 +97,32 @@ The resulting unpacked extension is written to `dist`.
 
 Provider presets are JSONC files under `presets/providers`.
 
+Inside `parserRule.schemaVersion: 2`, simple match conditions may use `equals`, `contains`,
+`startsWith`, or `notStartsWith` instead of a regex. A handler may use `content: "$.path"` when its
+only action is `appendContent`; handlers with multiple actions keep the explicit `actions` array.
+Text-match shorthands and `content` are parsed directly by the runtime and are also accepted by
+local Import.
+
+Handlers whose payload is a single-line JSON SSE `data:` frame may declare
+`transport: "sse-json-line"` instead of `rawRegex` plus `jsonGroup`. This is a transport shorthand,
+not a complete SSE parser: multi-line `data:`, event-boundary logic, and non-JSON frames still use
+the raw matcher.
+
+Boolean phases may be declared at the rule root and referenced by handlers. A handler with
+`startsPhase: true` injects the phase's `setMemory`; a normal handler in that phase automatically
+requires the phase to be active:
+
+```json
+"phases": {"inResponse": "true"},
+"handlers": [
+  {"phase": "inResponse", "startsPhase": true, "content": "$.content"},
+  {"phase": "inResponse", "content": "$.delta"}
+]
+```
+
+Phases use fixed string values and may only be referenced by top-level handlers. Complex
+alternative gates keep explicit `memoryKey` rules.
+
 After editing a preset:
 
 1. Increment `presets/VERSION`.
@@ -106,13 +132,18 @@ After editing a preset:
 node scripts/build-presets.mjs
 ```
 
+`npm run dev` and `npm run build` also rebuild this catalog through their pre-lifecycle scripts.
+While the development server is running, changes to `presets/providers/*.jsonc` or
+`presets/VERSION` automatically rebuild `presets/bundle.json`. Re-import the bundle to apply it;
+the development server never updates installed provider configuration automatically.
+
 3. Verify the committed bundle matches the JSONC sources:
 
 ```bash
 npm run presets:check
 ```
 
-`npm run build` runs this check through the `prebuild` lifecycle. Use
+CI and release checks still run this stale-bundle check before building. Use
 `npm run presets:check:strict` when auditing fixed-array-index warnings.
 
 4. Run parser fixture replay:

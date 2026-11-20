@@ -288,6 +288,21 @@ the extension/native-host layout, file hashes, SBOM and Provider-rule exclusion 
 
 Provider presets live in `client-extension/presets/providers/*.jsonc`.
 
+Provider rule schema v2 accepts literal `equals`, `contains`, `startsWith`, and `notStartsWith`
+match conditions. A single `appendContent` action may be written as handler-level
+`content: "$.path"`. These are runtime shorthands shared by built-in JSONC, fixture replay, and
+local Import; they do not change the serialized schema version.
+
+Stable single-line JSON SSE handlers can use `transport: "sse-json-line"` instead of repeating
+`rawRegex` and `jsonGroup`. The shorthand is normalized to the existing raw matcher; it does not
+provide event-name filtering, multi-line data assembly, or full SSE event-boundary semantics.
+
+Boolean phases can be declared under `parserRule.phases`. A handler with `startsPhase: true`
+automatically sets the phase memory key before its actions, while a normal handler in the same phase
+automatically requires that key to match the declared value. Phase handlers cannot also declare
+explicit memory gates. This is limited to fixed-string Boolean-style gates; complex alternative
+gates remain explicit.
+
 After changing a preset:
 
 1. Increment `client-extension/presets/VERSION`.
@@ -297,13 +312,21 @@ After changing a preset:
 node client-extension/scripts/build-presets.mjs
 ```
 
+Both `npm run dev --prefix client-extension` and
+`npm run build --prefix client-extension` rebuild this payload through their pre-lifecycle
+scripts. During `npm run dev`, provider JSONC and `VERSION` edits are debounced and automatically
+rebuilt into `presets/bundle.json`. Re-import that bundle to apply it; Vite does not update the
+installed provider configuration automatically. The explicit command remains useful when preparing
+changes without starting Vite.
+
 3. Verify that the committed bundle is current without rewriting it:
 
 ```bash
 npm run presets:check --prefix client-extension
 ```
 
-The production `npm run build` also runs this check through `prebuild`.
+CI and release checks still run this verification before building, so a stale committed bundle is
+not hidden by the local `prebuild` generation step.
 
 4. Run fixture replay with the extension loaded and CDP available:
 

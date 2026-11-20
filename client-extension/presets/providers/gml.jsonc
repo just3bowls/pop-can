@@ -125,9 +125,7 @@
     // 监听 /chatglm/backend-api/assistant/stream；这一家的引用和回合 token 只在页面渲染层有含义，没有额外 follow-up 网络源。
     "apiPatterns": [
       "https://chatglm.cn/chatglm/backend-api/assistant/stream"
-    ],
-    "followUpPatterns": [],
-    "followUpIdentityPath": ""
+    ]
   },
   "attachment": {
     // file 模式直接使用 el-upload 的隐藏 input；固定 selector 比自动择优更稳定，避免误选其他上传组件。
@@ -137,8 +135,6 @@
   "parserRule": {
     // GLM web SSE. Text streams as deltas, but the `status=finish` frame repeats the whole answer as a snapshot — and the deltas can stop early (dropping the closing markers), so that snapshot is the safety net. Provider-native turn and citation tokens are stripped because they are page-rendered chips with no URL metadata in the stream.
     "schemaVersion": 2,
-    "confidence": "medium",
-    "missingInfo": [],
     "contentTransforms": [
       {
         // The page renders this turn token as a source chip and the stream carries no URL mapping.
@@ -159,18 +155,16 @@
         }
       }
     ],
-    "memory": {},
     "handlers": [
       {
         // Normal streaming frames: a text part that is not the finish snapshot.
         "id": "gmlTextChunk",
         "match": {
           // Fan out parts and select the text content part by type; `status=finish` is handled below.
-          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "eventsPath": "$.parts[*]",
           "path": "$.content[?(@.type=='text')][0].type",
-          "regex": "^text$",
+          "equals": "text",
           "allOf": [
             {
               // 非 finish 帧按增量追加；finish 快照留给后面的 handler 去重结算。
@@ -179,29 +173,22 @@
             }
           ]
         },
-        "actions": [
-          {
-            // Append the raw delta; provider display chips are normalized by contentTransforms.
-            "op": "appendContent",
-            "path": "$.content[?(@.type=='text')][0].text"
-          }
-        ]
+        "content": "$.content[?(@.type=='text')][0].text"
       },
       {
         // The finish frame repeats the whole text; appending it verbatim would duplicate the answer.
         "id": "gmlFinishSnapshot",
         "match": {
           // Only the `status=finish` frame.
-          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "eventsPath": "$.parts[*]",
           "path": "$.content[?(@.type=='text')][0].type",
-          "regex": "^text$",
+          "equals": "text",
           "allOf": [
             {
               // 只让 status=finish 的最终快照进入这条结算路径。
               "path": "$.status",
-              "regex": "^finish$"
+              "equals": "finish"
             }
           ]
         },
@@ -214,7 +201,6 @@
         ]
       }
     ],
-    "final": [],
     "request": {
       // inline 模式改写最后一条消息中 type=text 的文本 part；只替换用户正文，不改其他多模态 part。
       "userText": "$.messages[-1].content[?(@.type=='text')][0].text"

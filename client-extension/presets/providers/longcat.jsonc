@@ -105,9 +105,7 @@
     "apiPatterns": [
       "https://longcat.chat/api/v1/chat-completion-oversea-V2",
       "https://longcat.chat/api/v1/chat-completion-V2"
-    ],
-    "followUpPatterns": [],
-    "followUpIdentityPath": ""
+    ]
   },
   "attachment": {
     // file 模式使用 #file-upload-default 隐藏 input；固定 id 可避开随机化 class。
@@ -117,37 +115,26 @@
   "parserRule": {
     // Longcat SSE: `data: {...}` where `event.type` names the kind of frame.
     "schemaVersion": 2,
-    "confidence": "high",
-    "missingInfo": [],
-    "memory": {},
     "handlers": [
       {
         // event.type=content — a piece of the answer.
         "id": "answerDelta",
         "match": {
           // 匹配 event.type=content，读取 event.content 中的正文增量。
-          "rawRegex": "data:(\\{.*\\})\\n",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "path": "$.event.type",
-          "regex": "^content$"
+          "equals": "content"
         },
-        "actions": [
-          {
-            // Append the piece.
-            "op": "appendContent",
-            "path": "$.event.content"
-          }
-        ]
+        "content": "$.event.content"
       },
       {
         // event.type=finish — the server finished this answer.
         "id": "finish",
         "match": {
           // 匹配 event.type=finish，作为服务端明确给出的正常结束信号。
-          "rawRegex": "data:(\\{.*\\})\\n",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "path": "$.event.type",
-          "regex": "^finish$"
+          "equals": "finish"
         },
         "actions": [
           {
@@ -158,7 +145,6 @@
         ]
       }
     ],
-    "final": [],
     "request": {
       // inline 模式改写请求体 $.content；该字段是 Longcat 当前用户输入。
       "userText": "$.content"

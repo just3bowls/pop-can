@@ -182,9 +182,7 @@
     // 监听 /open-apis/react/chat；正文与页面 reasoning 在同一个数据对象的不同字段中。
     "apiPatterns": [
       "https://aistudio.xiaomimimo.com/open-apis/react/chat"
-    ],
-    "followUpPatterns": [],
-    "followUpIdentityPath": ""
+    ]
   },
   "attachment": {
     // file 模式使用页面 text-like file input；selector 留空时由引擎自动选择，兼容页面动态生成上传控件。
@@ -194,38 +192,26 @@
   "parserRule": {
     // MiMo React chat SSE with named events (`event:message` / `event:finish`). Page reasoning and answer text arrive in separate JSON fields.
     "schemaVersion": 2,
-    "confidence": "high",
-    "missingInfo": [],
-    "contentTransforms": [],
-    "memory": {},
     "handlers": [
       {
         // React chat assistant deltas. reasoningContent is page-side thinking and is ignored because content is absent on those frames.
         "id": "answerDelta",
         "match": {
           // 匹配 messageType=assistant 的正文事件；reasoningContent 帧因没有 content 自然不会产生正文增量。
-          "rawRegex": "event:message\\ndata:\\s*(.+)\\n",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "path": "$.messageType",
-          "regex": "^assistant$"
+          "equals": "assistant"
         },
-        "actions": [
-          {
-            // Append answer content; missing content on reasoning frames produces no delta.
-            "op": "appendContent",
-            "path": "$.content"
-          }
-        ]
+        "content": "$.content"
       },
       {
         // content=[DONE] marks the end of the answer.
         "id": "finish",
         "match": {
           // 匹配 event:finish 且 content=[DONE] 的结束帧。
-          "rawRegex": "event:finish\\ndata:\\s*(.+)\\n",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "path": "$.content",
-          "regex": "^\\[DONE\\]$"
+          "equals": "[DONE]"
         },
         "actions": [
           {
@@ -236,7 +222,6 @@
         ]
       }
     ],
-    "final": [],
     "request": {
       // inline 模式改写请求体 $.query；该字段承载当前用户问题。
       "userText": "$.query"
