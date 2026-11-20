@@ -291,7 +291,7 @@ const validateRule = (id, rule, warnings, fixedIndexEvidence) => {
   const handlers = rule.handlers
   const sets = new Set()
   const uses = new Set()
-  const literalHandlers = []
+  const deltaHandlers = []
   handlers.forEach((handler, handlerIndex) => {
     if (!handler || typeof handler !== 'object' || Array.isArray(handler))
       fail(`${id}/handlers[${handlerIndex}]: must be an object`)
@@ -369,10 +369,7 @@ const validateRule = (id, rule, warnings, fixedIndexEvidence) => {
     const producesDelta =
       hasContent ||
       actions.some(a => ['appendContent', 'appendDelta', 'setContent', 'truncateContent'].includes(a.op))
-    const effectiveRawRegex =
-      match.transport === 'sse-json-line' ? SSE_JSON_LINE_RAW_REGEX : match.rawRegex || ''
-    if (producesDelta && /"(type|block_type|end_type)"\s*:\s*"/.test(effectiveRawRegex))
-      literalHandlers.push(handler.id)
+    if (producesDelta) deltaHandlers.push(handler.id)
     const fixedIndexPaths = [
       match.path,
       hasContent ? handler.content : undefined,
@@ -418,9 +415,9 @@ const validateRule = (id, rule, warnings, fixedIndexEvidence) => {
       const spec = JSON.parse(readFileSync(join(fixtureDir, file), 'utf8'))
       for (const handler of spec.expect?.handlers || []) covered.add(handler)
     }
-    for (const handlerId of literalHandlers)
+    for (const handlerId of deltaHandlers)
       if (!covered.has(handlerId))
-        warnings.push(`${id}: handler '${handlerId}' asserts a literal shape but no fixture pins it`)
+        warnings.push(`${id}: delta handler '${handlerId}' is not pinned by any fixture`)
   }
   for (const evidence of fixedIndexEvidence.values())
     if (!evidence.used)

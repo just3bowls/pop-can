@@ -8,13 +8,14 @@ import com.just3bowls.background.bootstrap.BackgroundState
 import com.just3bowls.background.runtime.ProviderTurnRunner
 import com.just3bowls.facade.*
 import com.just3bowls.model.diagnostics.PopCanLog
-import com.just3bowls.model.provider.ProviderRequestRule
+import com.just3bowls.model.provider.{ParserRuleExplain, ProviderRequestRule}
 
 import scala.collection.mutable
 import scala.scalajs.js
 
 private[background] object ProviderTaskMessageHandler {
-  val types: Set[String]                = Set("INPUT_PROMPT", "SESSION_CONTEXT_FULL", "CANCEL_TEST", "RULE_REPLAY")
+  val types: Set[String]                =
+    Set("INPUT_PROMPT", "SESSION_CONTEXT_FULL", "CANCEL_TEST", "RULE_REPLAY", "RULE_EXPLAIN")
   def handles(msgType: String): Boolean = types.contains(msgType)
 
   def handle(msgType: String, message: js.Any, sender: MessageSender): js.Any =
@@ -40,6 +41,29 @@ private[background] object ProviderTaskMessageHandler {
           s"test cancellation requested gen=${BackgroundState.activeTestGenerationId} tab=${BackgroundState.activeTestTabId}"
         )
         js.Promise.resolve[js.Any](JsBridge.obj("ok" -> (true)))
+      case "RULE_EXPLAIN"         =>
+        val explainMsg = JsBridge.asObject(message)
+        val fromExt    = sender.tab.toOption
+          .flatMap(_.url.toOption)
+          .exists(url => url.startsWith("chrome-extension://"))
+        if (!fromExt)
+          js.Promise.resolve[js.Any](
+            JsBridge.obj(
+              "ok"    -> (false),
+              "error" -> ("RULE_EXPLAIN is only accepted from extension pages")
+            )
+          )
+        else {
+          val rule = JsBridge.undefinedString(explainMsg.rule).getOrElse("")
+          js.Promise.resolve[js.Any](
+            ParserRuleExplain
+              .explain(rule)
+              .fold(
+                error => JsBridge.obj("ok" -> (false), "error" -> (error)),
+                value => JsBridge.obj("ok" -> (true), "rule" -> (value))
+              )
+          )
+        }
       case "RULE_REPLAY"          =>
         // 开发用（fixtures 回归网）：用**真引擎**把一段 raw 按给定规则跑一遍，回 content / 命中 handler / mode / 普查。
         // 只接受扩展页发来的请求（内容脚本 / 网页都拿不到这条通道），不碰页面、不动 CDP。
