@@ -37,6 +37,15 @@ const sensitiveKeys = new Set([
 
 const normalizeKey = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '')
 const isSensitiveKey = key => sensitiveKeys.has(normalizeKey(key))
+const isSyntheticDerivedToken = value => {
+  const dash = value.indexOf('-')
+  if (dash <= 0) return false
+  try {
+    return Buffer.from(value.slice(0, dash), 'base64').toString('utf8').startsWith('fixture-')
+  } catch {
+    return false
+  }
+}
 const looksPlaceholder = value =>
   value === '' ||
   value == null ||
@@ -49,7 +58,8 @@ const looksPlaceholder = value =>
   value.startsWith('00000000-0000-4000-8000-') ||
   value.startsWith('0123456789abcdef') ||
   value.startsWith('1000000000000000000') ||
-  value.startsWith('192.0.2.')
+  value.startsWith('192.0.2.') ||
+  isSyntheticDerivedToken(value)
 
 const walk = directory =>
   readdirSync(directory).flatMap(name => {
