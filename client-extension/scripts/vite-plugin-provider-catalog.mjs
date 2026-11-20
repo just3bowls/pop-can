@@ -4,13 +4,14 @@ import {fileURLToPath} from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const extensionRoot = resolve(here, '..')
-const providersDir = join(extensionRoot, 'presets', 'providers')
-const versionPath = join(extensionRoot, 'presets', 'VERSION')
-const buildScript = join(here, 'build-presets.mjs')
+const catalogDir = join(extensionRoot, 'provider-catalog')
+const providersDir = join(catalogDir, 'providers')
+const versionPath = join(catalogDir, 'VERSION')
+const buildScript = join(here, 'build-provider-catalog.mjs')
 const debounceMs = 300
 const watchedEvents = new Set(['add', 'change', 'unlink'])
 
-export const isPresetInput = file => {
+export const isProviderCatalogInput = file => {
   const target = resolve(file)
   return (
     target === versionPath ||
@@ -18,8 +19,8 @@ export const isPresetInput = file => {
   )
 }
 
-export const presetBuildWatchPlugin = () => ({
-  name: 'popcan-preset-build-watch',
+export const providerCatalogBuildWatchPlugin = () => ({
+  name: 'popcan-provider-catalog-build-watch',
   apply: 'serve',
   configureServer(server) {
     let timer
@@ -31,12 +32,12 @@ export const presetBuildWatchPlugin = () => ({
       if (output) console.log(output)
       if (error) {
         server.config.logger.error(
-          '[presets] bundle rebuild failed; keeping the previous valid presets/bundle.json'
+          '[provider-catalog] bundle rebuild failed; keeping the previous valid provider-catalog/bundle.json'
         )
         return
       }
       server.config.logger.info(
-        '[presets] bundle rebuilt; re-import presets/bundle.json to apply it'
+        '[provider-catalog] bundle rebuilt; re-import provider-catalog/bundle.json to apply it'
       )
     }
 
@@ -65,7 +66,7 @@ export const presetBuildWatchPlugin = () => ({
     }
 
     const onChange = (event, file) => {
-      if (watchedEvents.has(event) && isPresetInput(file)) schedule()
+      if (watchedEvents.has(event) && isProviderCatalogInput(file)) schedule()
     }
 
     server.watcher.add([providersDir, versionPath])

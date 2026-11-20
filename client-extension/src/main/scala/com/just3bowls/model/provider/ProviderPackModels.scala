@@ -130,7 +130,7 @@ object ProviderPackVersions {
           case None         => true
         }
       case _                               =>
-        PopCanLog.warn("presets", s"invalid version comparison extension=$extensionVersion minimum=$minimum")
+        PopCanLog.warn("provider-catalog", s"invalid version comparison extension=$extensionVersion minimum=$minimum")
         false
     }
 }

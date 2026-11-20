@@ -186,7 +186,7 @@ private[background] object FileAttachment {
     }
     if (expr.isEmpty)
       Future.failed(new Exception(
-        s"Attachment is not configured for this provider (presets/providers/$provider.jsonc → attachmentStrategy)"
+        s"Attachment is not configured for this provider (provider-catalog/providers/$provider.jsonc → attachmentStrategy)"
       ))
     else
       evaluate(expr)

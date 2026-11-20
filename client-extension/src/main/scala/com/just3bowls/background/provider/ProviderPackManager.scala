@@ -87,7 +87,7 @@ private[background] object ProviderPackManager {
 
   def startup(): Future[Unit] =
     applyBootstrap().recover { case e =>
-      PopCanLog.warn("presets", s"provider pack bootstrap failed: ${e.getMessage}")
+      PopCanLog.warn("provider-catalog", s"provider pack bootstrap failed: ${e.getMessage}")
       ()
     }.flatMap { _ =>
       ProviderPackStore.readSettings().flatMap { settings =>
@@ -103,7 +103,7 @@ private[background] object ProviderPackManager {
         else Future.successful(())
       }
     }.recover { case e =>
-      PopCanLog.warn("presets", s"provider pack startup check failed: ${e.getMessage}")
+      PopCanLog.warn("provider-catalog", s"provider pack startup check failed: ${e.getMessage}")
       ()
     }
 
@@ -113,7 +113,7 @@ private[background] object ProviderPackManager {
       case Some(sidecarRaw) =>
         val bootstrapSha = sidecarRaw.trim.toLowerCase
         if (!ProviderPackBootstrapPolicy.validSha256(bootstrapSha)) {
-          PopCanLog.warn("presets", "provider pack bootstrap SHA sidecar is invalid")
+          PopCanLog.warn("provider-catalog", "provider pack bootstrap SHA sidecar is invalid")
           Future.successful(())
         } else
           ProviderPackStore.readBootstrapMarker().flatMap { seen =>
@@ -127,7 +127,7 @@ private[background] object ProviderPackManager {
             else
               fetchLocalText(BootstrapPackPath).flatMap {
                 case None           =>
-                  PopCanLog.warn("presets", "provider pack bootstrap file is missing")
+                  PopCanLog.warn("provider-catalog", "provider pack bootstrap file is missing")
                   Future.successful(())
                 case Some(packText) =>
                   ProviderPackCrypto.sha256Hex(ProviderPackCrypto.utf8Bytes(packText)).flatMap { actualSha =>
@@ -144,20 +144,23 @@ private[background] object ProviderPackManager {
                               candidateSha
                             ) match {
                               case Left(reason) =>
-                                PopCanLog.warn("presets", s"provider pack bootstrap ignored: $reason")
+                                PopCanLog.warn("provider-catalog", s"provider pack bootstrap ignored: $reason")
                                 Future.successful(true)
                               case Right(_)     =>
                                 installText(packText, source = "setup", enableAutoUpdate = false)
                                   .map(_ => true)
                                   .recover { case e =>
-                                    PopCanLog.warn("presets", s"provider pack bootstrap failed: ${e.getMessage}")
+                                    PopCanLog.warn(
+                                      "provider-catalog",
+                                      s"provider pack bootstrap failed: ${e.getMessage}"
+                                    )
                                     false
                                   }
                             }
                           }
                         }
                         .recover { case e =>
-                          PopCanLog.warn("presets", s"provider pack bootstrap rejected: ${e.getMessage}")
+                          PopCanLog.warn("provider-catalog", s"provider pack bootstrap rejected: ${e.getMessage}")
                           true
                         }
                         .flatMap {
