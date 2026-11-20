@@ -75,7 +75,7 @@ private[background] object ProviderTaskMessageHandler {
                   "requestText"        -> (original.getOrElse("")),
                   "requestRewriteText" -> (roundTrip.getOrElse("")),
                   "requestRewritten"   -> (rewritten.nonEmpty),
-                  "requestError"       -> (if (original.nonEmpty) "" else ProviderRequestRule.diagnose(rule, body))
+                  "requestError"       -> (if (rewritten.nonEmpty) "" else ProviderRequestRule.diagnose(rule, body))
                 ))
               case None if requestBodyBase64.nonEmpty =>
                 js.Promise.resolve[js.Any](
