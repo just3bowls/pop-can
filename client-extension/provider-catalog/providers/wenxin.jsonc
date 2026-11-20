@@ -1,7 +1,6 @@
 {
   // Wenxin 有两种聊天端点：经典 /aichat/api/conversation 与 agent /chat/api/agent/task_mode；不同模式的答案组件和增量语义不同，规则按 URL 明确分派。
   "schemaVersion": 1,
-  "name": "wenxin",
   "page": {
     // Wenxin 使用 textarea 作为输入框，New Chat 在页面导航；fingerprints 用于定位编辑器和新建对话入口。
     "url": "https://wenxin.baidu.com/?enter_type=wenxin_logo",
@@ -18,16 +17,11 @@
         "ancestorTexts": [
           "快速 👈 复杂问题文心助手回答更优"
         ],
-        "anchorDeltaX": 0,
-        "anchorDeltaY": 0,
-        "ariaLabel": "",
         "capturedAt": 1788612759178,
         "classes": [
           "ci-textarea",
           "ci-scroll-style"
         ],
-        "clickable": false,
-        "dataTestId": "",
         "docX": 845.2000122070312,
         "docY": 239.58750915527344,
         "editable": true,
@@ -35,19 +29,10 @@
         "id": "chat-textarea",
         "innerHeight": 694,
         "innerWidth": 1490,
-        "name": "",
-        "nearInput": false,
-        "nearestText": "",
-        "parentClasses": [],
         "parentTag": "div",
-        "parentText": "",
         "placeholder": "帮我生成PPT，主题为民权运动的历史和重要性",
         "role": "input",
-        "scrollX": 0,
-        "scrollY": 0,
-        "siblingTexts": [],
         "tag": "textarea",
-        "text": "",
         "width": 794.4000244140625,
         "x": 845.2000122070312,
         "y": 239.58750915527344
@@ -65,37 +50,22 @@
           "开启新对话",
           "开启新对话"
         ],
-        "anchorDeltaX": 0,
-        "anchorDeltaY": 0,
-        "ariaLabel": "",
         "capturedAt": 1788612756716,
         "classes": [
           "cos-line-clamp-1",
           "new-dialog-container-text"
         ],
-        "clickable": false,
-        "dataTestId": "",
         "docX": 77.70000076293945,
         "docY": 81,
-        "editable": false,
         "height": 20,
-        "id": "",
         "innerHeight": 740,
         "innerWidth": 1490,
-        "name": "",
-        "nearInput": false,
-        "nearestText": "",
         "parentClasses": [
           "new-dialog-container-button",
           "new-dialog-container-button-sample"
         ],
         "parentTag": "div",
-        "parentText": "",
-        "placeholder": "",
         "role": "new-chat",
-        "scrollX": 0,
-        "scrollY": 0,
-        "siblingTexts": [],
         "tag": "span",
         "text": "开启新对话",
         "width": 70,

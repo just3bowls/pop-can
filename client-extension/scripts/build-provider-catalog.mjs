@@ -15,6 +15,7 @@ import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { dirname, join, basename } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parse, printParseErrorCode } from 'jsonc-parser'
+import {isDefaultFingerprintValue} from './lib/provider-catalog-defaults.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const catalogDir = join(here, '..', 'provider-catalog')
@@ -34,13 +35,12 @@ if (unknownArgs.length > 0) {
 /** 运行时读的字段全集；多一个少一个都在这里拦下来（bundle 是线上配置，不允许悄悄漂移）。 */
 const REQUIRED_KEYS = [
   'schemaVersion',
-  'name',
   'page',
   'network',
   'attachment',
   'parserRule'
 ]
-const DOCUMENT_KEYS = new Set([...REQUIRED_KEYS, 'buildEvidence'])
+const DOCUMENT_KEYS = new Set([...REQUIRED_KEYS, 'name', 'buildEvidence'])
 const PAGE_KEYS = new Set(['url', 'selectors', 'fingerprints'])
 const NETWORK_KEYS = new Set(['apiPatterns', 'followUpPatterns', 'followUpIdentityPath'])
 const ATTACHMENT_KEYS = new Set(['strategy', 'selector'])
@@ -426,14 +426,16 @@ const validateRule = (id, rule, warnings, fixedIndexEvidence) => {
 
 const key0 = (rule, key) => rule[key]
 
-const validate = (id, doc) => {
+const validate = (id, doc, warnings) => {
   const keys = Object.keys(doc)
   const extra = keys.filter(key => !DOCUMENT_KEYS.has(key))
   const missing = REQUIRED_KEYS.filter(key => !keys.includes(key))
   if (extra.length) fail(`${id}: unknown keys ${extra.join(', ')}`)
   if (missing.length) fail(`${id}: missing keys ${missing.join(', ')}`)
   if (doc.schemaVersion !== 1) fail(`${id}: schemaVersion must be 1`)
-  if (typeof doc.name !== 'string' || !doc.name.trim()) fail(`${id}: name must be a non-empty string`)
+  if (doc.name !== undefined && (typeof doc.name !== 'string' || !doc.name.trim()))
+    fail(`${id}: name must be a non-empty string when present`)
+  if (doc.name === id) warnings.push(`${id}: name is redundant; omit it and use the provider id`)
   if (typeof doc.page !== 'object' || doc.page === null || Array.isArray(doc.page))
     fail(`${id}: page must be an object`)
   for (const key of Object.keys(doc.page)) if (!PAGE_KEYS.has(key)) fail(`${id}/page: unknown key '${key}'`)
@@ -442,14 +444,23 @@ const validate = (id, doc) => {
     fail(`${id}: page.selectors must be an object`)
   if (typeof doc.page.selectors.input !== 'string' || !doc.page.selectors.input.trim())
     fail(`${id}: page.selectors.input must be a non-empty string`)
-  if (typeof doc.page.selectors['new-chat'] !== 'string')
+  if (doc.page.selectors['new-chat'] !== undefined && typeof doc.page.selectors['new-chat'] !== 'string')
     fail(`${id}: page.selectors.new-chat must be a string`)
+  if (doc.page.selectors['new-chat'] === '')
+    warnings.push(`${id}: page.selectors.new-chat is the default empty value; omit it`)
   if (typeof doc.page.fingerprints !== 'object' || doc.page.fingerprints === null || Array.isArray(doc.page.fingerprints))
     fail(`${id}: page.fingerprints must be an object`)
-  const selectorRoles = Object.keys(doc.page.selectors).sort()
+  const selectorRoles = [...new Set([...Object.keys(doc.page.selectors), 'input'])].sort()
   const fingerprintRoles = Object.keys(doc.page.fingerprints).sort()
   if (JSON.stringify(selectorRoles) !== JSON.stringify(fingerprintRoles))
     fail(`${id}: page.selectors and page.fingerprints roles must match (${selectorRoles} vs ${fingerprintRoles})`)
+  for (const fingerprint of Object.values(doc.page.fingerprints)) {
+    if (typeof fingerprint !== 'object' || fingerprint === null || Array.isArray(fingerprint))
+      fail(`${id}: page.fingerprints entries must be objects`)
+    for (const [key, value] of Object.entries(fingerprint))
+      if (isDefaultFingerprintValue(key, value))
+        warnings.push(`${id}: fingerprint field '${key}' uses its default value; omit it`)
+  }
   if (typeof doc.network !== 'object' || doc.network === null || Array.isArray(doc.network))
     fail(`${id}: network must be an object`)
   for (const key of Object.keys(doc.network)) if (!NETWORK_KEYS.has(key)) fail(`${id}/network: unknown key '${key}'`)
@@ -464,7 +475,10 @@ const validate = (id, doc) => {
   for (const key of Object.keys(doc.attachment))
     if (!ATTACHMENT_KEYS.has(key)) fail(`${id}/attachment: unknown key '${key}'`)
   if (typeof doc.attachment.strategy !== 'string') fail(`${id}: attachment.strategy must be a string`)
-  if (typeof doc.attachment.selector !== 'string') fail(`${id}: attachment.selector must be a string`)
+  if (doc.attachment.selector !== undefined && typeof doc.attachment.selector !== 'string')
+    fail(`${id}: attachment.selector must be a string when present`)
+  if (doc.attachment.selector === '')
+    warnings.push(`${id}: attachment.selector is the default empty value; omit it`)
   const rule = doc.parserRule
   if (typeof rule !== 'object' || rule === null || Array.isArray(rule)) fail(`${id}: parserRule must be an object`)
   if (!Array.isArray(rule.handlers) || rule.handlers.length === 0) fail(`${id}: parserRule.handlers must be a non-empty array`)
@@ -487,7 +501,7 @@ if (ids.length === 0) fail('no .jsonc provider files found in provider-catalog/p
 const warnings = []
 const providers = ids.map(id => {
   const doc = readJsonc(join(providersDir, `${id}.jsonc`), `${id}.jsonc`)
-  validate(id, doc)
+  validate(id, doc, warnings)
   const evidence = validateFixedIndexEvidence(id, doc.buildEvidence)
   validateRule(id, doc.parserRule, warnings, evidence)
   const {buildEvidence, ...runtimeDoc} = doc

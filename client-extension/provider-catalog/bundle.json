@@ -1,12 +1,11 @@
 {
   "schemaVersion": 1,
-  "bundleVersion": 27,
-  "generatedAt": "2026-11-20T14:03:11.398Z",
+  "bundleVersion": 28,
+  "generatedAt": "2026-11-20T15:01:48.579Z",
   "providers": [
     {
       "id": "deepseek",
       "schemaVersion": 1,
-      "name": "deepseek",
       "page": {
         "url": "https://chat.deepseek.com/",
         "selectors": {
@@ -26,9 +25,6 @@
               "深度思考智能搜索",
               "深度思考智能搜索"
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1791666774414,
             "classes": [
               "_27c9245",
@@ -37,30 +33,20 @@
               "ds-scroll-area--enabled",
               "d96f2d2a"
             ],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 779.3000183105469,
             "docY": 326.1000061035156,
             "editable": true,
             "height": 60,
-            "id": "",
             "innerHeight": 711,
             "innerWidth": 1298,
             "name": "search",
-            "nearInput": false,
-            "nearestText": "",
             "parentClasses": [
               "_24fad49"
             ],
             "parentTag": "div",
-            "parentText": "",
             "placeholder": "给 DeepSeek 发送消息 ",
             "role": "input",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "textarea",
-            "text": "",
             "width": 774.4000244140625,
             "x": 779.3000183105469,
             "y": 326.1000061035156
@@ -78,34 +64,18 @@
               "开启新对话",
               "开启新对话"
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1791666772517,
-            "classes": [],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 141.0999984741211,
             "docY": 90.00000476837158,
-            "editable": false,
             "height": 17.600000381469727,
-            "id": "",
             "innerHeight": 711,
             "innerWidth": 1298,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
             "parentClasses": [
               "_5a8ac7a",
               "a084f19e"
             ],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "new-chat",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "span",
             "text": "开启新对话",
             "width": 70,
@@ -120,8 +90,7 @@
         ]
       },
       "attachment": {
-        "strategy": "input",
-        "selector": ""
+        "strategy": "input"
       },
       "parserRule": {
         "schemaVersion": 1,
@@ -215,7 +184,6 @@
     {
       "id": "doubao",
       "schemaVersion": 1,
-      "name": "doubao",
       "page": {
         "url": "https://www.doubao.com/chat",
         "selectors": {
@@ -240,41 +208,25 @@
               "container-ObLj2X",
               "w-full"
             ],
-            "ancestorTexts": [],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1790673710133,
             "classes": [
               "tiptap",
               "ProseMirror",
               "ProseMirror-focused"
             ],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 788.8000183105469,
             "docY": 623.2000122070312,
             "editable": true,
             "height": 24,
-            "id": "",
             "innerHeight": 711,
             "innerWidth": 1298,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
             "parentClasses": [
               "w-full",
               "text-16"
             ],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "input",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "div",
-            "text": "",
             "width": 945.6000366210938,
             "x": 788.8000183105469,
             "y": 623.2000122070312
@@ -313,9 +265,6 @@
               "豆包新工作任务Ctrl J新对话Ctrl Shift K",
               "豆包新工作任务Ctrl J新对话Ctrl Shift K定时任务Ctrl Shift T插件 · 技能 · 伙伴Ctrl Shift S云盘Ctrl Shift DAPI 服务更多 To pick up a draggable item, "
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1790673707630,
             "classes": [
               "group/sidebar_nav_item",
@@ -331,25 +280,13 @@
               "mb-2"
             ],
             "clickable": true,
-            "dataTestId": "",
             "docX": 140.00000476837158,
             "docY": 104.80000305175781,
-            "editable": false,
             "height": 32,
-            "id": "",
             "innerHeight": 767,
             "innerWidth": 1298,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
-            "parentClasses": [],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "new-chat",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "div",
             "text": "新对话Ctrl Shift K",
             "width": 254.40000915527344,
@@ -364,8 +301,7 @@
         ]
       },
       "attachment": {
-        "strategy": "input",
-        "selector": ""
+        "strategy": "input"
       },
       "parserRule": {
         "schemaVersion": 1,
@@ -543,7 +479,6 @@
     {
       "id": "gml",
       "schemaVersion": 1,
-      "name": "gml",
       "page": {
         "url": "https://chatglm.cn/main/alltoolsdetail?t=1788611652123&lang=zh",
         "selectors": {
@@ -565,39 +500,26 @@
               "和我聊聊天吧GLM-Flash极致新对话",
               "和我聊聊天吧GLM-Flash极致新对话"
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1788611790947,
             "classes": [
               "scroll-display-none"
             ],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 875.2000122070312,
             "docY": 307.7749938964844,
             "editable": true,
             "height": 68,
-            "id": "",
             "innerHeight": 694,
             "innerWidth": 1490,
-            "name": "",
-            "nearInput": false,
             "nearestText": "和我聊聊天吧",
             "parentClasses": [
               "input-box-inner"
             ],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "input",
-            "scrollX": 0,
-            "scrollY": 0,
             "siblingTexts": [
               "和我聊聊天吧"
             ],
             "tag": "textarea",
-            "text": "",
             "width": 774.4000244140625,
             "x": 875.2000122070312,
             "y": 307.7749938964844
@@ -620,25 +542,15 @@
               "新对话学习搭子AI画图AI阅读AI生视频AgentMore云知识库智能体最近对话获取下一步请求数据批量操作重命名删除对话解析JSON请求内容批量操作重命名删除对话读取下一步请求数据批量操作重命名删除对话",
               "新对话学习搭子AI画图AI阅读AI生视频AgentMore云知识库智能体最近对话获取下一步请求数据批量操作重命名删除对话解析JSON请求内容批量操作重命名删除对话读取下一步请求数据批量操作重命名删除对话只喝三碗吖积分 7666.00全选已选"
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1788611786801,
             "classes": [
               "text"
             ],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 69.79999923706055,
             "docY": 74,
-            "editable": false,
             "height": 20,
-            "id": "",
             "innerHeight": 740,
             "innerWidth": 1490,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
             "parentClasses": [
               "new-session",
               "flex",
@@ -648,12 +560,7 @@
               "el-tooltip__trigger"
             ],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "new-chat",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "div",
             "text": "新对话",
             "width": 42,
@@ -738,7 +645,6 @@
     {
       "id": "kimi",
       "schemaVersion": 1,
-      "name": "kimi",
       "page": {
         "url": "https://www.kimi.com/",
         "selectors": {
@@ -757,39 +663,26 @@
               "输入 \"/\" 唤起插件和技能",
               "输入 \"/\" 唤起插件和技能"
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1791509633882,
             "classes": [
               "chat-input-editor"
             ],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 758.2000122070312,
             "docY": 312.20001220703125,
             "editable": true,
             "height": 48,
-            "id": "",
             "innerHeight": 711,
             "innerWidth": 1298,
-            "name": "",
-            "nearInput": false,
             "nearestText": "输入 \"/\" 唤起插件和技能",
             "parentClasses": [
               "chat-input-editor-container"
             ],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "input",
-            "scrollX": 0,
-            "scrollY": 0,
             "siblingTexts": [
               "输入 \"/\" 唤起插件和技能"
             ],
             "tag": "div",
-            "text": "",
             "width": 734.4000244140625,
             "x": 758.2000122070312,
             "y": 312.20001220703125
@@ -807,9 +700,6 @@
               "#LeftBarAnimatedIcon-enter-rs-1sihg8c-mh2{transform-box:view-box;transform-origin:0 0;animation:LeftBarAnimatedIcon-ente",
               "#LeftBarAnimatedIcon-enter-rs-1sihg8c-mh2{transform-box:view-box;transform-origin:0 0;animation:LeftBarAnimatedIcon-ente"
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1791509632154,
             "classes": [
               "new-chat-btn"
@@ -818,24 +708,14 @@
             "dataTestId": "sidebar-new-chat",
             "docX": 120,
             "docY": 82.80000114440918,
-            "editable": false,
             "height": 41.60000228881836,
-            "id": "",
             "innerHeight": 711,
             "innerWidth": 1298,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
             "parentClasses": [
               "sidebar-new-chat"
             ],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "new-chat",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "a",
             "text": "#NewChatAnimatedIcon-svg-rs-ew8n6j-p1{transform-box:view-box;transform-origin:0 0;animation:NewChatAnimatedIcon-svg-rs-ew8n6j-p1 0.4167s linear 1 forwards}@keyframes NewChatAnimatedIcon-svg-rs-ew8n6j-",
             "width": 224,
@@ -944,7 +824,6 @@
     {
       "id": "longcat",
       "schemaVersion": 1,
-      "name": "longcat",
       "page": {
         "url": "https://longcat.chat/",
         "selectors": {
@@ -958,38 +837,21 @@
               "my-mtd-textarea",
               "textarea-wrap"
             ],
-            "ancestorTexts": [],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1790644227853,
             "classes": [
               "tiptap",
               "ProseMirror",
               "ProseMirror-focused"
             ],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 774.8000183105469,
             "docY": 365.2437686920166,
             "editable": true,
             "height": 25.137500762939453,
-            "id": "",
             "innerHeight": 711,
             "innerWidth": 1298,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
-            "parentClasses": [],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "input",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "div",
-            "text": "",
             "width": 762.4000244140625,
             "x": 774.8000183105469,
             "y": 365.2437686920166
@@ -1005,35 +867,20 @@
               "开启新对话",
               "开启新对话下载手机应用请先登录简体中文"
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1790644226323,
             "classes": [
               "new-content"
             ],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 80,
             "docY": 111,
-            "editable": false,
             "height": 46,
-            "id": "",
             "innerHeight": 767,
             "innerWidth": 1298,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
             "parentClasses": [
               "slider-header"
             ],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "new-chat",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "div",
             "text": "开启新对话",
             "width": 120,
@@ -1087,7 +934,6 @@
     {
       "id": "mimo",
       "schemaVersion": 1,
-      "name": "mimo",
       "page": {
         "url": "https://aistudio.xiaomimimo.com/#/c",
         "selectors": {
@@ -1117,9 +963,6 @@
               "翻译解题答疑智拍问答",
               "翻译解题答疑智拍问答"
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1790590117672,
             "classes": [
               "relative",
@@ -1143,32 +986,21 @@
               "retina:placeholder:font-normal",
               "md:text-sm"
             ],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 776.8000183105469,
             "docY": 610.4000244140625,
             "editable": true,
             "height": 32,
-            "id": "",
             "innerHeight": 711,
             "innerWidth": 1298,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
             "parentClasses": [
               "flex",
               "gap-2",
               "items-end"
             ],
             "parentTag": "div",
-            "parentText": "",
             "placeholder": "有问题，尽管问，Shift + Enter 换行",
             "role": "input",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "textarea",
-            "text": "",
             "width": 766.4000244140625,
             "x": 776.8000183105469,
             "y": 610.4000244140625
@@ -1203,8 +1035,6 @@
               "UltraSpeedNewZIO函数式异步编程库介绍MiMo ClawMiMo V2.6MiMo ChatZIO框架趋势与热度分析",
               "UltraSpeedNewZIO函数式异步编程库介绍MiMo ClawMiMo V2.6MiMo ChatZIO框架趋势与热度分析"
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
             "ariaLabel": "新对话",
             "capturedAt": 1790590113506,
             "classes": [
@@ -1221,16 +1051,11 @@
               "hover:text-mimo-icon-n1"
             ],
             "clickable": true,
-            "dataTestId": "",
             "docX": 231.1999969482422,
             "docY": 156,
-            "editable": false,
             "height": 20,
-            "id": "",
             "innerHeight": 767,
             "innerWidth": 1298,
-            "name": "",
-            "nearInput": false,
             "nearestText": "MiMo Chat",
             "parentClasses": [
               "flex",
@@ -1247,16 +1072,11 @@
               "bg-mimo-fill-neutral-active"
             ],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "new-chat",
-            "scrollX": 0,
-            "scrollY": 0,
             "siblingTexts": [
               "MiMo Chat"
             ],
             "tag": "button",
-            "text": "",
             "width": 20,
             "x": 231.1999969482422,
             "y": 156
@@ -1269,8 +1089,7 @@
         ]
       },
       "attachment": {
-        "strategy": "input",
-        "selector": ""
+        "strategy": "input"
       },
       "parserRule": {
         "schemaVersion": 1,
@@ -1307,7 +1126,6 @@
     {
       "id": "qianwen",
       "schemaVersion": 1,
-      "name": "qianwen",
       "page": {
         "url": "https://www.qianwen.com/",
         "selectors": {
@@ -1331,10 +1149,6 @@
               "ease-out",
               "overflow-clip"
             ],
-            "ancestorTexts": [],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1791685802297,
             "classes": [
               "relative",
@@ -1355,31 +1169,19 @@
               "placeholder:text-disabled",
               "px-2"
             ],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 773.7875061035156,
             "docY": 341.0999946594238,
             "editable": true,
             "height": 49.400001525878906,
-            "id": "",
             "innerHeight": 711,
             "innerWidth": 1298,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
             "parentClasses": [
               "relative",
               "w-full"
             ],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "input",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "div",
-            "text": "",
             "width": 734.4000244140625,
             "x": 773.7875061035156,
             "y": 341.0999946594238
@@ -1411,26 +1213,16 @@
               "新对话",
               "新对话"
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1791685800504,
             "classes": [
               "truncate",
               "font-400"
             ],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 67,
             "docY": 134,
-            "editable": false,
             "height": 20,
-            "id": "",
             "innerHeight": 711,
             "innerWidth": 1298,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
             "parentClasses": [
               "flex",
               "h-full",
@@ -1448,12 +1240,7 @@
               "cursor-pointer"
             ],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "new-chat",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "span",
             "text": "新对话",
             "width": 42,
@@ -1526,7 +1313,6 @@
     {
       "id": "wenxin",
       "schemaVersion": 1,
-      "name": "wenxin",
       "page": {
         "url": "https://wenxin.baidu.com/?enter_type=wenxin_logo",
         "selectors": {
@@ -1542,16 +1328,11 @@
             "ancestorTexts": [
               "快速 👈 复杂问题文心助手回答更优"
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1788612759178,
             "classes": [
               "ci-textarea",
               "ci-scroll-style"
             ],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 845.2000122070312,
             "docY": 239.58750915527344,
             "editable": true,
@@ -1559,19 +1340,10 @@
             "id": "chat-textarea",
             "innerHeight": 694,
             "innerWidth": 1490,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
-            "parentClasses": [],
             "parentTag": "div",
-            "parentText": "",
             "placeholder": "帮我生成PPT，主题为民权运动的历史和重要性",
             "role": "input",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "textarea",
-            "text": "",
             "width": 794.4000244140625,
             "x": 845.2000122070312,
             "y": 239.58750915527344
@@ -1589,37 +1361,22 @@
               "开启新对话",
               "开启新对话"
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1788612756716,
             "classes": [
               "cos-line-clamp-1",
               "new-dialog-container-text"
             ],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 77.70000076293945,
             "docY": 81,
-            "editable": false,
             "height": 20,
-            "id": "",
             "innerHeight": 740,
             "innerWidth": 1490,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
             "parentClasses": [
               "new-dialog-container-button",
               "new-dialog-container-button-sample"
             ],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "new-chat",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "span",
             "text": "开启新对话",
             "width": 70,
@@ -1725,7 +1482,6 @@
     {
       "id": "yuanbao",
       "schemaVersion": 1,
-      "name": "yuanbao",
       "page": {
         "url": "https://yuanbao.tencent.com/chat/naQivTmsDa",
         "selectors": {
@@ -1745,41 +1501,25 @@
               "px-[6px]",
               "[&>#search-bar]:!pl-0"
             ],
-            "ancestorTexts": [],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
-            "ariaLabel": "",
             "capturedAt": 1790592417441,
             "classes": [
               "ql-editor",
               "ql-blank"
             ],
-            "clickable": false,
-            "dataTestId": "",
             "docX": 775.8000183105469,
             "docY": 594.4000244140625,
             "editable": true,
             "height": 20,
-            "id": "",
             "innerHeight": 711,
             "innerWidth": 1298,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
             "parentClasses": [
               "chat-command-editor-specail",
               "InputTextArea_hightLightTextAreaNew__aKxTD",
               "ql-container"
             ],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "input",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "div",
-            "text": "",
             "width": 914.4000244140625,
             "x": 775.8000183105469,
             "y": 594.4000244140625
@@ -1795,35 +1535,22 @@
               "新建对话AI 创作分组分组示例最近Flink 作业流生产问题及解决OpenClaw记忆系统设计解析Hermes与OpenClaw的区别Flink Doris 面试核心问题解析Doris索引类型及底层原理Debezium底层实现及CDC原理大",
               "元宝新建对话AI 创作分组分组示例最近Flink 作业流生产问题及解决OpenClaw记忆系统设计解析Hermes与OpenClaw的区别Flink Doris 面试核心问题解析Doris索引类型及底层原理Debezium底层实现及CDC原"
             ],
-            "anchorDeltaX": 0,
-            "anchorDeltaY": 0,
             "ariaLabel": "新建对话",
             "capturedAt": 1790592411169,
             "classes": [
               "yb-new-chat-entry__item"
             ],
             "clickable": true,
-            "dataTestId": "",
             "docX": 130,
             "docY": 118,
-            "editable": false,
             "height": 32,
-            "id": "",
             "innerHeight": 767,
             "innerWidth": 1298,
-            "name": "",
-            "nearInput": false,
-            "nearestText": "",
             "parentClasses": [
               "yb-new-chat-entry"
             ],
             "parentTag": "div",
-            "parentText": "",
-            "placeholder": "",
             "role": "new-chat",
-            "scrollX": 0,
-            "scrollY": 0,
-            "siblingTexts": [],
             "tag": "div",
             "text": "新建对话",
             "width": 232,

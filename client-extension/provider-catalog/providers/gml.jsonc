@@ -1,7 +1,6 @@
 {
   // GLM 网页 SSE：正文按增量输出，但 status=finish 帧会重复完整答案；规则用 appendDelta 吸收最终快照，并过滤页面渲染用的 turn/citation token。
   "schemaVersion": 1,
-  "name": "gml",
   "page": {
     // 输入框是 composer textarea，附件入口暴露 input.el-upload__input，New Chat 在页面主区域；fingerprints 用于校准文本框与新建对话入口。
     "url": "https://chatglm.cn/main/alltoolsdetail?t=1788611652123&lang=zh",
@@ -24,39 +23,26 @@
           "和我聊聊天吧GLM-Flash极致新对话",
           "和我聊聊天吧GLM-Flash极致新对话"
         ],
-        "anchorDeltaX": 0,
-        "anchorDeltaY": 0,
-        "ariaLabel": "",
         "capturedAt": 1788611790947,
         "classes": [
           "scroll-display-none"
         ],
-        "clickable": false,
-        "dataTestId": "",
         "docX": 875.2000122070312,
         "docY": 307.7749938964844,
         "editable": true,
         "height": 68,
-        "id": "",
         "innerHeight": 694,
         "innerWidth": 1490,
-        "name": "",
-        "nearInput": false,
         "nearestText": "和我聊聊天吧",
         "parentClasses": [
           "input-box-inner"
         ],
         "parentTag": "div",
-        "parentText": "",
-        "placeholder": "",
         "role": "input",
-        "scrollX": 0,
-        "scrollY": 0,
         "siblingTexts": [
           "和我聊聊天吧"
         ],
         "tag": "textarea",
-        "text": "",
         "width": 774.4000244140625,
         "x": 875.2000122070312,
         "y": 307.7749938964844
@@ -79,25 +65,15 @@
           "新对话学习搭子AI画图AI阅读AI生视频AgentMore云知识库智能体最近对话获取下一步请求数据批量操作重命名删除对话解析JSON请求内容批量操作重命名删除对话读取下一步请求数据批量操作重命名删除对话",
           "新对话学习搭子AI画图AI阅读AI生视频AgentMore云知识库智能体最近对话获取下一步请求数据批量操作重命名删除对话解析JSON请求内容批量操作重命名删除对话读取下一步请求数据批量操作重命名删除对话只喝三碗吖积分 7666.00全选已选"
         ],
-        "anchorDeltaX": 0,
-        "anchorDeltaY": 0,
-        "ariaLabel": "",
         "capturedAt": 1788611786801,
         "classes": [
           "text"
         ],
-        "clickable": false,
-        "dataTestId": "",
         "docX": 69.79999923706055,
         "docY": 74,
-        "editable": false,
         "height": 20,
-        "id": "",
         "innerHeight": 740,
         "innerWidth": 1490,
-        "name": "",
-        "nearInput": false,
-        "nearestText": "",
         "parentClasses": [
           "new-session",
           "flex",
@@ -107,12 +83,7 @@
           "el-tooltip__trigger"
         ],
         "parentTag": "div",
-        "parentText": "",
-        "placeholder": "",
         "role": "new-chat",
-        "scrollX": 0,
-        "scrollY": 0,
-        "siblingTexts": [],
         "tag": "div",
         "text": "新对话",
         "width": 42,
