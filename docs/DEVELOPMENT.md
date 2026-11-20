@@ -288,7 +288,7 @@ the extension/native-host layout, file hashes, SBOM and Provider-rule exclusion 
 
 Provider presets live in `client-extension/presets/providers/*.jsonc`.
 
-Provider rule schema v2 accepts literal `equals`, `contains`, `startsWith`, and `notStartsWith`
+Provider rule schema v1 accepts literal `equals`, `contains`, `startsWith`, and `notStartsWith`
 match conditions. A single `appendContent` action may be written as handler-level
 `content: "$.path"`. These are runtime shorthands shared by built-in JSONC, fixture replay, and
 local Import; they do not change the serialized schema version.

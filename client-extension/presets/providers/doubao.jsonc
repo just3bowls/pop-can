@@ -1,6 +1,6 @@
 {
   // Doubao 网页 SSE：答案位于 block_type=10000 文本块，深度思考档会先出现 10040 思考块；规则通过 thinkStart/answerStart 阶段门把页面思考与最终答案分开。
-  "schemaVersion": 2,
+  "schemaVersion": 1,
   "name": "doubao",
   "page": {
     // Doubao 使用 Tiptap/ProseMirror contenteditable 作为输入框，New Chat 在左侧导航；fingerprints 优先匹配编辑器角色、classes 与容器层级。
@@ -158,7 +158,7 @@
   },
   "parserRule": {
     // doubao SSE. 答案永远在 `block_type=10000` 的文本块里；但深度思考档会先来一个 10040 思考块，思考文字被包成一个 `10000` 文本块（`parent_id` 指向思考块），它的 `CHUNK_DELTA` 增量与答案的**形状完全一致**。所以规则先用 `thinkStart` 记住“进过思考块”，再用 `answerStart` 记住“答案块开始”（帧内断言：`block_id` 后面直接是 `content`，即没有 `parent_id`；另有 `answer_first_token` 作为备份触发），delta handler 的门是 `answerStart 非空` 或 `thinkStart 为空` —— 思考阶段被挡、普通档不受影响。
-    "schemaVersion": 2,
+    "schemaVersion": 1,
     "handlers": [
       {
         // 思考块出现（block_type=10040）→ 记下 `thinkStart`，后面的增量就知道自己在思考阶段。

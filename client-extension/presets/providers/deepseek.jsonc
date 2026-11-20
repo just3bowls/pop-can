@@ -1,6 +1,6 @@
 {
   // DeepSeek 网页 SSE：请求走 /api/v0/chat/completion，答案先以 RESPONSE 片段开局，后面是裸 data 文本增量；规则用 inResponse 阶段门屏蔽搜索、状态等非正文帧。
-  "schemaVersion": 2,
+  "schemaVersion": 1,
   "name": "deepseek",
   "page": {
     // DeepSeek 的输入框是 textarea，New Chat 位于侧栏；fingerprints 用可编辑控件、父级布局和侧栏导航结构做二次定位，避免 XPath 漂移后误点。
@@ -123,7 +123,7 @@
   },
   "parserRule": {
     // deepseek SSE. The answer starts with a RESPONSE fragment event and then streams as bare `data: {"v":"..."}` deltas; a memory flag marks that we are inside the response so status/search events are ignored.
-    "schemaVersion": 2,
+    "schemaVersion": 1,
     "phases": {
       "inResponse": "true"
     },

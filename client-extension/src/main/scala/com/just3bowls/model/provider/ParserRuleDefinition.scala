@@ -116,20 +116,23 @@ object ParserRuleDefinition {
       if (!JsonValue.isObject(value)) Left("parserRule must be a JSON object")
       else {
         val schemaVersion = JsonValue.intField(value, "schemaVersion").getOrElse(0)
-        val memory        = JsonValue
-          .objectField(value, "memory")
-          .map(JsonValue.dictionary)
-          .getOrElse(Map.empty)
-          .map { case (key, raw) => key -> JsonValue.display(raw) }
-        val mode          = parseMode(JsonValue.objectField(value, "mode"))
-        val finalActions  = JsonValue.arrayField(value, "finalActions").flatMap(parseAction)
-        val transforms    = JsonValue.arrayField(value, "contentTransforms").map(parseTransform)
-        val request       = parseRequest(JsonValue.objectField(value, "request"))
-        for {
-          phases   <- parsePhases(value, memory)
-          handlers <- parseHandlers(value, phases)
-        } yield {
-          ParserRuleDefinition(schemaVersion, memory, mode, handlers, finalActions, transforms, request)
+        if (schemaVersion != 1) Left(s"parserRule.schemaVersion must be 1, got $schemaVersion")
+        else {
+          val memory       = JsonValue
+            .objectField(value, "memory")
+            .map(JsonValue.dictionary)
+            .getOrElse(Map.empty)
+            .map { case (key, raw) => key -> JsonValue.display(raw) }
+          val mode         = parseMode(JsonValue.objectField(value, "mode"))
+          val finalActions = JsonValue.arrayField(value, "finalActions").flatMap(parseAction)
+          val transforms   = JsonValue.arrayField(value, "contentTransforms").map(parseTransform)
+          val request      = parseRequest(JsonValue.objectField(value, "request"))
+          for {
+            phases   <- parsePhases(value, memory)
+            handlers <- parseHandlers(value, phases)
+          } yield {
+            ParserRuleDefinition(schemaVersion, memory, mode, handlers, finalActions, transforms, request)
+          }
         }
       }
     }

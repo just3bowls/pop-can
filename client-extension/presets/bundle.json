@@ -1,11 +1,11 @@
 {
-  "schemaVersion": 2,
-  "bundleVersion": 26,
-  "generatedAt": "2026-11-20T03:26:44.558Z",
+  "schemaVersion": 1,
+  "bundleVersion": 27,
+  "generatedAt": "2026-11-20T14:03:11.398Z",
   "providers": [
     {
       "id": "deepseek",
-      "schemaVersion": 2,
+      "schemaVersion": 1,
       "name": "deepseek",
       "page": {
         "url": "https://chat.deepseek.com/",
@@ -124,7 +124,7 @@
         "selector": ""
       },
       "parserRule": {
-        "schemaVersion": 2,
+        "schemaVersion": 1,
         "phases": {
           "inResponse": "true"
         },
@@ -214,7 +214,7 @@
     },
     {
       "id": "doubao",
-      "schemaVersion": 2,
+      "schemaVersion": 1,
       "name": "doubao",
       "page": {
         "url": "https://www.doubao.com/chat",
@@ -368,7 +368,7 @@
         "selector": ""
       },
       "parserRule": {
-        "schemaVersion": 2,
+        "schemaVersion": 1,
         "handlers": [
           {
             "id": "thinkingStart",
@@ -542,7 +542,7 @@
     },
     {
       "id": "gml",
-      "schemaVersion": 2,
+      "schemaVersion": 1,
       "name": "gml",
       "page": {
         "url": "https://chatglm.cn/main/alltoolsdetail?t=1788611652123&lang=zh",
@@ -672,7 +672,7 @@
         "selector": "input.el-upload__input"
       },
       "parserRule": {
-        "schemaVersion": 2,
+        "schemaVersion": 1,
         "contentTransforms": [
           {
             "id": "dropTurnChip",
@@ -737,7 +737,7 @@
     },
     {
       "id": "kimi",
-      "schemaVersion": 2,
+      "schemaVersion": 1,
       "name": "kimi",
       "page": {
         "url": "https://www.kimi.com/",
@@ -854,7 +854,7 @@
         "selector": "input.hidden-input"
       },
       "parserRule": {
-        "schemaVersion": 2,
+        "schemaVersion": 1,
         "contentTransforms": [
           {
             "id": "dropReferenceBlock",
@@ -943,7 +943,7 @@
     },
     {
       "id": "longcat",
-      "schemaVersion": 2,
+      "schemaVersion": 1,
       "name": "longcat",
       "page": {
         "url": "https://longcat.chat/",
@@ -1053,7 +1053,7 @@
         "selector": "#file-upload-default"
       },
       "parserRule": {
-        "schemaVersion": 2,
+        "schemaVersion": 1,
         "handlers": [
           {
             "id": "answerDelta",
@@ -1086,7 +1086,7 @@
     },
     {
       "id": "mimo",
-      "schemaVersion": 2,
+      "schemaVersion": 1,
       "name": "mimo",
       "page": {
         "url": "https://aistudio.xiaomimimo.com/#/c",
@@ -1273,7 +1273,7 @@
         "selector": ""
       },
       "parserRule": {
-        "schemaVersion": 2,
+        "schemaVersion": 1,
         "handlers": [
           {
             "id": "answerDelta",
@@ -1306,7 +1306,7 @@
     },
     {
       "id": "qianwen",
-      "schemaVersion": 2,
+      "schemaVersion": 1,
       "name": "qianwen",
       "page": {
         "url": "https://www.qianwen.com/",
@@ -1476,7 +1476,7 @@
         "selector": "div[contenteditable=\"true\"]"
       },
       "parserRule": {
-        "schemaVersion": 2,
+        "schemaVersion": 1,
         "handlers": [
           {
             "id": "qianwenAnswerText",
@@ -1525,7 +1525,7 @@
     },
     {
       "id": "wenxin",
-      "schemaVersion": 2,
+      "schemaVersion": 1,
       "name": "wenxin",
       "page": {
         "url": "https://wenxin.baidu.com/?enter_type=wenxin_logo",
@@ -1639,7 +1639,7 @@
         "selector": "#chat-textarea"
       },
       "parserRule": {
-        "schemaVersion": 2,
+        "schemaVersion": 1,
         "handlers": [
           {
             "id": "wenxinTaskModeAnswer",
@@ -1724,7 +1724,7 @@
     },
     {
       "id": "yuanbao",
-      "schemaVersion": 2,
+      "schemaVersion": 1,
       "name": "yuanbao",
       "page": {
         "url": "https://yuanbao.tencent.com/chat/naQivTmsDa",
@@ -1842,7 +1842,7 @@
         "selector": "div.ql-editor"
       },
       "parserRule": {
-        "schemaVersion": 2,
+        "schemaVersion": 1,
         "contentTransforms": [
           {
             "id": "dropCitationToken",

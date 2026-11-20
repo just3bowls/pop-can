@@ -18,7 +18,7 @@ class ParserRuleDefinitionSpec extends FunSuite {
   test("parses text shorthands and content into the runtime representation") {
     val rule = parse(
       """{
-        |  "schemaVersion": 2,
+        |  "schemaVersion": 1,
         |  "handlers": [
         |    {
         |      "id": "answer",
@@ -44,11 +44,11 @@ class ParserRuleDefinitionSpec extends FunSuite {
 
   test("rejects conflicting and invalid shorthand fields") {
     val invalid = List(
-      """{"schemaVersion":2,"handlers":[{"id":"x","match":{"equals":"x","contains":"x"}}]}""",
-      """{"schemaVersion":2,"handlers":[{"id":"x","match":{"regex":"^x$","equals":"x"}}]}""",
-      """{"schemaVersion":2,"handlers":[{"id":"x","match":{"equals":1}}]}""",
-      """{"schemaVersion":2,"handlers":[{"id":"x","actions":[],"content":"$.text"}]}""",
-      """{"schemaVersion":2,"handlers":[{"id":"x","content":"text"}]}"""
+      """{"schemaVersion":1,"handlers":[{"id":"x","match":{"equals":"x","contains":"x"}}]}""",
+      """{"schemaVersion":1,"handlers":[{"id":"x","match":{"regex":"^x$","equals":"x"}}]}""",
+      """{"schemaVersion":1,"handlers":[{"id":"x","match":{"equals":1}}]}""",
+      """{"schemaVersion":1,"handlers":[{"id":"x","actions":[],"content":"$.text"}]}""",
+      """{"schemaVersion":1,"handlers":[{"id":"x","content":"text"}]}"""
     )
 
     invalid.foreach { rule =>
@@ -59,7 +59,7 @@ class ParserRuleDefinitionSpec extends FunSuite {
   test("normalizes sse-json-line into the existing raw matcher") {
     val rule = parse(
       """{
-        |  "schemaVersion": 2,
+        |  "schemaVersion": 1,
         |  "handlers": [
         |    {
         |      "id": "answer",
@@ -76,10 +76,10 @@ class ParserRuleDefinitionSpec extends FunSuite {
 
   test("rejects invalid transport combinations") {
     val invalid = List(
-      """{"schemaVersion":2,"handlers":[{"id":"x","match":{"transport":"unknown"}}]}""",
-      """{"schemaVersion":2,"handlers":[{"id":"x","match":{"transport":"sse-json-line","rawRegex":"x"}}]}""",
-      """{"schemaVersion":2,"handlers":[{"id":"x","match":{"transport":"sse-json-line","jsonGroup":1}}]}""",
-      """{"schemaVersion":2,"handlers":[{"id":"x","match":{"allOf":[{"transport":"sse-json-line"}]}}]}"""
+      """{"schemaVersion":1,"handlers":[{"id":"x","match":{"transport":"unknown"}}]}""",
+      """{"schemaVersion":1,"handlers":[{"id":"x","match":{"transport":"sse-json-line","rawRegex":"x"}}]}""",
+      """{"schemaVersion":1,"handlers":[{"id":"x","match":{"transport":"sse-json-line","jsonGroup":1}}]}""",
+      """{"schemaVersion":1,"handlers":[{"id":"x","match":{"allOf":[{"transport":"sse-json-line"}]}}]}"""
     )
 
     invalid.foreach { rule =>
@@ -90,7 +90,7 @@ class ParserRuleDefinitionSpec extends FunSuite {
   test("normalizes phase starts and continuations into memory gates") {
     val rule = parse(
       """{
-        |  "schemaVersion": 2,
+        |  "schemaVersion": 1,
         |  "phases": {"inResponse": "true"},
         |  "handlers": [
         |    {
@@ -123,18 +123,23 @@ class ParserRuleDefinitionSpec extends FunSuite {
 
   test("rejects invalid phase declarations and handler conflicts") {
     val invalid = List(
-      """{"schemaVersion":2,"phases":{"answer":"true"},"handlers":[{"id":"x","phase":"missing"}]}""",
-      """{"schemaVersion":2,"handlers":[{"id":"x","startsPhase":true}]}""",
-      """{"schemaVersion":2,"phases":{"answer":"true"},"handlers":[{"id":"x","phase":"answer","startsPhase":"yes"}]}""",
-      """{"schemaVersion":2,"phases":{"answer":"true"},"handlers":[{"id":"x","phase":"answer","match":{"memoryKey":"answer"}}]}""",
-      """{"schemaVersion":2,"phases":{"answer":"true"},"handlers":[{"id":"x","phase":"answer","match":{"allOf":[{"memoryKey":"answer"}]}}]}""",
-      """{"schemaVersion":2,"phases":{"answer":"true"},"handlers":[{"id":"x","phase":"answer","startsPhase":true,"actions":[{"op":"setMemory","key":"answer","value":"true"}]}]}""",
-      """{"schemaVersion":2,"memory":{"answer":"true"},"phases":{"answer":"true"},"handlers":[{"id":"x"}]}""",
-      """{"schemaVersion":2,"phases":{"answer":true},"handlers":[{"id":"x"}]}"""
+      """{"schemaVersion":1,"phases":{"answer":"true"},"handlers":[{"id":"x","phase":"missing"}]}""",
+      """{"schemaVersion":1,"handlers":[{"id":"x","startsPhase":true}]}""",
+      """{"schemaVersion":1,"phases":{"answer":"true"},"handlers":[{"id":"x","phase":"answer","startsPhase":"yes"}]}""",
+      """{"schemaVersion":1,"phases":{"answer":"true"},"handlers":[{"id":"x","phase":"answer","match":{"memoryKey":"answer"}}]}""",
+      """{"schemaVersion":1,"phases":{"answer":"true"},"handlers":[{"id":"x","phase":"answer","match":{"allOf":[{"memoryKey":"answer"}]}}]}""",
+      """{"schemaVersion":1,"phases":{"answer":"true"},"handlers":[{"id":"x","phase":"answer","startsPhase":true,"actions":[{"op":"setMemory","key":"answer","value":"true"}]}]}""",
+      """{"schemaVersion":1,"memory":{"answer":"true"},"phases":{"answer":"true"},"handlers":[{"id":"x"}]}""",
+      """{"schemaVersion":1,"phases":{"answer":true},"handlers":[{"id":"x"}]}"""
     )
 
     invalid.foreach { rule =>
       assert(ParserRuleDefinition.parse(rule).isLeft, rule)
     }
+  }
+
+  test("rejects the retired schema v2") {
+    assert(ParserRuleDefinition.parse("""{"schemaVersion":2,"handlers":[]}""").isLeft)
+    assert(ParserRuleDefinition.parse("""{"schemaVersion":1,"handlers":[]}""").isRight)
   }
 }

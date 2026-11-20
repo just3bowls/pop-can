@@ -284,8 +284,8 @@ const validatePhases = (id, phases, memory) => {
 const validateRule = (id, rule, warnings, fixedIndexEvidence) => {
   for (const key of Object.keys(rule))
     if (!RULE_KEYS.has(key)) fail(`${id}/parserRule: unknown key '${key}'`)
-  if (rule.schemaVersion !== 2)
-    fail(`${id}/parserRule.schemaVersion: must be 2`)
+  if (rule.schemaVersion !== 1)
+    fail(`${id}/parserRule.schemaVersion: must be 1`)
   validateContentTransforms(id, rule.contentTransforms)
   const phases = validatePhases(id, rule.phases, rule.memory)
   const handlers = rule.handlers
@@ -435,7 +435,7 @@ const validate = (id, doc) => {
   const missing = REQUIRED_KEYS.filter(key => !keys.includes(key))
   if (extra.length) fail(`${id}: unknown keys ${extra.join(', ')}`)
   if (missing.length) fail(`${id}: missing keys ${missing.join(', ')}`)
-  if (doc.schemaVersion !== 2) fail(`${id}: schemaVersion must be 2`)
+  if (doc.schemaVersion !== 1) fail(`${id}: schemaVersion must be 1`)
   if (typeof doc.name !== 'string' || !doc.name.trim()) fail(`${id}: name must be a non-empty string`)
   if (typeof doc.page !== 'object' || doc.page === null || Array.isArray(doc.page))
     fail(`${id}: page must be an object`)
@@ -507,13 +507,13 @@ if (existsSync(bundlePath)) {
 }
 const sameAsPrevious =
   previous &&
-  previous.schemaVersion === 2 &&
+  previous.schemaVersion === 1 &&
   previous.bundleVersion === version &&
   Array.isArray(previous.providers) &&
   JSON.stringify(previous.providers) === JSON.stringify(providers)
 
 const bundle = {
-  schemaVersion: 2,
+  schemaVersion: 1,
   bundleVersion: version,
   generatedAt: sameAsPrevious ? previous.generatedAt : new Date().toISOString(),
   providers

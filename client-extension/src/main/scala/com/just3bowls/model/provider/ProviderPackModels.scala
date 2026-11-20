@@ -94,7 +94,7 @@ object ProviderPackIndex {
     }
     if (kind != "provider-index") Left("Provider index has the wrong kind")
     else if (packSchema != 1) Left(s"Unsupported provider pack schema: $packSchema")
-    else if (providerSchema != 2) Left(s"Unsupported provider schema: $providerSchema")
+    else if (providerSchema != 1) Left(s"Unsupported provider schema: $providerSchema")
     else if (bundleVersion <= 0) Left("Provider index has no positive bundleVersion")
     else if (minExtensionVersion.trim.isEmpty) Left("Provider index has no minExtensionVersion")
     else if (!sha256.matches("^[0-9a-f]{64}$")) Left("Provider index has an invalid SHA256")

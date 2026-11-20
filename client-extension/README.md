@@ -97,7 +97,7 @@ The resulting unpacked extension is written to `dist`.
 
 Provider presets are JSONC files under `presets/providers`.
 
-Inside `parserRule.schemaVersion: 2`, simple match conditions may use `equals`, `contains`,
+Inside `parserRule.schemaVersion: 1`, simple match conditions may use `equals`, `contains`,
 `startsWith`, or `notStartsWith` instead of a regex. A handler may use `content: "$.path"` when its
 only action is `appendContent`; handlers with multiple actions keep the explicit `actions` array.
 Text-match shorthands and `content` are parsed directly by the runtime and are also accepted by

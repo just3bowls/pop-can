@@ -33,7 +33,7 @@ class ProviderPackCryptoSpec extends FunSuite {
     val valid = JsBridge.obj(
       "kind"                  -> ("provider-index"),
       "packSchemaVersion"     -> (1),
-      "providerSchemaVersion" -> (2),
+      "providerSchemaVersion" -> (1),
       "bundleVersion"         -> (21),
       "minExtensionVersion"   -> ("0.1.0"),
       "generatedAt"           -> ("2026-11-14T00:00:00.000Z"),
@@ -46,7 +46,7 @@ class ProviderPackCryptoSpec extends FunSuite {
     val external = JsBridge.obj(
       "kind"                  -> ("provider-index"),
       "packSchemaVersion"     -> (1),
-      "providerSchemaVersion" -> (2),
+      "providerSchemaVersion" -> (1),
       "bundleVersion"         -> (21),
       "minExtensionVersion"   -> ("0.1.0"),
       "generatedAt"           -> ("2026-11-14T00:00:00.000Z"),
