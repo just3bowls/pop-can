@@ -12,4 +12,9 @@ class MarkerOverlayViewSpec extends FunSuite {
     assertEquals(MarkerOverlayView.labelSide("new-chat", 20, 160, 200), "right")
     assertEquals(MarkerOverlayView.labelSide("new-chat", 160, 180, 200), "left")
   }
+
+  test("draws the connector on the same side as the label") {
+    assertEquals(MarkerOverlayView.connectorSide("left"), "left")
+    assertEquals(MarkerOverlayView.connectorSide("right"), "right")
+  }
 }

@@ -44,6 +44,9 @@ object MarkerOverlayView {
     else "right"
   }
 
+  def connectorSide(labelSide: String): String =
+    if (labelSide == "left") "left" else "right"
+
   def render(state: MarkerOverlayState): HtmlElement =
     div(
       position := "fixed",
@@ -63,20 +66,20 @@ object MarkerOverlayView {
           border   := (if (box.labelOnly) "0" else s"1px dashed ${box.color}"),
           pointerEvents.none,
           div(
-            position                                       := "absolute",
-            top                                            := "50%",
-            width                                          := "7px",
-            height                                         := "1px",
-            backgroundColor                                := box.color,
-            (if (box.labelSide == "left") right else left) := "-7px"
+            position                                                      := "absolute",
+            top                                                           := "50%",
+            width                                                         := "7px",
+            height                                                        := "1px",
+            backgroundColor                                               := box.color,
+            (if (connectorSide(box.labelSide) == "left") left else right) := "-7px"
           ),
           span(
-            position                                       := "absolute",
-            (if (box.labelSide == "left") right else left) := "calc(100% + 7px)",
-            top                                            := "50%",
-            transform                                      := "translateY(-50%)",
-            display                                        := "inline-block",
-            padding                                        := "1px 5px",
+            position                                                      := "absolute",
+            (if (box.labelSide == "left") right else left)                := "calc(100% + 7px)",
+            top                                                           := "50%",
+            transform                                                     := "translateY(-50%)",
+            display                                                       := "inline-block",
+            padding                                                       := "1px 5px",
             borderRadius    := (if (box.labelSide == "left") "3px 0 0 3px" else "0 3px 3px 0"),
             fontSize        := "10px",
             lineHeight      := "1.35",
