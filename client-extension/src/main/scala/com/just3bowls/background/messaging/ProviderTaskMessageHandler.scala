@@ -163,6 +163,12 @@ private[background] object ProviderTaskMessageHandler {
                   "mode"          -> (parser.currentMode),
                   "error"         -> (parser.currentError),
                   "census"        -> (parser.census),
+                  "stats"         -> (JsBridge.obj(
+                    "rawScans"       -> (parser.stats.rawScans),
+                    "framesParsed"   -> (parser.stats.framesParsed),
+                    "jsonParses"     -> (parser.stats.jsonParses),
+                    "handlerFanouts" -> (parser.stats.handlerFanouts)
+                  )),
                   "hits"          -> (js.Array(hits.toSeq.sorted*))
                 ))
             }

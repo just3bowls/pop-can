@@ -12,6 +12,7 @@
     "presets:check:strict": "node scripts/build-presets.mjs --check --strict",
     "presets:explain": "node scripts/explain-provider-rule.mjs",
     "presets:diff": "node scripts/explain-provider-rule.mjs --compare",
+    "presets:bench": "node scripts/bench-provider-rule.mjs",
     "presets:test": "node --test scripts/vite-plugin-preset-build.test.mjs scripts/explain-provider-rule.test.mjs",
     "fixtures:sanitize": "node scripts/sanitize-fixtures.mjs",
     "fixtures:privacy": "node scripts/check-fixture-privacy.mjs",
