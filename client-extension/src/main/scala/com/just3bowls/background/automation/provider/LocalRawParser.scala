@@ -294,6 +294,7 @@ final class LocalRawParser(ruleJson: String, onHandlerHit: String => Unit = _ =>
         val memoryOnly =
           condition.path.forall(_.trim.isEmpty) &&
             condition.regex.forall(_.trim.isEmpty) &&
+            condition.textMatch.isEmpty &&
             condition.allOf.isEmpty &&
             condition.anyOf.isEmpty &&
             memoryKey.nonEmpty
@@ -368,19 +369,13 @@ final class LocalRawParser(ruleJson: String, onHandlerHit: String => Unit = _ =>
         }
       case _                                       => true
     }
-    val directOk     = condition.path match {
-      case Some(path) =>
-        evalPath(event, path).exists { value =>
-          condition.regex.forall(regexMatches(
-            stringify(value),
-            _
-          ))
-        }
-      case None       =>
-        condition.regex.forall(regexMatches(
-          stringify(event),
-          _
-        ))
+    val directValue  = condition.path match {
+      case Some(path) => evalPath(event, path).map(stringify)
+      case None       => Some(stringify(event))
+    }
+    val directOk     = directValue.exists { value =>
+      condition.regex.forall(regexMatches(value, _)) &&
+      condition.textMatch.forall(_.matches(value))
     }
     // `mode`：模式的**额外约束**。标签已知时按它筛；标签未知（站点改了声明）时不生效（fail-open），
     // 免得一个改名把本来能用的形状匹配也一起打挂。

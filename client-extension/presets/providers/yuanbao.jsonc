@@ -113,9 +113,7 @@
     // 监听 /api/chat SSE；meta/chainID 标签在流末尾才出现，不能用于开头模式分派。
     "apiPatterns": [
       "https://yuanbao.tencent.com/api/chat"
-    ],
-    "followUpPatterns": [],
-    "followUpIdentityPath": ""
+    ]
   },
   "attachment": {
     // file 模式使用 paste 把 .txt 交给 ql-editor，因为富文本编辑器通过剪贴板事件接收附件最稳定。
@@ -125,8 +123,6 @@
   "parserRule": {
     // Yuanbao SSE, one endpoint, several dialects — **不用 mode 分派**：它的 `event: speech_type` 是一串能力声明（实测一轮里出现过 `status` → `search_with_text` → `text` → `hint_v2_tip`，顺序还随模式变），拿第一个非 status 当标签会锁错（2026-10-14 实测：DeepSeek 快速档被锁成 search_with_text，handler 全被跳过、正文 0）。所以改为纯形状匹配：帧级 `type=text` 走 `answerDelta`（$.msg），`deepSearchAgent` 帧的 `contents[].type=text` 走 `agentContent`（$.text）。`meta.chainID` 命名了同一件事（DeepSearch / DeepSeekR1 / WorkingAgentDirect），但它在流末尾才到，也不用于分派。
     "schemaVersion": 2,
-    "confidence": "high",
-    "missingInfo": [],
     "contentTransforms": [
       {
         // Yuanbao citation markers are display metadata rather than answer text.
@@ -147,54 +143,38 @@
         }
       }
     ],
-    "memory": {},
     "handlers": [
       {
         // 经典方言（Hy3 / Hy3 深度思考 / DeepSeek 快速档 / search_with_text 档等）：答案走 `{"type":"text","msg":…}`。
         "id": "answerDelta",
         "match": {
           // 帧级 `$.type=text` 且带 `$.msg`；agent 方言的帧级 type 是 deepSearchAgent，天然不会被收。
-          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "path": "$.type",
-          "regex": "^text$"
+          "equals": "text"
         },
-        "actions": [
-          {
-            // Append raw text; contentTransforms strips citation and underline metadata.
-            "op": "appendContent",
-            "path": "$.msg"
-          }
-        ]
+        "content": "$.msg"
       },
       {
         // agent 方言（Hy4 preview / OneAgent）：one contents[] item per frame，type=text 是答案，type=think 是页面自己的思考。
         "id": "agentContent",
         "match": {
           // 帧级正则要求 deepSearchAgent（classic 帧没有 contents，本 handler 不会收）。
-          "rawRegex": "(?m)^data:\\s*(\\{.*\"type\"\\s*:\\s*\"deepSearchAgent\".*\\})\\s*$",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "eventsPath": "$.contents[*]",
           "path": "$.type",
-          "regex": "^text$"
+          "equals": "text"
         },
-        "actions": [
-          {
-            // Fragments can legitimately repeat (e.g. `\n\n`), so append verbatim; appendDelta would drop them.
-            "op": "appendContent",
-            "path": "$.text"
-          }
-        ]
+        "content": "$.text"
       },
       {
         // type=meta with stopReason=stop — the server finished this answer.
         "id": "messageMeta",
         "match": {
           // 匹配最终 meta 帧中的 stopReason=stop，不把中途能力声明或 agent 状态当作结束。
-          "rawRegex": "data: (\\{\"type\":\"meta\".*\\})\\n",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "path": "$.stopReason",
-          "regex": "^stop$"
+          "equals": "stop"
         },
         "actions": [
           {
@@ -205,7 +185,6 @@
         ]
       }
     ],
-    "final": [],
     "request": {
       // inline 模式同时改写 $.prompt 与 $.displayPrompt，保持真实请求字段和页面显示文本一致。
       "userText": [

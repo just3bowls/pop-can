@@ -109,9 +109,7 @@
     "apiPatterns": [
       "https://chat.baidu.com/aichat/api/conversation",
       "https://chat.baidu.com/chat/api/agent/task_mode"
-    ],
-    "followUpPatterns": [],
-    "followUpIdentityPath": ""
+    ]
   },
   "attachment": {
     // file 模式通过 paste 把 .txt 交给编辑器，因为页面没有稳定的文件 input。
@@ -121,39 +119,28 @@
   "parserRule": {
     // Wenxin (百度文心助手) 有多条聊天端点，每个模式的答案组件不同：经典端点 /aichat/api/conversation 既会返回 `markdown-yiyin|yan`，也会在 Search Lightning 模式切到 `officeWriting.data.content`；新的 agent 端点 /chat/api/agent/task_mode 用 `markdown-yiyan`（另有 `agentProcess` 流承载 agent 的推理过程，目前不映射）。handler 用 `match.urlRegex` 按传输作用域，每个模式的形状显式可读，而不是用正则并集去猜。请求体带完整性校验字段，所以规则同时声明 `request.derive`。
     "schemaVersion": 2,
-    "confidence": "high",
-    "missingInfo": [],
-    "memory": {},
     "handlers": [
       {
         // Agent 端点（/chat/api/agent/task_mode）：答案是 `markdown-yiyan` generator 的 `data.value` 严格增量帧（实测 19 帧拼出完整 marker 块）。必须用 appendContent：增量里会出现合法重复片段（例如 `\n@@END:`），appendDelta 的「已包含就跳过」会误删 7 个字符。
         "id": "wenxinTaskModeAnswer",
         "match": {
           // 限定 agent task_mode 端点，用 component=markdown-yiyan 识别最终答案，排除 agentProcess 推理流。
-          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "urlRegex": "chat\\.baidu\\.com/chat/api/agent/task_mode",
           "path": "$.data.message.content.generator.component",
-          "regex": "^markdown-yiyan$"
+          "equals": "markdown-yiyan"
         },
-        "actions": [
-          {
-            // 严格增量，原样追加（不能用 appendDelta：合法重复片段会被当成重复帧丢掉）。
-            "op": "appendContent",
-            "path": "$.data.message.content.generator.data.value"
-          }
-        ]
+        "content": "$.data.message.content.generator.data.value"
       },
       {
         // Agent 端点收尾：流里出现 `generate-complete`（endTurn=true）表示回答完成；显式声明完成，让规则而不是 socket 关闭来判定这一轮结束。
         "id": "wenxinTaskModeDone",
         "match": {
           // 限定 agent task_mode 端点，用 metaData.state=generate-complete 判定本轮完成。
-          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "urlRegex": "chat\\.baidu\\.com/chat/api/agent/task_mode",
           "path": "$.data.message.metaData.state",
-          "regex": "^generate-complete$"
+          "equals": "generate-complete"
         },
         "actions": [
           {
@@ -168,49 +155,34 @@
         "id": "wenxinConversationAnswer",
         "match": {
           // 经典端点 `/aichat/api/conversation` 现在也发 `markdown-yiyan`（旧捕获是 `markdown-yiyin`），所以按 `markdown-yiy(an|in)` 收；实测该端点的 value 是纯增量，用 appendContent。
-          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "urlRegex": "chat\\.baidu\\.com/aichat/api/conversation",
           "path": "$.data.message.content.generator.component",
           "regex": "^markdown-yiy(an|in)$"
         },
-        "actions": [
-          {
-            // 增量语义（不是快照），appendContent；用 appendDelta 会把 `\n\n` 这类合法重复增量当重复帧丢掉。
-            "op": "appendContent",
-            "path": "$.data.message.content.generator.data.value"
-          }
-        ]
+        "content": "$.data.message.content.generator.data.value"
       },
       {
         // Search Lightning 模式把正文放在 `officeWriting.data.content`，实测 175 个小增量拼出完整 marker（包括 `@@BEG:response@@` 也被拆成多个片段）。这段两套端点都可能出现，因此按组件形状统一接收。
         "id": "wenxinOfficeWritingAnswer",
         "match": {
           // 两套端点都可能进入 Search Lightning，因此按 component=officeWriting 统一识别正文。
-          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "urlRegex": "chat\\.baidu\\.com/(?:aichat/api/conversation|chat/api/agent/task_mode)",
           "path": "$.data.message.content.generator.component",
-          "regex": "^officeWriting$"
+          "equals": "officeWriting"
         },
-        "actions": [
-          {
-            // 严格增量；marker 本身会被拆成 `@@`、`B`、`EG` 等片段，必须原样拼接。
-            "op": "appendContent",
-            "path": "$.data.message.content.generator.data.content"
-          }
-        ]
+        "content": "$.data.message.content.generator.data.content"
       },
       {
         // 经典端点也会以 generate-complete + endTurn=true 收尾；显式设置 finishReason，避免 Search Lightning 等模式白等流关闭。
         "id": "wenxinConversationDone",
         "match": {
           // 限定经典 conversation 端点，用 metaData.state=generate-complete 判定本轮完成。
-          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "urlRegex": "chat\\.baidu\\.com/aichat/api/conversation",
           "path": "$.data.message.metaData.state",
-          "regex": "^generate-complete$"
+          "equals": "generate-complete"
         },
         "actions": [
           {
@@ -221,7 +193,6 @@
         ]
       }
     ],
-    "final": [],
     "request": {
       // 以上路径对应经典端点 /aichat/api/conversation 的请求体形状；新 agent 端点 /chat/api/agent/task_mode 的 body 形状不同（message.inputMethod/content/searchInfo…），inline 模式（请求体改写）需要先对新端点请求体采样再补路径——file/typed 模式不受影响。
       "userText": "$.message.query[?(@.type=='TEXT')][0].data.text.query",

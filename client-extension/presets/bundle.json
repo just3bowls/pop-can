@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "bundleVersion": 22,
-  "generatedAt": "2026-11-13T23:02:17.041Z",
+  "bundleVersion": 26,
+  "generatedAt": "2026-11-20T03:26:44.558Z",
   "providers": [
     {
       "id": "deepseek",
@@ -117,9 +117,7 @@
       "network": {
         "apiPatterns": [
           "https://chat.deepseek.com/api/v0/chat/completion"
-        ],
-        "followUpPatterns": [],
-        "followUpIdentityPath": ""
+        ]
       },
       "attachment": {
         "strategy": "input",
@@ -127,9 +125,9 @@
       },
       "parserRule": {
         "schemaVersion": 2,
-        "confidence": "high",
-        "missingInfo": [],
-        "memory": {},
+        "phases": {
+          "inResponse": "true"
+        },
         "handlers": [
           {
             "id": "responseFragmentStart",
@@ -138,19 +136,11 @@
               "jsonGroup": 1,
               "eventsPath": "$.v.response.fragments[*]",
               "path": "$.type",
-              "regex": "RESPONSE"
+              "contains": "RESPONSE"
             },
-            "actions": [
-              {
-                "op": "setMemory",
-                "key": "inResponse",
-                "value": "true"
-              },
-              {
-                "op": "appendContent",
-                "path": "$.content"
-              }
-            ]
+            "phase": "inResponse",
+            "startsPhase": true,
+            "content": "$.content"
           },
           {
             "id": "responseStart",
@@ -159,19 +149,11 @@
               "jsonGroup": 1,
               "eventsPath": "$.v[*]",
               "path": "$.type",
-              "regex": "RESPONSE"
+              "contains": "RESPONSE"
             },
-            "actions": [
-              {
-                "op": "setMemory",
-                "key": "inResponse",
-                "value": "true"
-              },
-              {
-                "op": "appendContent",
-                "path": "$.content"
-              }
-            ]
+            "phase": "inResponse",
+            "startsPhase": true,
+            "content": "$.content"
           },
           {
             "id": "batchedResponseFragmentStart",
@@ -180,19 +162,11 @@
               "jsonGroup": 1,
               "eventsPath": "$.v[*].v[*]",
               "path": "$.type",
-              "regex": "RESPONSE"
+              "contains": "RESPONSE"
             },
-            "actions": [
-              {
-                "op": "setMemory",
-                "key": "inResponse",
-                "value": "true"
-              },
-              {
-                "op": "appendContent",
-                "path": "$.content"
-              }
-            ]
+            "phase": "inResponse",
+            "startsPhase": true,
+            "content": "$.content"
           },
           {
             "id": "contentAppend",
@@ -200,22 +174,16 @@
               "rawRegex": "data: (\\{\"p\":\"response/fragments/-1/content\".*\\})",
               "jsonGroup": 1,
               "path": "$.v",
-              "regex": "^(?!\\[reference:).*",
-              "memoryKey": "inResponse",
-              "memoryEquals": "true",
+              "notStartsWith": "[reference:",
               "allOf": [
                 {
                   "path": "$.p",
-                  "regex": "^response/fragments/-1/content$"
+                  "equals": "response/fragments/-1/content"
                 }
               ]
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.v"
-              }
-            ]
+            "phase": "inResponse",
+            "content": "$.v"
           },
           {
             "id": "directAppend",
@@ -223,16 +191,10 @@
               "rawRegex": "data: (\\{\"v\":\".*\"\\})",
               "jsonGroup": 1,
               "path": "$.v",
-              "regex": "^(?!\\[reference:).*",
-              "memoryKey": "inResponse",
-              "memoryEquals": "true"
+              "notStartsWith": "[reference:"
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.v"
-              }
-            ]
+            "phase": "inResponse",
+            "content": "$.v"
           }
         ],
         "contentTransforms": [
@@ -245,7 +207,6 @@
             }
           }
         ],
-        "final": [],
         "request": {
           "userText": "$.prompt"
         }
@@ -400,9 +361,7 @@
       "network": {
         "apiPatterns": [
           "https://www.doubao.com/chat/completion"
-        ],
-        "followUpPatterns": [],
-        "followUpIdentityPath": ""
+        ]
       },
       "attachment": {
         "strategy": "input",
@@ -410,9 +369,6 @@
       },
       "parserRule": {
         "schemaVersion": 2,
-        "confidence": "high",
-        "missingInfo": [],
-        "memory": {},
         "handlers": [
           {
             "id": "thinkingStart",
@@ -424,7 +380,7 @@
               "allOf": [
                 {
                   "path": "$.block_type",
-                  "regex": "^10040$"
+                  "equals": "10040"
                 }
               ]
             },
@@ -523,12 +479,7 @@
                 }
               ]
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.patch_value.content_block[?(@.block_type=='10000')][0].content.text_block.text"
-              }
-            ]
+            "content": "$.patch_value.content_block[?(@.block_type=='10000')][0].content.text_block.text"
           },
           {
             "id": "answerNotifyDelta",
@@ -547,12 +498,7 @@
                 }
               ]
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.content.content_block[?(@.block_type=='10000')][0].content.text_block.text"
-              }
-            ]
+            "content": "$.content.content_block[?(@.block_type=='10000')][0].content.text_block.text"
           },
           {
             "id": "chunkDelta",
@@ -571,12 +517,7 @@
                 }
               ]
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.text"
-              }
-            ]
+            "content": "$.text"
           },
           {
             "id": "replyEnd",
@@ -584,7 +525,7 @@
               "rawRegex": "event: SSE_REPLY_END\\ndata: (.+)\\n",
               "jsonGroup": 1,
               "path": "$.end_type",
-              "regex": "^1$"
+              "equals": "1"
             },
             "actions": [
               {
@@ -594,7 +535,6 @@
             ]
           }
         ],
-        "final": [],
         "request": {
           "userText": "$.messages[-1].content_block[?(@.block_type=='10000')][0].content.text_block.text"
         }
@@ -725,9 +665,7 @@
       "network": {
         "apiPatterns": [
           "https://chatglm.cn/chatglm/backend-api/assistant/stream"
-        ],
-        "followUpPatterns": [],
-        "followUpIdentityPath": ""
+        ]
       },
       "attachment": {
         "strategy": "input",
@@ -735,8 +673,6 @@
       },
       "parserRule": {
         "schemaVersion": 2,
-        "confidence": "medium",
-        "missingInfo": [],
         "contentTransforms": [
           {
             "id": "dropTurnChip",
@@ -755,16 +691,14 @@
             }
           }
         ],
-        "memory": {},
         "handlers": [
           {
             "id": "gmlTextChunk",
             "match": {
-              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "eventsPath": "$.parts[*]",
               "path": "$.content[?(@.type=='text')][0].type",
-              "regex": "^text$",
+              "equals": "text",
               "allOf": [
                 {
                   "path": "$.status",
@@ -772,25 +706,19 @@
                 }
               ]
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.content[?(@.type=='text')][0].text"
-              }
-            ]
+            "content": "$.content[?(@.type=='text')][0].text"
           },
           {
             "id": "gmlFinishSnapshot",
             "match": {
-              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "eventsPath": "$.parts[*]",
               "path": "$.content[?(@.type=='text')][0].type",
-              "regex": "^text$",
+              "equals": "text",
               "allOf": [
                 {
                   "path": "$.status",
-                  "regex": "^finish$"
+                  "equals": "finish"
                 }
               ]
             },
@@ -802,7 +730,6 @@
             ]
           }
         ],
-        "final": [],
         "request": {
           "userText": "$.messages[-1].content[?(@.type=='text')][0].text"
         }
@@ -920,9 +847,7 @@
       "network": {
         "apiPatterns": [
           "https://www.kimi.com/apiv2/kimi.gateway.chat.v1.ChatService/Chat"
-        ],
-        "followUpPatterns": [],
-        "followUpIdentityPath": ""
+        ]
       },
       "attachment": {
         "strategy": "input",
@@ -930,8 +855,6 @@
       },
       "parserRule": {
         "schemaVersion": 2,
-        "confidence": "high",
-        "missingInfo": [],
         "contentTransforms": [
           {
             "id": "dropReferenceBlock",
@@ -942,7 +865,6 @@
             }
           }
         ],
-        "memory": {},
         "handlers": [
           {
             "id": "answerStart",
@@ -951,12 +873,7 @@
               "jsonGroup": 0,
               "path": "$.block.text.content"
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.block.text.content"
-              }
-            ]
+            "content": "$.block.text.content"
           },
           {
             "id": "answerDelta",
@@ -965,12 +882,7 @@
               "jsonGroup": 0,
               "path": "$.block.text.content"
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.block.text.content"
-              }
-            ]
+            "content": "$.block.text.content"
           },
           {
             "id": "messageCompleted",
@@ -978,7 +890,7 @@
               "rawRegex": "\\{\"op\"\\s*:\\s*\"set\"\\s*,\\s*\"mask\"\\s*:\\s*\"message\\.status\"\\s*,\\s*\"eventOffset\"\\s*:\\s*\\d+\\s*,\\s*\"message\"\\s*:\\s*\\{[^{}]*?\"status\"\\s*:\\s*\"MESSAGE_STATUS_COMPLETED\"\\s*[^{}]*?\\}\\}",
               "jsonGroup": 0,
               "path": "$.message.status",
-              "regex": "^MESSAGE_STATUS_COMPLETED$"
+              "equals": "MESSAGE_STATUS_COMPLETED"
             },
             "actions": [
               {
@@ -1024,7 +936,6 @@
             ]
           }
         ],
-        "final": [],
         "request": {
           "userText": "$.message.blocks[0].text.content"
         }
@@ -1135,9 +1046,7 @@
         "apiPatterns": [
           "https://longcat.chat/api/v1/chat-completion-oversea-V2",
           "https://longcat.chat/api/v1/chat-completion-V2"
-        ],
-        "followUpPatterns": [],
-        "followUpIdentityPath": ""
+        ]
       },
       "attachment": {
         "strategy": "input",
@@ -1145,32 +1054,22 @@
       },
       "parserRule": {
         "schemaVersion": 2,
-        "confidence": "high",
-        "missingInfo": [],
-        "memory": {},
         "handlers": [
           {
             "id": "answerDelta",
             "match": {
-              "rawRegex": "data:(\\{.*\\})\\n",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "path": "$.event.type",
-              "regex": "^content$"
+              "equals": "content"
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.event.content"
-              }
-            ]
+            "content": "$.event.content"
           },
           {
             "id": "finish",
             "match": {
-              "rawRegex": "data:(\\{.*\\})\\n",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "path": "$.event.type",
-              "regex": "^finish$"
+              "equals": "finish"
             },
             "actions": [
               {
@@ -1180,7 +1079,6 @@
             ]
           }
         ],
-        "final": [],
         "request": {
           "userText": "$.content"
         }
@@ -1368,9 +1266,7 @@
       "network": {
         "apiPatterns": [
           "https://aistudio.xiaomimimo.com/open-apis/react/chat"
-        ],
-        "followUpPatterns": [],
-        "followUpIdentityPath": ""
+        ]
       },
       "attachment": {
         "strategy": "input",
@@ -1378,33 +1274,22 @@
       },
       "parserRule": {
         "schemaVersion": 2,
-        "confidence": "high",
-        "missingInfo": [],
-        "contentTransforms": [],
-        "memory": {},
         "handlers": [
           {
             "id": "answerDelta",
             "match": {
-              "rawRegex": "event:message\\ndata:\\s*(.+)\\n",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "path": "$.messageType",
-              "regex": "^assistant$"
+              "equals": "assistant"
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.content"
-              }
-            ]
+            "content": "$.content"
           },
           {
             "id": "finish",
             "match": {
-              "rawRegex": "event:finish\\ndata:\\s*(.+)\\n",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "path": "$.content",
-              "regex": "^\\[DONE\\]$"
+              "equals": "[DONE]"
             },
             "actions": [
               {
@@ -1414,7 +1299,6 @@
             ]
           }
         ],
-        "final": [],
         "request": {
           "userText": "$.query"
         }
@@ -1593,18 +1477,14 @@
       },
       "parserRule": {
         "schemaVersion": 2,
-        "confidence": "high",
-        "missingInfo": [],
-        "memory": {},
         "handlers": [
           {
             "id": "qianwenAnswerText",
             "match": {
-              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "eventsPath": "$.data.messages[*]",
               "path": "$.mime_type",
-              "regex": "^multi_load/iframe$"
+              "equals": "multi_load/iframe"
             },
             "actions": [
               {
@@ -1616,15 +1496,14 @@
           {
             "id": "qianwenAnswerDone",
             "match": {
-              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "eventsPath": "$.data.messages[*]",
               "path": "$.mime_type",
-              "regex": "^multi_load/iframe$",
+              "equals": "multi_load/iframe",
               "allOf": [
                 {
                   "path": "$.status",
-                  "regex": "^complete$"
+                  "equals": "complete"
                 }
               ]
             },
@@ -1636,7 +1515,6 @@
             ]
           }
         ],
-        "final": [],
         "request": {
           "userText": [
             "$.messages[-1].content",
@@ -1754,9 +1632,7 @@
         "apiPatterns": [
           "https://chat.baidu.com/aichat/api/conversation",
           "https://chat.baidu.com/chat/api/agent/task_mode"
-        ],
-        "followUpPatterns": [],
-        "followUpIdentityPath": ""
+        ]
       },
       "attachment": {
         "strategy": "paste",
@@ -1764,34 +1640,24 @@
       },
       "parserRule": {
         "schemaVersion": 2,
-        "confidence": "high",
-        "missingInfo": [],
-        "memory": {},
         "handlers": [
           {
             "id": "wenxinTaskModeAnswer",
             "match": {
-              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "urlRegex": "chat\\.baidu\\.com/chat/api/agent/task_mode",
               "path": "$.data.message.content.generator.component",
-              "regex": "^markdown-yiyan$"
+              "equals": "markdown-yiyan"
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.data.message.content.generator.data.value"
-              }
-            ]
+            "content": "$.data.message.content.generator.data.value"
           },
           {
             "id": "wenxinTaskModeDone",
             "match": {
-              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "urlRegex": "chat\\.baidu\\.com/chat/api/agent/task_mode",
               "path": "$.data.message.metaData.state",
-              "regex": "^generate-complete$"
+              "equals": "generate-complete"
             },
             "actions": [
               {
@@ -1803,43 +1669,30 @@
           {
             "id": "wenxinConversationAnswer",
             "match": {
-              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "urlRegex": "chat\\.baidu\\.com/aichat/api/conversation",
               "path": "$.data.message.content.generator.component",
               "regex": "^markdown-yiy(an|in)$"
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.data.message.content.generator.data.value"
-              }
-            ]
+            "content": "$.data.message.content.generator.data.value"
           },
           {
             "id": "wenxinOfficeWritingAnswer",
             "match": {
-              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "urlRegex": "chat\\.baidu\\.com/(?:aichat/api/conversation|chat/api/agent/task_mode)",
               "path": "$.data.message.content.generator.component",
-              "regex": "^officeWriting$"
+              "equals": "officeWriting"
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.data.message.content.generator.data.content"
-              }
-            ]
+            "content": "$.data.message.content.generator.data.content"
           },
           {
             "id": "wenxinConversationDone",
             "match": {
-              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "urlRegex": "chat\\.baidu\\.com/aichat/api/conversation",
               "path": "$.data.message.metaData.state",
-              "regex": "^generate-complete$"
+              "equals": "generate-complete"
             },
             "actions": [
               {
@@ -1849,7 +1702,6 @@
             ]
           }
         ],
-        "final": [],
         "request": {
           "userText": "$.message.query[?(@.type=='TEXT')][0].data.text.query",
           "derive": [
@@ -1983,9 +1835,7 @@
       "network": {
         "apiPatterns": [
           "https://yuanbao.tencent.com/api/chat"
-        ],
-        "followUpPatterns": [],
-        "followUpIdentityPath": ""
+        ]
       },
       "attachment": {
         "strategy": "paste",
@@ -1993,8 +1843,6 @@
       },
       "parserRule": {
         "schemaVersion": 2,
-        "confidence": "high",
-        "missingInfo": [],
         "contentTransforms": [
           {
             "id": "dropCitationToken",
@@ -2013,46 +1861,32 @@
             }
           }
         ],
-        "memory": {},
         "handlers": [
           {
             "id": "answerDelta",
             "match": {
-              "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "path": "$.type",
-              "regex": "^text$"
+              "equals": "text"
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.msg"
-              }
-            ]
+            "content": "$.msg"
           },
           {
             "id": "agentContent",
             "match": {
-              "rawRegex": "(?m)^data:\\s*(\\{.*\"type\"\\s*:\\s*\"deepSearchAgent\".*\\})\\s*$",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "eventsPath": "$.contents[*]",
               "path": "$.type",
-              "regex": "^text$"
+              "equals": "text"
             },
-            "actions": [
-              {
-                "op": "appendContent",
-                "path": "$.text"
-              }
-            ]
+            "content": "$.text"
           },
           {
             "id": "messageMeta",
             "match": {
-              "rawRegex": "data: (\\{\"type\":\"meta\".*\\})\\n",
-              "jsonGroup": 1,
+              "transport": "sse-json-line",
               "path": "$.stopReason",
-              "regex": "^stop$"
+              "equals": "stop"
             },
             "actions": [
               {
@@ -2062,7 +1896,6 @@
             ]
           }
         ],
-        "final": [],
         "request": {
           "userText": [
             "$.prompt",

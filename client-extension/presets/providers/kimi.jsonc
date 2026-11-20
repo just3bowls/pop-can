@@ -112,9 +112,7 @@
     // 监听 Kimi ChatService/Chat 的 gRPC-Web POST；帧解包由请求层完成，parserRule 只解释解包后的 JSON。
     "apiPatterns": [
       "https://www.kimi.com/apiv2/kimi.gateway.chat.v1.ChatService/Chat"
-    ],
-    "followUpPatterns": [],
-    "followUpIdentityPath": ""
+    ]
   },
   "attachment": {
     // file 模式使用页面隐藏的 input.hidden-input；固定 selector 避免页面其他上传控件干扰。
@@ -124,8 +122,6 @@
   "parserRule": {
     // Kimi streams gRPC-Web frames whose payload is a JSON operation log (op=set / op=append on masks); this rule reads the decoded frames, the framing itself is handled by the request layer. 另外认两种控制帧：`"done":{}`（收尾）与 `{"error":{"code":…}}`（provider 报错，直接失败而不是等超时）。 另认两种控制帧：`done:{}`（正常收尾）与错误帧（报可读原因，别等超时）。
     "schemaVersion": 2,
-    "confidence": "high",
-    "missingInfo": [],
     "contentTransforms": [
       {
         // Kimi citation references are page-rendered metadata rather than answer text.
@@ -137,7 +133,6 @@
         }
       }
     ],
-    "memory": {},
     "handlers": [
       {
         // op=set on block.text — the block's first, whole content.
@@ -148,13 +143,7 @@
           "jsonGroup": 0,
           "path": "$.block.text.content"
         },
-        "actions": [
-          {
-            // Append raw content; contentTransforms is the single normalization layer.
-            "op": "appendContent",
-            "path": "$.block.text.content"
-          }
-        ]
+        "content": "$.block.text.content"
       },
       {
         // op=append on block.text.content — incremental pieces of the same block.
@@ -165,13 +154,7 @@
           "jsonGroup": 0,
           "path": "$.block.text.content"
         },
-        "actions": [
-          {
-            // Append raw content; contentTransforms is the single normalization layer.
-            "op": "appendContent",
-            "path": "$.block.text.content"
-          }
-        ]
+        "content": "$.block.text.content"
       },
       {
         // op=set on message.status=MESSAGE_STATUS_COMPLETED — the turn is over.
@@ -181,7 +164,7 @@
           "rawRegex": "\\{\"op\"\\s*:\\s*\"set\"\\s*,\\s*\"mask\"\\s*:\\s*\"message\\.status\"\\s*,\\s*\"eventOffset\"\\s*:\\s*\\d+\\s*,\\s*\"message\"\\s*:\\s*\\{[^{}]*?\"status\"\\s*:\\s*\"MESSAGE_STATUS_COMPLETED\"\\s*[^{}]*?\\}\\}",
           "jsonGroup": 0,
           "path": "$.message.status",
-          "regex": "^MESSAGE_STATUS_COMPLETED$"
+          "equals": "MESSAGE_STATUS_COMPLETED"
         },
         "actions": [
           {
@@ -236,7 +219,6 @@
         ]
       }
     ],
-    "final": [],
     "request": {
       // ChatService schema 把 message.blocks 定义为有序的用户消息块；这次捕获的请求只有一个文本块。
       // 该顺序由协议保证，不是可重排的候选集合，所以保留 [0] 并由 buildEvidence 绑定 request fixture。

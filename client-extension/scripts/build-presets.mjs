@@ -86,9 +86,14 @@ const readVersion = () => {
  * ② 某个 handler 依赖 `memoryKey`，但规则里没人 `setMemory` 同一个键（阶段门永远打不开）。
  */
 const MATCH_KEYS = new Set([
-  'rawRegex', 'jsonGroup', 'eventsPath', 'path', 'regex', 'urlRegex', 'mode',
+  'transport', 'rawRegex', 'jsonGroup', 'eventsPath', 'path', 'regex',
+  'equals', 'contains', 'startsWith', 'notStartsWith', 'urlRegex', 'mode',
   'memoryKey', 'memoryEquals', 'memoryNotEquals', 'memoryPath', 'allOf', 'anyOf'
 ])
+const TEXT_MATCH_KEYS = ['equals', 'contains', 'startsWith', 'notStartsWith']
+const TRANSPORT_KINDS = new Set(['sse-json-line'])
+const SSE_JSON_LINE_RAW_REGEX = String.raw`(?m)^data:\s*(\{.*\})\s*$`
+const HANDLER_KEYS = new Set(['id', 'match', 'actions', 'content', 'phase', 'startsPhase'])
 const ACTION_OPS = new Set([
   'appendContent',
   'appendDelta',
@@ -101,11 +106,12 @@ const ACTION_OPS = new Set([
 ])
 const ACTION_KEYS = new Set(['op', 'path', 'value', 'key'])
 const RULE_KEYS = new Set([
-  'schemaVersion', 'confidence', 'missingInfo', 'contentTransforms',
-  'memory', 'mode', 'handlers', 'final', 'finalActions', 'request'
+  'schemaVersion', 'contentTransforms', 'memory', 'phases', 'mode',
+  'handlers', 'finalActions', 'request'
 ])
 const TRANSFORM_KEYS = new Set(['id', 'regex', 'replacement', 'settle'])
 const SETTLE_KEYS = new Set(['candidatePrefix', 'holdback'])
+const MEMORY_MATCH_KEYS = ['memoryKey', 'memoryEquals', 'memoryNotEquals', 'memoryPath']
 
 const collectConditions = match => {
   const out = [match]
@@ -257,37 +263,121 @@ const validateFixedIndexEvidence = (id, evidence) => {
   return out
 }
 
+const validatePhases = (id, phases, memory) => {
+  if (phases === undefined) return new Map()
+  if (!phases || typeof phases !== 'object' || Array.isArray(phases))
+    fail(`${id}/parserRule.phases: must be an object`)
+  const out = new Map()
+  for (const [rawKey, value] of Object.entries(phases)) {
+    const key = rawKey.trim()
+    if (!key) fail(`${id}/parserRule.phases: keys must be non-empty`)
+    if (out.has(key)) fail(`${id}/parserRule.phases: duplicate phase '${key}'`)
+    if (memory && Object.prototype.hasOwnProperty.call(memory, key))
+      fail(`${id}/parserRule.phases.${key}: conflicts with root memory key`)
+    if (typeof value !== 'string' || !value.trim())
+      fail(`${id}/parserRule.phases.${key}: must be a non-empty string`)
+    out.set(key, value.trim())
+  }
+  return out
+}
+
 const validateRule = (id, rule, warnings, fixedIndexEvidence) => {
   for (const key of Object.keys(rule))
     if (!RULE_KEYS.has(key)) fail(`${id}/parserRule: unknown key '${key}'`)
   if (rule.schemaVersion !== 2)
     fail(`${id}/parserRule.schemaVersion: must be 2`)
   validateContentTransforms(id, rule.contentTransforms)
+  const phases = validatePhases(id, rule.phases, rule.memory)
   const handlers = rule.handlers
   const sets = new Set()
   const uses = new Set()
   const literalHandlers = []
-  handlers.forEach(handler => {
+  handlers.forEach((handler, handlerIndex) => {
+    if (!handler || typeof handler !== 'object' || Array.isArray(handler))
+      fail(`${id}/handlers[${handlerIndex}]: must be an object`)
     const where = `${id}/${handler.id}`
-    for (const key of Object.keys(handler.match || {}))
+    for (const key of Object.keys(handler))
+      if (!HANDLER_KEYS.has(key)) fail(`${where}: unknown handler key '${key}'`)
+    const match = handler.match || {}
+    if (typeof match !== 'object' || Array.isArray(match)) fail(`${where}: match must be an object`)
+    for (const key of Object.keys(match))
       if (!MATCH_KEYS.has(key)) fail(`${where}: unknown match key '${key}'`)
-    for (const cond of collectConditions(handler.match || {})) {
+    for (const cond of collectConditions(match)) {
+      const hasTransport = Object.prototype.hasOwnProperty.call(cond, 'transport')
+      if (hasTransport) {
+        if (cond !== match) fail(`${where}: transport is only allowed on handler.match`)
+        if (typeof cond.transport !== 'string' || !TRANSPORT_KINDS.has(cond.transport))
+          fail(`${where}.transport: unsupported transport '${cond.transport}'`)
+        if (
+          Object.prototype.hasOwnProperty.call(cond, 'rawRegex') ||
+          Object.prototype.hasOwnProperty.call(cond, 'jsonGroup')
+        )
+          fail(`${where}: transport cannot be combined with rawRegex or jsonGroup`)
+      }
+      const selectedTextMatches = TEXT_MATCH_KEYS.filter(key =>
+        Object.prototype.hasOwnProperty.call(cond, key)
+      )
+      if (selectedTextMatches.length > 1)
+        fail(`${where}: only one text match shorthand is allowed`)
+      if (selectedTextMatches.length > 0 && Object.prototype.hasOwnProperty.call(cond, 'regex'))
+        fail(`${where}: regex and ${selectedTextMatches[0]} are mutually exclusive`)
+      for (const key of selectedTextMatches)
+        if (typeof cond[key] !== 'string' || !cond[key].trim())
+          fail(`${where}.match.${key}: must be a non-empty string`)
       if (cond.memoryKey) uses.add(cond.memoryKey)
       if (cond.mode && key0(rule, 'mode') === undefined) fail(`${where}: match.mode needs rule.mode.fromStream`)
     }
     if (handler.match?.memoryPath && !handler.match?.memoryKey)
       fail(`${where}: memoryPath needs memoryKey`)
+    const hasPhase = Object.prototype.hasOwnProperty.call(handler, 'phase')
+    const hasStartsPhase = Object.prototype.hasOwnProperty.call(handler, 'startsPhase')
+    let phase = ''
+    let startsPhase = false
+    if (hasStartsPhase && typeof handler.startsPhase !== 'boolean')
+      fail(`${where}.startsPhase: must be a boolean`)
+    if (hasStartsPhase && !hasPhase) fail(`${where}.startsPhase: requires phase`)
+    if (hasPhase) {
+      if (typeof handler.phase !== 'string' || !handler.phase.trim())
+        fail(`${where}.phase: must be a non-empty string`)
+      phase = handler.phase.trim()
+      if (!phases.has(phase)) fail(`${where}.phase: unknown phase '${phase}'`)
+      startsPhase = hasStartsPhase && handler.startsPhase
+      if (collectConditions(match).some(cond =>
+        MEMORY_MATCH_KEYS.some(key => Object.prototype.hasOwnProperty.call(cond, key))
+      ))
+        fail(`${where}: phase cannot be combined with explicit memory gates`)
+    }
+    const hasActions = Object.prototype.hasOwnProperty.call(handler, 'actions')
+    const hasContent = Object.prototype.hasOwnProperty.call(handler, 'content')
+    if (hasActions && hasContent) fail(`${where}: content and actions are mutually exclusive`)
+    if (hasActions && !Array.isArray(handler.actions)) fail(`${where}: actions must be an array`)
+    if (hasContent) {
+      if (typeof handler.content !== 'string' || !handler.content.trim())
+        fail(`${where}.content: must be a non-empty JSONPath`)
+      if (!handler.content.trim().startsWith('$'))
+        fail(`${where}.content: must be a JSONPath starting with '$'`)
+    }
+    const actions = hasActions ? handler.actions : []
+    if (phase && startsPhase && actions.some(action => action.op === 'setMemory' && action.key === phase))
+      fail(`${where}: startsPhase cannot be combined with setMemory for '${phase}'`)
+    if (phase) {
+      if (startsPhase) sets.add(phase)
+      else uses.add(phase)
+    }
     // 只统计「会产生 delta」的 handler：纯 setMemory / setFinishReason 的 handler 永远不出现在 hits 里
     // （finishReason 没变化时 emit 返回空），拿 fixture 覆盖要求它们不合理。
-    const producesDelta = (handler.actions || []).some(a =>
-      ['appendContent', 'appendDelta', 'setContent', 'truncateContent'].includes(a.op)
-    )
-    if (producesDelta && /"(type|block_type|end_type)"\s*:\s*"/.test(handler.match?.rawRegex || ''))
+    const producesDelta =
+      hasContent ||
+      actions.some(a => ['appendContent', 'appendDelta', 'setContent', 'truncateContent'].includes(a.op))
+    const effectiveRawRegex =
+      match.transport === 'sse-json-line' ? SSE_JSON_LINE_RAW_REGEX : match.rawRegex || ''
+    if (producesDelta && /"(type|block_type|end_type)"\s*:\s*"/.test(effectiveRawRegex))
       literalHandlers.push(handler.id)
     const fixedIndexPaths = [
-      handler.match?.path,
-      ...(handler.actions || []).map(action => action.path),
-      ...collectConditions(handler.match || {}).flatMap(cond => [cond.path, cond.memoryPath])
+      match.path,
+      hasContent ? handler.content : undefined,
+      ...actions.map(action => action.path),
+      ...collectConditions(match).flatMap(cond => [cond.path, cond.memoryPath])
     ].filter(hasUnsafeFixedIndex)
     for (const path of new Set(fixedIndexPaths)) {
       const evidence = fixedIndexEvidence.get(`response\0${path}`)
@@ -297,7 +387,7 @@ const validateRule = (id, rule, warnings, fixedIndexEvidence) => {
           `${where}: fixed array index in '${path}' — use eventsPath + a discriminator unless a buildEvidence entry names the exact response fixture`
         )
     }
-    for (const action of handler.actions || []) {
+    for (const action of actions) {
       if (!ACTION_OPS.has(action.op)) fail(`${where}: unknown action op '${action.op}'`)
       for (const key of Object.keys(action)) if (!ACTION_KEYS.has(key)) fail(`${where}: unknown action key '${key}'`)
       if (action.op === 'setMemory' && action.key) sets.add(action.key)
@@ -368,8 +458,9 @@ const validate = (id, doc) => {
   for (const key of Object.keys(doc.network)) if (!NETWORK_KEYS.has(key)) fail(`${id}/network: unknown key '${key}'`)
   if (!Array.isArray(doc.network.apiPatterns) || doc.network.apiPatterns.length === 0)
     fail(`${id}: network.apiPatterns must be a non-empty array`)
-  if (!Array.isArray(doc.network.followUpPatterns)) fail(`${id}: network.followUpPatterns must be an array`)
-  if (typeof doc.network.followUpIdentityPath !== 'string')
+  if (doc.network.followUpPatterns !== undefined && !Array.isArray(doc.network.followUpPatterns))
+    fail(`${id}: network.followUpPatterns must be an array when present`)
+  if (doc.network.followUpIdentityPath !== undefined && typeof doc.network.followUpIdentityPath !== 'string')
     fail(`${id}: network.followUpIdentityPath must be a string`)
   if (typeof doc.attachment !== 'object' || doc.attachment === null || Array.isArray(doc.attachment))
     fail(`${id}: attachment must be an object`)
