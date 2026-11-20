@@ -95,7 +95,7 @@ The resulting unpacked extension is written to `dist`.
 
 ## Provider Pack
 
-Provider presets are JSONC files under `presets/providers`.
+Provider definitions are JSONC files under `provider-catalog/providers`.
 
 Inside `parserRule.schemaVersion: 1`, simple match conditions may use `equals`, `contains`,
 `startsWith`, or `notStartsWith` instead of a regex. A handler may use `content: "$.path"` when its
@@ -129,37 +129,37 @@ Authoring shorthands are normalized by the real extension runtime. Use these com
 development extension loaded and CDP available:
 
 ```bash
-npm run presets:explain -- --provider deepseek
-npm run presets:diff -- --provider deepseek --from HEAD~1
-npm run presets:bench
+npm run providers:explain -- --provider deepseek
+npm run providers:diff -- --provider deepseek --from HEAD~1
+npm run providers:bench
 ```
 
-`presets:explain` prints the effective rawRegex, literal matcher, memory gates, and actions.
-`presets:diff` compares effective rules rather than JSONC formatting. `presets:bench` reports
+`providers:explain` prints the effective rawRegex, literal matcher, memory gates, and actions.
+`providers:diff` compares effective rules rather than JSONC formatting. `providers:bench` reports
 shared-extractor scan/parse/fanout counts for representative large fixtures.
 
 After editing a preset:
 
-1. Increment `presets/VERSION`.
+1. Increment `provider-catalog/VERSION`.
 2. Rebuild the bundled catalog:
 
 ```bash
-node scripts/build-presets.mjs
+node scripts/build-provider-catalog.mjs
 ```
 
 `npm run dev` and `npm run build` also rebuild this catalog through their pre-lifecycle scripts.
-While the development server is running, changes to `presets/providers/*.jsonc` or
-`presets/VERSION` automatically rebuild `presets/bundle.json`. Re-import the bundle to apply it;
+While the development server is running, changes to `provider-catalog/providers/*.jsonc` or
+`provider-catalog/VERSION` automatically rebuild `provider-catalog/bundle.json`. Re-import the bundle to apply it;
 the development server never updates installed provider configuration automatically.
 
 3. Verify the committed bundle matches the JSONC sources:
 
 ```bash
-npm run presets:check
+npm run providers:check
 ```
 
 CI and release checks still run this stale-bundle check before building. Use
-`npm run presets:check:strict` when auditing fixed-array-index warnings.
+`npm run providers:check:strict` when auditing fixed-array-index warnings.
 
 4. Run parser fixture replay:
 

@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- * 把 `presets/providers/*.jsonc`（逐家权威文件，人可读、可手改）打成 `presets/bundle.json`
+ * 把 `provider-catalog/providers/*.jsonc`（逐家权威文件，人可读、可手改）打成 `provider-catalog/bundle.json`
  * —— 这份 bundle 才是插件运行时要读、用户要 import 的东西。
  *
- * 用法：`node client-extension/scripts/build-presets.mjs`
+ * 用法：`node client-extension/scripts/build-provider-catalog.mjs`
  *
  * 约定：
  * - 文件名（去掉 .jsonc）= provider id，也就是 `parserProvider:<id>` 的 key；文件里不写 id，避免两处漂移。
  * - 源文件允许行注释、块注释和尾逗号；产物始终是无注释的严格 JSON。
- * - `presets/VERSION` 是单行整数，发布时手动 +1；bundleVersion 直接取自它。
+ * - `provider-catalog/VERSION` 是单行整数，发布时手动 +1；bundleVersion 直接取自它。
  * - 幂等：providers 内容与版本都没变时不重写文件（generatedAt 也不会变），所以重跑不会污染 git diff。
  */
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs'
@@ -17,17 +17,17 @@ import { fileURLToPath } from 'node:url'
 import { parse, printParseErrorCode } from 'jsonc-parser'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const presetsDir = join(here, '..', 'presets')
-const providersDir = join(presetsDir, 'providers')
-const versionPath = join(presetsDir, 'VERSION')
-const bundlePath = join(presetsDir, 'bundle.json')
+const catalogDir = join(here, '..', 'provider-catalog')
+const providersDir = join(catalogDir, 'providers')
+const versionPath = join(catalogDir, 'VERSION')
+const bundlePath = join(catalogDir, 'bundle.json')
 const args = new Set(process.argv.slice(2))
 const checkMode = args.has('--check')
 const strictMode = args.has('--strict')
 const unknownArgs = [...args].filter(arg => arg !== '--check' && arg !== '--strict')
 if (unknownArgs.length > 0) {
-  console.error(`build-presets: unknown argument(s): ${unknownArgs.join(', ')}`)
-  console.error('usage: build-presets.mjs [--check] [--strict]')
+  console.error(`build-provider-catalog: unknown argument(s): ${unknownArgs.join(', ')}`)
+  console.error('usage: build-provider-catalog.mjs [--check] [--strict]')
   process.exit(2)
 }
 
@@ -48,7 +48,7 @@ const BUILD_EVIDENCE_KEYS = new Set(['fixedIndexes'])
 const FIXED_INDEX_EVIDENCE_KEYS = new Set(['path', 'kind', 'reason', 'fixture'])
 
 const fail = message => {
-  console.error(`build-presets: ${message}`)
+  console.error(`build-provider-catalog: ${message}`)
   process.exit(1)
 }
 
@@ -75,7 +75,7 @@ const readVersion = () => {
   if (!existsSync(versionPath)) fail(`missing ${versionPath}`)
   const raw = readFileSync(versionPath, 'utf8').trim()
   const version = Number.parseInt(raw, 10)
-  if (!Number.isInteger(version) || version <= 0) fail(`presets/VERSION must be a positive integer, got ${JSON.stringify(raw)}`)
+  if (!Number.isInteger(version) || version <= 0) fail(`provider-catalog/VERSION must be a positive integer, got ${JSON.stringify(raw)}`)
   return version
 }
 
@@ -210,7 +210,7 @@ const validateRequestFixture = (id, path) => {
 }
 
 const validateFixedIndexEvidence = (id, evidence) => {
-  const fixtureDir = join(presetsDir, 'fixtures', id)
+  const fixtureDir = join(catalogDir, 'fixtures', id)
   if (evidence === undefined) return new Map()
   if (!evidence || typeof evidence !== 'object' || Array.isArray(evidence))
     fail(`${id}/buildEvidence: must be an object`)
@@ -232,7 +232,7 @@ const validateFixedIndexEvidence = (id, evidence) => {
     if (entry.kind !== 'request' && entry.kind !== 'response')
       fail(`${where}.kind: must be 'request' or 'response'`)
     if (basename(entry.fixture) !== entry.fixture)
-      fail(`${where}.fixture: must be a file name in presets/fixtures/${id}`)
+      fail(`${where}.fixture: must be a file name in provider-catalog/fixtures/${id}`)
     const fixturePath = join(fixtureDir, entry.fixture)
     if (!existsSync(fixturePath)) fail(`${where}.fixture: missing ${fixturePath}`)
     if (entry.kind === 'request') {
@@ -402,8 +402,8 @@ const validateRule = (id, rule, warnings, fixedIndexEvidence) => {
       )
   }
 
-  const fixtureDir = join(presetsDir, 'fixtures', id)
-  if (!existsSync(fixtureDir)) warnings.push(`${id}: no fixtures (add presets/fixtures/${id}/*)`)
+  const fixtureDir = join(catalogDir, 'fixtures', id)
+  if (!existsSync(fixtureDir)) warnings.push(`${id}: no fixtures (add provider-catalog/fixtures/${id}/*)`)
   else {
     const files = readdirSync(fixtureDir)
     const fixtures = files.filter(name => name.endsWith('.expect.json'))
@@ -482,7 +482,7 @@ const ids = providerFiles
   .map(name => basename(name, '.jsonc'))
   .sort()
 
-if (ids.length === 0) fail('no .jsonc provider files found in presets/providers')
+if (ids.length === 0) fail('no .jsonc provider files found in provider-catalog/providers')
 
 const warnings = []
 const providers = ids.map(id => {
@@ -517,13 +517,13 @@ const bundle = {
 }
 
 if (strictMode && warnings.length > 0) {
-  for (const warning of warnings) console.error(`build-presets: error: ${warning}`)
-  console.error(`build-presets: strict mode rejected ${warnings.length} warning(s)`)
+  for (const warning of warnings) console.error(`build-provider-catalog: error: ${warning}`)
+  console.error(`build-provider-catalog: strict mode rejected ${warnings.length} warning(s)`)
   process.exit(1)
 }
 
 if (checkMode) {
-  if (!previous) fail(`missing ${bundlePath}; run: npm run presets:build --prefix client-extension`)
+  if (!previous) fail(`missing ${bundlePath}; run: npm run providers:build --prefix client-extension`)
   const reasons = []
   if (previous.schemaVersion !== bundle.schemaVersion) {
     reasons.push(`schemaVersion ${previous.schemaVersion} != ${bundle.schemaVersion}`)
@@ -548,20 +548,20 @@ if (checkMode) {
     reasons.push(`providers differ${detail ? ` (${detail})` : ''}`)
   }
   if (reasons.length > 0) {
-    for (const reason of reasons) console.error(`build-presets: stale bundle: ${reason}`)
-    fail('bundle.json is stale; run: npm run presets:build --prefix client-extension')
+    for (const reason of reasons) console.error(`build-provider-catalog: stale bundle: ${reason}`)
+    fail('bundle.json is stale; run: npm run providers:build --prefix client-extension')
   }
-  for (const warning of warnings) console.warn(`build-presets: warning: ${warning}`)
+  for (const warning of warnings) console.warn(`build-provider-catalog: warning: ${warning}`)
   console.log(
-    `build-presets: bundle v${bundle.bundleVersion} · ${providers.length} providers · ` +
+    `build-provider-catalog: bundle v${bundle.bundleVersion} · ${providers.length} providers · ` +
       `in sync · ${warnings.length} warning(s)`
   )
   process.exit(0)
 }
 
 writeFileSync(bundlePath, `${JSON.stringify(bundle, null, 2)}\n`)
-for (const warning of warnings) console.warn(`build-presets: warning: ${warning}`)
+for (const warning of warnings) console.warn(`build-provider-catalog: warning: ${warning}`)
 console.log(
-  `build-presets: bundle v${version} · ${providers.length} providers (${ids.join(', ')}) · ` +
+  `build-provider-catalog: bundle v${version} · ${providers.length} providers (${ids.join(', ')}) · ` +
     `${sameAsPrevious ? 'unchanged' : 'updated'} · ${warnings.length} warning(s)`
 )

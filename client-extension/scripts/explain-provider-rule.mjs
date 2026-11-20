@@ -18,7 +18,7 @@ const valueAfter = name => {
 
 export const sourceText = (source, provider) => {
   if (existsSync(source)) return readFileSync(source, 'utf8')
-  const relative = `client-extension/presets/providers/${provider}.jsonc`
+  const relative = `client-extension/provider-catalog/providers/${provider}.jsonc`
   return execFileSync('git', ['show', `${source}:${relative}`], {
     cwd: repoRoot,
     encoding: 'utf8'
@@ -104,7 +104,7 @@ const main = async () => {
     process.exit(2)
   }
   const currentText = sourceText(
-    currentSource || join(extensionRoot, 'presets', 'providers', `${provider}.jsonc`),
+    currentSource || join(extensionRoot, 'provider-catalog', 'providers', `${provider}.jsonc`),
     provider
   )
   const effective = await explainRule(ruleFromProviderText(currentText, provider))

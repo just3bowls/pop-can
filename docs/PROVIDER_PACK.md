@@ -87,11 +87,11 @@ key access always has an approval boundary:
 - Configure at least one required reviewer on `provider-signing`.
 
 ```bash
-npm run presets:build --prefix client-extension
-npm run presets:check --prefix client-extension
+npm run providers:build --prefix client-extension
+npm run providers:check --prefix client-extension
 ```
 
-Any content change must increment `client-extension/presets/VERSION`. The publication workflow
+Any content change must increment `client-extension/provider-catalog/VERSION`. The publication workflow
 compares the new content hash with the currently deployed index and rejects an unchanged version
 when content differs.
 

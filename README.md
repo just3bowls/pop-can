@@ -245,7 +245,7 @@ sbt --client 'server/test'
 sbt --client 'extension/test'
 sbt --client 'extension/fastLinkJS'
 sbt --client 'scalafmtCheckAll'
-npm run presets:check --prefix client-extension
+npm run providers:check --prefix client-extension
 node client-extension/scripts/check-architecture.mjs
 node client-extension/scripts/check-linked-js.mjs
 ```

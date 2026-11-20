@@ -8,7 +8,7 @@ import {evalInTarget, usablePluginPage} from './lib/provider-cdp.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const extensionRoot = resolve(here, '..')
-const presetsDir = join(extensionRoot, 'presets')
+const catalogDir = join(extensionRoot, 'provider-catalog')
 const samples = [
   ['deepseek', 'thinking'],
   ['yuanbao', 'search-with-text'],
@@ -16,7 +16,7 @@ const samples = [
 ]
 
 const providerRule = provider => {
-  const path = join(presetsDir, 'providers', `${provider}.jsonc`)
+  const path = join(catalogDir, 'providers', `${provider}.jsonc`)
   const doc = parseJsonc(readFileSync(path, 'utf8'), [], {allowTrailingComma: true, disallowComments: false})
   return JSON.stringify(doc.parserRule)
 }
@@ -24,7 +24,7 @@ const providerRule = provider => {
 const main = async () => {
   const page = await usablePluginPage()
   for (const [provider, dialect] of samples) {
-    const fixture = join(presetsDir, 'fixtures', provider, `${dialect}.raw.txt`)
+    const fixture = join(catalogDir, 'fixtures', provider, `${dialect}.raw.txt`)
     const expectPath = fixture.replace(/\.raw\.txt$/, '.expect.json')
     if (!existsSync(fixture)) throw new Error(`missing benchmark fixture: ${fixture}`)
     if (!existsSync(expectPath)) throw new Error(`missing benchmark expectation: ${expectPath}`)

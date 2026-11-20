@@ -4,7 +4,7 @@ import {fileURLToPath} from 'node:url'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const extensionRoot = path.resolve(scriptDir, '..')
-const fixturesRoot = path.join(extensionRoot, 'presets', 'fixtures')
+const fixturesRoot = path.join(extensionRoot, 'provider-catalog', 'fixtures')
 
 const sensitiveKeys = new Set([
   'authorization',

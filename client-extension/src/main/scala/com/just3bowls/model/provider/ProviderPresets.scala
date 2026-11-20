@@ -73,7 +73,7 @@ final case class ProviderImportPlan(
 /**
  * provider 预设包的运行时入口：**把配置文件变成运行时真相**。
  *
- * 一句话职责：仓库里 `presets/providers/` 下的逐家 JSONC 是"有哪些 provider、长什么样"，签名 Provider Pack 是它在运行时的形态；本对象负责把已安装 pack 落到
+ * 一句话职责：仓库里 `provider-catalog/providers/` 下的逐家 JSONC 是"有哪些 provider、长什么样"，签名 Provider Pack 是它在运行时的形态；本对象负责把已安装 pack 落到
  * `chrome.storage.local["parserProvider:<id>"]`（唯一运行时真相），并维护"删除过哪些"与"上次应用到哪个版本"。
  *
  * 冲突口径见 [[PresetApply]]：本地优先，只有"从预设包原样应用、之后没被动过"的文档才会被随包升级。
@@ -296,7 +296,7 @@ object ProviderPresets {
       Jsonc.parse(trimmed, "Import") match {
         case Left(error)                                                             => Left(s"Invalid JSONC: $error")
         case Right(value) if !JsonValue.isObject(value) && !JsonValue.isArray(value) =>
-          Left("Unrecognized JSONC: expected a preset bundle, a provider object, or an array of providers")
+          Left("Unrecognized JSONC: expected a provider bundle, a provider object, or an array of providers")
         case Right(value)                                                            =>
           try {
             val parsed = value
@@ -313,7 +313,7 @@ object ProviderPresets {
                 plan =>
                   plan.copy(owned = false)
               )
-            } else Left("Unrecognized JSONC: expected a preset bundle, a provider object, or an array of providers")
+            } else Left("Unrecognized JSONC: expected a provider bundle, a provider object, or an array of providers")
           } catch { case e: Throwable => Left(s"Invalid JSONC: ${e.getMessage}") }
       }
   }

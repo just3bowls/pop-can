@@ -27,10 +27,10 @@ private[background] object BackgroundBootstrap {
     ProviderPresets
       .ensureApplied()
       .map { report =>
-        if (report.changed) PopCanLog.info("presets", s"provider presets ${report.summary}")
+        if (report.changed) PopCanLog.info("provider-catalog", s"provider catalog ${report.summary}")
         ()
       }
-      .recover { case e => PopCanLog.warn("presets", s"apply failed: ${e.getMessage}") }
+      .recover { case e => PopCanLog.warn("provider-catalog", s"apply failed: ${e.getMessage}") }
       .foreach { _ =>
         ProviderPackManager.startup()
         WebChatContentScripts.startWatch()

@@ -47,7 +47,7 @@ jobs:
         run: |
           node release/check-version.mjs --tag "$RELEASE_TAG"
           node release/check-extension-id.mjs
-          npm run presets:check:strict --prefix client-extension
+          npm run providers:check:strict --prefix client-extension
           npm run fixtures:privacy --prefix client-extension
           node client-extension/scripts/check-architecture.mjs
           node release/check-deprecated-paths.mjs

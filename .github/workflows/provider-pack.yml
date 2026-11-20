@@ -30,7 +30,7 @@ jobs:
         run: npm ci --prefix client-extension
 
       - name: Verify provider bundle
-        run: npm run presets:check:strict --prefix client-extension
+        run: npm run providers:check:strict --prefix client-extension
 
       - name: Build signed provider pack
         env:
