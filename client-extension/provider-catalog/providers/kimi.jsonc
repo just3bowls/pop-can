@@ -1,7 +1,6 @@
 {
   // Kimi 使用 gRPC-Web 帧承载 JSON operation log；规则识别 text block 的 set/append、message completed、done 与 provider error 控制帧。
   "schemaVersion": 1,
-  "name": "kimi",
   "page": {
     // Kimi 的编辑器是 contenteditable，New Chat 在侧栏；fingerprints 依赖编辑器角色与页面布局，而不是容易变化的深层节点序号。
     "url": "https://www.kimi.com/",
@@ -21,39 +20,26 @@
           "输入 \"/\" 唤起插件和技能",
           "输入 \"/\" 唤起插件和技能"
         ],
-        "anchorDeltaX": 0,
-        "anchorDeltaY": 0,
-        "ariaLabel": "",
         "capturedAt": 1791509633882,
         "classes": [
           "chat-input-editor"
         ],
-        "clickable": false,
-        "dataTestId": "",
         "docX": 758.2000122070312,
         "docY": 312.20001220703125,
         "editable": true,
         "height": 48,
-        "id": "",
         "innerHeight": 711,
         "innerWidth": 1298,
-        "name": "",
-        "nearInput": false,
         "nearestText": "输入 \"/\" 唤起插件和技能",
         "parentClasses": [
           "chat-input-editor-container"
         ],
         "parentTag": "div",
-        "parentText": "",
-        "placeholder": "",
         "role": "input",
-        "scrollX": 0,
-        "scrollY": 0,
         "siblingTexts": [
           "输入 \"/\" 唤起插件和技能"
         ],
         "tag": "div",
-        "text": "",
         "width": 734.4000244140625,
         "x": 758.2000122070312,
         "y": 312.20001220703125
@@ -71,9 +57,6 @@
           "#LeftBarAnimatedIcon-enter-rs-1sihg8c-mh2{transform-box:view-box;transform-origin:0 0;animation:LeftBarAnimatedIcon-ente",
           "#LeftBarAnimatedIcon-enter-rs-1sihg8c-mh2{transform-box:view-box;transform-origin:0 0;animation:LeftBarAnimatedIcon-ente"
         ],
-        "anchorDeltaX": 0,
-        "anchorDeltaY": 0,
-        "ariaLabel": "",
         "capturedAt": 1791509632154,
         "classes": [
           "new-chat-btn"
@@ -82,24 +65,14 @@
         "dataTestId": "sidebar-new-chat",
         "docX": 120,
         "docY": 82.80000114440918,
-        "editable": false,
         "height": 41.60000228881836,
-        "id": "",
         "innerHeight": 711,
         "innerWidth": 1298,
-        "name": "",
-        "nearInput": false,
-        "nearestText": "",
         "parentClasses": [
           "sidebar-new-chat"
         ],
         "parentTag": "div",
-        "parentText": "",
-        "placeholder": "",
         "role": "new-chat",
-        "scrollX": 0,
-        "scrollY": 0,
-        "siblingTexts": [],
         "tag": "a",
         "text": "#NewChatAnimatedIcon-svg-rs-ew8n6j-p1{transform-box:view-box;transform-origin:0 0;animation:NewChatAnimatedIcon-svg-rs-ew8n6j-p1 0.4167s linear 1 forwards}@keyframes NewChatAnimatedIcon-svg-rs-ew8n6j-",
         "width": 224,

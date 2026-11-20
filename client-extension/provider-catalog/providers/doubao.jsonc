@@ -1,7 +1,6 @@
 {
   // Doubao 网页 SSE：答案位于 block_type=10000 文本块，深度思考档会先出现 10040 思考块；规则通过 thinkStart/answerStart 阶段门把页面思考与最终答案分开。
   "schemaVersion": 1,
-  "name": "doubao",
   "page": {
     // Doubao 使用 Tiptap/ProseMirror contenteditable 作为输入框，New Chat 在左侧导航；fingerprints 优先匹配编辑器角色、classes 与容器层级。
     "url": "https://www.doubao.com/chat",
@@ -27,41 +26,25 @@
           "container-ObLj2X",
           "w-full"
         ],
-        "ancestorTexts": [],
-        "anchorDeltaX": 0,
-        "anchorDeltaY": 0,
-        "ariaLabel": "",
         "capturedAt": 1790673710133,
         "classes": [
           "tiptap",
           "ProseMirror",
           "ProseMirror-focused"
         ],
-        "clickable": false,
-        "dataTestId": "",
         "docX": 788.8000183105469,
         "docY": 623.2000122070312,
         "editable": true,
         "height": 24,
-        "id": "",
         "innerHeight": 711,
         "innerWidth": 1298,
-        "name": "",
-        "nearInput": false,
-        "nearestText": "",
         "parentClasses": [
           "w-full",
           "text-16"
         ],
         "parentTag": "div",
-        "parentText": "",
-        "placeholder": "",
         "role": "input",
-        "scrollX": 0,
-        "scrollY": 0,
-        "siblingTexts": [],
         "tag": "div",
-        "text": "",
         "width": 945.6000366210938,
         "x": 788.8000183105469,
         "y": 623.2000122070312
@@ -100,9 +83,6 @@
           "豆包新工作任务Ctrl J新对话Ctrl Shift K",
           "豆包新工作任务Ctrl J新对话Ctrl Shift K定时任务Ctrl Shift T插件 · 技能 · 伙伴Ctrl Shift S云盘Ctrl Shift DAPI 服务更多 To pick up a draggable item, "
         ],
-        "anchorDeltaX": 0,
-        "anchorDeltaY": 0,
-        "ariaLabel": "",
         "capturedAt": 1790673707630,
         "classes": [
           "group/sidebar_nav_item",
@@ -118,25 +98,13 @@
           "mb-2"
         ],
         "clickable": true,
-        "dataTestId": "",
         "docX": 140.00000476837158,
         "docY": 104.80000305175781,
-        "editable": false,
         "height": 32,
-        "id": "",
         "innerHeight": 767,
         "innerWidth": 1298,
-        "name": "",
-        "nearInput": false,
-        "nearestText": "",
-        "parentClasses": [],
         "parentTag": "div",
-        "parentText": "",
-        "placeholder": "",
         "role": "new-chat",
-        "scrollX": 0,
-        "scrollY": 0,
-        "siblingTexts": [],
         "tag": "div",
         "text": "新对话Ctrl Shift K",
         "width": 254.40000915527344,
@@ -153,8 +121,7 @@
   },
   "attachment": {
     // file 模式向编辑器附近的隐藏 file input 注入 .txt；selector 留空时自动选择 text-like 输入，页面支持多文件但本流程只上传本轮 request body。
-    "strategy": "input",
-    "selector": ""
+    "strategy": "input"
   },
   "parserRule": {
     // doubao SSE. 答案永远在 `block_type=10000` 的文本块里；但深度思考档会先来一个 10040 思考块，思考文字被包成一个 `10000` 文本块（`parent_id` 指向思考块），它的 `CHUNK_DELTA` 增量与答案的**形状完全一致**。所以规则先用 `thinkStart` 记住“进过思考块”，再用 `answerStart` 记住“答案块开始”（帧内断言：`block_id` 后面直接是 `content`，即没有 `parent_id`；另有 `answer_first_token` 作为备份触发），delta handler 的门是 `answerStart 非空` 或 `thinkStart 为空` —— 思考阶段被挡、普通档不受影响。
