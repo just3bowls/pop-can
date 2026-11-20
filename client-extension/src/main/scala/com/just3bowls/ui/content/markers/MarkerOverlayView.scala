@@ -11,6 +11,7 @@ final case class MarkerBoxView(
     top: Double,
     width: Double,
     height: Double,
+    labelSide: String,
     flash: Boolean
 )
 
@@ -29,6 +30,20 @@ final case class MarkerOverlayState(
 )
 
 object MarkerOverlayView {
+  def labelSide(role: String, left: Double, right: Double, viewportWidth: Double): String = {
+    val estimatedWidth = role match {
+      case "new-chat" => 70.0
+      case "input"    => 42.0
+      case _          => 64.0
+    }
+    val leftSpace      = math.max(0.0, left)
+    val rightSpace     = math.max(0.0, viewportWidth - right)
+    if (leftSpace >= estimatedWidth + 8) "left"
+    else if (rightSpace >= estimatedWidth + 8) "right"
+    else if (leftSpace >= rightSpace) "left"
+    else "right"
+  }
+
   def render(state: MarkerOverlayState): HtmlElement =
     div(
       position := "fixed",
@@ -47,13 +62,22 @@ object MarkerOverlayView {
           height   := s"${box.height}px",
           border   := (if (box.labelOnly) "0" else s"1px dashed ${box.color}"),
           pointerEvents.none,
+          div(
+            position                                       := "absolute",
+            top                                            := "50%",
+            width                                          := "7px",
+            height                                         := "1px",
+            backgroundColor                                := box.color,
+            (if (box.labelSide == "left") right else left) := "-7px"
+          ),
           span(
-            position        := "absolute",
-            left            := "-1px",
-            top             := "-18px",
-            display         := "inline-block",
-            padding         := "1px 5px",
-            borderRadius    := "3px",
+            position                                       := "absolute",
+            (if (box.labelSide == "left") right else left) := "calc(100% + 7px)",
+            top                                            := "50%",
+            transform                                      := "translateY(-50%)",
+            display                                        := "inline-block",
+            padding                                        := "1px 5px",
+            borderRadius    := (if (box.labelSide == "left") "3px 0 0 3px" else "0 3px 3px 0"),
             fontSize        := "10px",
             lineHeight      := "1.35",
             whiteSpace.nowrap,

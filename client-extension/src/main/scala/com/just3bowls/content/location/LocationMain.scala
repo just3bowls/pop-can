@@ -250,6 +250,12 @@ object LocationMain {
               top = JsBridge.asDouble(rect.top) - 1,
               width = width + 2,
               height = height + 2,
+              labelSide = MarkerOverlayView.labelSide(
+                role,
+                JsBridge.asDouble(rect.left),
+                JsBridge.asDouble(rect.right),
+                JsBridge.asDouble(JsBridge.window.innerWidth)
+              ),
               flash = previous.exists(_.flash)
             )
             if (!previous.contains(next)) {
