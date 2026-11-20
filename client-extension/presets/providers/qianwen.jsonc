@@ -175,20 +175,16 @@
   "parserRule": {
     // qianwen (domestic, chat2.qianwen.com): the answer always arrives as `multi_load/iframe` messages, but over two transports — the streaming `/api/v2/chat` SSE (one message per `data:` frame, content is a cumulative snapshot) and, when the server switches the turn to an async card, the `/api/v1/chat/snap` snapshot polls (all messages inside one `data.messages[]` array; the complete answer lands in the snapshot whose `is_async_card` finally flips to 0). `eventsPath` fans the message array out so one handler set covers both shapes. Progress bars / follow-up cards / intent signals carry no answer text.
     "schemaVersion": 2,
-    "confidence": "high",
-    "missingInfo": [],
-    "memory": {},
     "handlers": [
       {
         // Answer text: only `multi_load/iframe` messages carry it; `bar/workflow` is the progress bar, `paa/iframe` / `survey/card` are follow-up cards, `signal/post` is the intent signal.
         "id": "qianwenAnswerText",
         "match": {
           // 展开 messages[] 后只选 mime_type=multi_load/iframe 的答案消息，跳过进度条、推荐卡和意图信号。
-          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "eventsPath": "$.data.messages[*]",
           "path": "$.mime_type",
-          "regex": "^multi_load/iframe$"
+          "equals": "multi_load/iframe"
         },
         "actions": [
           {
@@ -203,16 +199,15 @@
         "id": "qianwenAnswerDone",
         "match": {
           // 在答案消息中再匹配 status=complete，只有终态消息才结束本轮。
-          "rawRegex": "(?m)^data:\\s*(\\{.*\\})\\s*$",
-          "jsonGroup": 1,
+          "transport": "sse-json-line",
           "eventsPath": "$.data.messages[*]",
           "path": "$.mime_type",
-          "regex": "^multi_load/iframe$",
+          "equals": "multi_load/iframe",
           "allOf": [
             {
               // Only the terminal message.
               "path": "$.status",
-              "regex": "^complete$"
+              "equals": "complete"
             }
           ]
         },
@@ -225,7 +220,6 @@
         ]
       }
     ],
-    "final": [],
     "request": {
       // Request body: {"req_id":..,"messages":[{"mime_type":"text/plain","content":"...","meta_data":{"ori_query":"..."}}]}. Both paths hold the user's prompt; rewriting the body keeps them consistent.
       "userText": [
