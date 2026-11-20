@@ -1,6 +1,6 @@
 {
   // Qianwen 国内版有两类答案传输：/api/v2/chat SSE 增量快照，以及异步卡片时 /api/v1/chat/snap 轮询快照；规则用 eventsPath 同时覆盖两种形状。
-  "schemaVersion": 2,
+  "schemaVersion": 1,
   "name": "qianwen",
   "page": {
     // Qianwen 使用 Slate/contenteditable 编辑器，New Chat 在侧栏；fingerprints 用于稳定定位该富文本输入区。
@@ -174,7 +174,7 @@
   },
   "parserRule": {
     // qianwen (domestic, chat2.qianwen.com): the answer always arrives as `multi_load/iframe` messages, but over two transports — the streaming `/api/v2/chat` SSE (one message per `data:` frame, content is a cumulative snapshot) and, when the server switches the turn to an async card, the `/api/v1/chat/snap` snapshot polls (all messages inside one `data.messages[]` array; the complete answer lands in the snapshot whose `is_async_card` finally flips to 0). `eventsPath` fans the message array out so one handler set covers both shapes. Progress bars / follow-up cards / intent signals carry no answer text.
-    "schemaVersion": 2,
+    "schemaVersion": 1,
     "handlers": [
       {
         // Answer text: only `multi_load/iframe` messages carry it; `bar/workflow` is the progress bar, `paa/iframe` / `survey/card` are follow-up cards, `signal/post` is the intent signal.

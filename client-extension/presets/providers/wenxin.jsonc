@@ -1,6 +1,6 @@
 {
   // Wenxin 有两种聊天端点：经典 /aichat/api/conversation 与 agent /chat/api/agent/task_mode；不同模式的答案组件和增量语义不同，规则按 URL 明确分派。
-  "schemaVersion": 2,
+  "schemaVersion": 1,
   "name": "wenxin",
   "page": {
     // Wenxin 使用 textarea 作为输入框，New Chat 在页面导航；fingerprints 用于定位编辑器和新建对话入口。
@@ -118,7 +118,7 @@
   },
   "parserRule": {
     // Wenxin (百度文心助手) 有多条聊天端点，每个模式的答案组件不同：经典端点 /aichat/api/conversation 既会返回 `markdown-yiyin|yan`，也会在 Search Lightning 模式切到 `officeWriting.data.content`；新的 agent 端点 /chat/api/agent/task_mode 用 `markdown-yiyan`（另有 `agentProcess` 流承载 agent 的推理过程，目前不映射）。handler 用 `match.urlRegex` 按传输作用域，每个模式的形状显式可读，而不是用正则并集去猜。请求体带完整性校验字段，所以规则同时声明 `request.derive`。
-    "schemaVersion": 2,
+    "schemaVersion": 1,
     "handlers": [
       {
         // Agent 端点（/chat/api/agent/task_mode）：答案是 `markdown-yiyan` generator 的 `data.value` 严格增量帧（实测 19 帧拼出完整 marker 块）。必须用 appendContent：增量里会出现合法重复片段（例如 `\n@@END:`），appendDelta 的「已包含就跳过」会误删 7 个字符。

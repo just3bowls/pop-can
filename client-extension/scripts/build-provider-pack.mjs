@@ -71,7 +71,7 @@ const packName = `provider-pack-v${bundle.bundleVersion}.popcan.json`
 const packPayload = {
   kind: 'provider-pack',
   packSchemaVersion: 1,
-  providerSchemaVersion: 2,
+  providerSchemaVersion: 1,
   bundleVersion: bundle.bundleVersion,
   minExtensionVersion: productVersion,
   generatedAt: bundle.generatedAt,
@@ -88,7 +88,7 @@ writeFileSync(latestPackPath, packText)
 const indexPayload = {
   kind: 'provider-index',
   packSchemaVersion: 1,
-  providerSchemaVersion: 2,
+  providerSchemaVersion: 1,
   bundleVersion: bundle.bundleVersion,
   minExtensionVersion: productVersion,
   generatedAt: bundle.generatedAt,

@@ -120,7 +120,7 @@ object ProviderPresets {
       val providerSchema = JsBridge.intField(raw, "providerSchemaVersion").getOrElse(0)
       if (kind != "provider-pack") Left("Provider payload has the wrong kind")
       else if (packSchema != 1) Left(s"Unsupported provider pack schema: $packSchema")
-      else if (providerSchema != 2) Left(s"Unsupported provider schema: $providerSchema")
+      else if (providerSchema != 1) Left(s"Unsupported provider schema: $providerSchema")
       else parseBundle(raw, fallbackId = false).map(_.bundle)
     } catch { case e: Throwable => Left(s"Invalid provider pack payload: ${e.getMessage}") }
 
@@ -350,12 +350,12 @@ object ProviderPresets {
     val provider = ParserProviderLocal.parse(id, doc)
     val rule     = parseRule(provider.parserRule)
     val schema   = JsonValue.intField(doc, "schemaVersion").getOrElse(0)
-    if (schema != 2) Left(s"$id: schemaVersion must be 2")
+    if (schema != 1) Left(s"$id: schemaVersion must be 1")
     else if (provider.pageUrl.trim.isEmpty) Left(s"$id: page.url is required")
     else if (provider.inputSelector.trim.isEmpty) Left(s"$id: page.selectors.input is required")
     else if (provider.apiPatterns.isEmpty) Left(s"$id: network.apiPatterns is required")
     else if (js.isUndefined(rule) || rule == null) Left(s"$id: parserRule is required")
-    else if (ruleSchema(rule) != 2) Left(s"$id: parserRule.schemaVersion must be 2")
+    else if (ruleSchema(rule) != 1) Left(s"$id: parserRule.schemaVersion must be 1")
     else Right(provider.copy(name = if (provider.name.trim.nonEmpty) provider.name else id))
   }
   private def ruleSchema(rule: js.Any): Int                                                     =

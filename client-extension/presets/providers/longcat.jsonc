@@ -1,6 +1,6 @@
 {
   // Longcat 标准 SSE：event.type=content 输出正文增量，event.type=finish 显式收尾。
-  "schemaVersion": 2,
+  "schemaVersion": 1,
   "name": "longcat",
   "page": {
     // Longcat 使用 composer 内的可编辑输入区，New Chat 走页面导航；fingerprints 用于输入框与新建对话按钮的定位校准。
@@ -114,7 +114,7 @@
   },
   "parserRule": {
     // Longcat SSE: `data: {...}` where `event.type` names the kind of frame.
-    "schemaVersion": 2,
+    "schemaVersion": 1,
     "handlers": [
       {
         // event.type=content — a piece of the answer.

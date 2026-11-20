@@ -4,6 +4,7 @@ import com.just3bowls.facade.JsBridge
 import com.just3bowls.facade.JsonValue
 import com.just3bowls.api.provider.PresetApply
 import com.just3bowls.facade.ChromeAPI
+import com.just3bowls.model.diagnostics.PopCanLog
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
@@ -126,7 +127,16 @@ object ParserProviderLocal {
             if (providerKeys.isEmpty) Future.successful(Map.empty[String, ParserProviderLocal])
             else
               ChromeAPI.storage.local.get(js.Array(providerKeys*)).toFuture.map { values =>
-                val entries = providerKeys.flatMap { key =>
+                val supportedKeys = providerKeys.filter { key =>
+                  values.get(key).forall(raw => JsonValue.intField(raw, "schemaVersion").contains(1))
+                }
+                providerKeys.filterNot(supportedKeys.contains).foreach { key =>
+                  PopCanLog.warn(
+                    "presets",
+                    s"ignored incompatible provider document ${key.stripPrefix(prefix)} (expected schemaVersion=1)"
+                  )
+                }
+                val entries = supportedKeys.flatMap { key =>
                   val id = key.stripPrefix(prefix)
                   // 注意：`js.Dictionary.get` 已经返回 `Option`，别再包一层 —— 双包会拿到 `Some(Option(…))` 当文档解析，
                   // 结果是每家 provider 都退化成 `name=id / status=draft` 的空配置（真实踩过）。
@@ -234,7 +244,7 @@ object ParserProviderLocal {
   }
   def toJs(config: ParserProviderLocal): js.Object        = {
     val doc = JsBridge.obj(
-      "schemaVersion" -> (2),
+      "schemaVersion" -> (1),
       "id"            -> (config.id),
       "name"          -> (config.name),
       "page"          -> (JsBridge.obj(

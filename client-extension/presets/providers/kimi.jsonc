@@ -1,6 +1,6 @@
 {
   // Kimi 使用 gRPC-Web 帧承载 JSON operation log；规则识别 text block 的 set/append、message completed、done 与 provider error 控制帧。
-  "schemaVersion": 2,
+  "schemaVersion": 1,
   "name": "kimi",
   "page": {
     // Kimi 的编辑器是 contenteditable，New Chat 在侧栏；fingerprints 依赖编辑器角色与页面布局，而不是容易变化的深层节点序号。
@@ -121,7 +121,7 @@
   },
   "parserRule": {
     // Kimi streams gRPC-Web frames whose payload is a JSON operation log (op=set / op=append on masks); this rule reads the decoded frames, the framing itself is handled by the request layer. 另外认两种控制帧：`"done":{}`（收尾）与 `{"error":{"code":…}}`（provider 报错，直接失败而不是等超时）。 另认两种控制帧：`done:{}`（正常收尾）与错误帧（报可读原因，别等超时）。
-    "schemaVersion": 2,
+    "schemaVersion": 1,
     "contentTransforms": [
       {
         // Kimi citation references are page-rendered metadata rather than answer text.

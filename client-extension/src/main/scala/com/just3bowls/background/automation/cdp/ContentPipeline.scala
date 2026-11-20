@@ -55,7 +55,7 @@ final private[background] class ContentPipeline(rule: ParserRuleDefinition) {
     }
   }
   private val schemaVersion: Int = rule.schemaVersion
-  require(schemaVersion == 2, s"parserRule.schemaVersion must be 2, got $schemaVersion")
+  require(schemaVersion == 1, s"parserRule.schemaVersion must be 1, got $schemaVersion")
   private val transforms: List[Transform] =
     rule.contentTransforms.map(compileTransform)
   private val duplicateIds                =

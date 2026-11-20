@@ -1,6 +1,6 @@
 {
   // Yuanbao SSE：同一端点存在 Hy3、Hy4 agent、DeepSeek 快速和 search_with_text 等多种方言；规则按帧形状匹配，不按 speech_type 能力声明分派。
-  "schemaVersion": 2,
+  "schemaVersion": 1,
   "name": "yuanbao",
   "page": {
     // Yuanbao 使用 Quill ql-editor 富文本输入，New Chat 在会话导航中；fingerprints 依赖编辑器 class 和页面结构。
@@ -122,7 +122,7 @@
   },
   "parserRule": {
     // Yuanbao SSE, one endpoint, several dialects — **不用 mode 分派**：它的 `event: speech_type` 是一串能力声明（实测一轮里出现过 `status` → `search_with_text` → `text` → `hint_v2_tip`，顺序还随模式变），拿第一个非 status 当标签会锁错（2026-10-14 实测：DeepSeek 快速档被锁成 search_with_text，handler 全被跳过、正文 0）。所以改为纯形状匹配：帧级 `type=text` 走 `answerDelta`（$.msg），`deepSearchAgent` 帧的 `contents[].type=text` 走 `agentContent`（$.text）。`meta.chainID` 命名了同一件事（DeepSearch / DeepSeekR1 / WorkingAgentDirect），但它在流末尾才到，也不用于分派。
-    "schemaVersion": 2,
+    "schemaVersion": 1,
     "contentTransforms": [
       {
         // Yuanbao citation markers are display metadata rather than answer text.
