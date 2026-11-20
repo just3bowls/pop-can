@@ -303,6 +303,19 @@ automatically requires that key to match the declared value. Phase handlers cann
 explicit memory gates. This is limited to fixed-string Boolean-style gates; complex alternative
 gates remain explicit.
 
+Effective-rule inspection also runs through the loaded extension so it uses the same parser as
+production:
+
+```bash
+npm run presets:explain --prefix client-extension -- --provider deepseek
+npm run presets:diff --prefix client-extension -- --provider deepseek --from HEAD~1
+npm run presets:bench --prefix client-extension
+```
+
+Strict preset validation requires every handler that can emit content/delta to be pinned by at least
+one response fixture. The raw matcher groups handlers sharing the same `(rawRegex, jsonGroup)` into
+one extractor, while preserving independent handler cursors and same-frame memory snapshots.
+
 After changing a preset:
 
 1. Increment `client-extension/presets/VERSION`.

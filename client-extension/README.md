@@ -123,6 +123,21 @@ requires the phase to be active:
 Phases use fixed string values and may only be referenced by top-level handlers. Complex
 alternative gates keep explicit `memoryKey` rules.
 
+### Inspect Effective Rules
+
+Authoring shorthands are normalized by the real extension runtime. Use these commands with the
+development extension loaded and CDP available:
+
+```bash
+npm run presets:explain -- --provider deepseek
+npm run presets:diff -- --provider deepseek --from HEAD~1
+npm run presets:bench
+```
+
+`presets:explain` prints the effective rawRegex, literal matcher, memory gates, and actions.
+`presets:diff` compares effective rules rather than JSONC formatting. `presets:bench` reports
+shared-extractor scan/parse/fanout counts for representative large fixtures.
+
 After editing a preset:
 
 1. Increment `presets/VERSION`.
