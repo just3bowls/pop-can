@@ -117,4 +117,31 @@ class LocalRawParserShorthandSpec extends FunSuite {
 
     assertEquals(parser.filteredContent, "first")
   }
+
+  test("shares raw extraction across handlers with the same matcher") {
+    val sharedRule =
+      """{
+        |  "schemaVersion": 1,
+        |  "handlers": [
+        |    {
+        |      "id": "first",
+        |      "match": {"rawRegex": "DATA (\\{.*\\})\n", "jsonGroup": 1},
+        |      "content": "$.first"
+        |    },
+        |    {
+        |      "id": "second",
+        |      "match": {"rawRegex": "DATA (\\{.*\\})\n", "jsonGroup": 1},
+        |      "content": "$.second"
+        |    }
+        |  ]
+        |}""".stripMargin
+    val parser     = new LocalRawParser(sharedRule)
+
+    parser.feed("DATA {\"first\":\"a\",\"second\":\"b\"}\n")
+
+    assertEquals(parser.stats.rawScans, 1)
+    assertEquals(parser.stats.framesParsed, 1)
+    assertEquals(parser.stats.jsonParses, 1)
+    assertEquals(parser.stats.handlerFanouts, 2)
+  }
 }
