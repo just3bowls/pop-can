@@ -1,0 +1,11 @@
+id: 0
+event: STREAM_MSG_NOTIFY
+data: {"content":{"content_block":[{"block_type":10040,"block_id":"think-1","content":{"thinking_block":{"text_block":{"text":"hidden"}}}}]}}
+
+id: 1
+event: STREAM_MSG_NOTIFY
+data: {"content":{"content_block":[{"block_type":10000,"block_id":"answer-1","content":{"text_block":{"text":"@@BEG:response@@\n@@BEG:reasoning_content@@\nreasoning\n@@END:reasoning_content@@\n\n@@BEG:content@@\nnotify start\n@@END:content@@\n@@END:response@@"}}}]}}
+
+id: 2
+event: SSE_REPLY_END
+data: {"end_type":1}
