@@ -53,6 +53,9 @@ jobs:
       - name: Check provider preset bundle
         run: npm run presets:check:strict --prefix client-extension
 
+      - name: Test provider preset watcher
+        run: npm run presets:test --prefix client-extension
+
       - name: Check fixture privacy
         run: npm run fixtures:privacy --prefix client-extension
 
