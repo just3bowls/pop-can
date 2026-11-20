@@ -166,7 +166,7 @@ private[ui] object ParserPanel {
     }
 
     /** 复制到剪贴板：成功由调用方决定怎么反馈（行内按钮 = 翻文案，面板级 = toast），失败统一弹 toast。 */
-    def copyToClipboard(text: String, onSuccess: () => Unit): Unit              =
+    def copyToClipboard(text: String, onSuccess: () => Unit): Unit                     =
       try {
         val clipboard = JsBridge.navigator.clipboard
         if (!js.isUndefined(clipboard) && clipboard != null) {
@@ -176,18 +176,18 @@ private[ui] object ParserPanel {
             .foreach(_ => ())
         } else Toast.error("Copy failed — clipboard unavailable")
       } catch { case _: Throwable => Toast.error("Copy failed — clipboard unavailable") }
-    def looksLikePackEnvelope(text: String): Boolean                            =
+    def looksLikePackEnvelope(text: String): Boolean                                   =
       try {
         val parsed = JsBridge.jsonParse(text)
         JsBridge.intField(parsed, "formatVersion").contains(1) &&
         JsBridge.stringField(parsed, "payload").exists(_.nonEmpty) &&
         JsBridge.stringField(parsed, "signature").exists(_.nonEmpty)
       } catch { case _: Throwable => false }
-    def setPackBusy(value: Boolean): Unit                                       =
+    def setPackBusy(value: Boolean): Unit                                              =
       packBusyVar.set(value)
-    def requestPackPermission(): Future[Boolean]                                =
+    def requestPackPermission(): Future[Boolean]                                       =
       ProviderPackConfig.requestPermission()
-    def downloadPack(closeImport: Boolean = false): Unit                        =
+    def downloadPack(closeImport: Boolean = false): Unit                               =
       setPackBusy(true)
       requestPackPermission()
         .flatMap { granted =>
@@ -205,7 +205,7 @@ private[ui] object ParserPanel {
           reload()
         }
         .foreach(_ => setPackBusy(false))
-    def checkPack(): Unit                                                       =
+    def checkPack(): Unit                                                              =
       setPackBusy(true)
       requestPackPermission()
         .flatMap { granted =>
@@ -224,7 +224,7 @@ private[ui] object ParserPanel {
           reload()
         }
         .foreach(_ => setPackBusy(false))
-    def updateAutoUpdate(enabled: Boolean): Unit                                =
+    def updateAutoUpdate(enabled: Boolean): Unit                                       =
       val action =
         if (enabled)
           requestPackPermission().flatMap { granted =>
@@ -242,30 +242,44 @@ private[ui] object ParserPanel {
           reload()
         }
         .foreach(_ => ())
-    def providerJson(local: ParserProviderLocal): String                        =
+    def providerJson(local: ParserProviderLocal): String                               =
       JsBridge.asString(js.JSON.stringify(ParserProviderLocal.toJs(local), null, 2))
-    def presetBadges(local: ParserProviderLocal): List[HtmlElement]             =
+    final case class ProviderNamePresentation(color: String, tooltip: String)
+    def providerNamePresentation(local: ParserProviderLocal): ProviderNamePresentation = {
+      val installed   = ProviderPresets.version
+      val localImport = local.preset.map(_.version).getOrElse(0)
       ProviderPresets.stateOf(local) match {
-        case ProviderPresetState.Builtin   => Nil
-        case ProviderPresetState.Modified  =>
-          List(
-            chip(
-              "modified",
-              "#b45309",
-              "#fef3c7",
-              "Content differs from the installed provider pack"
-            )
+        case ProviderPresetState.Builtin       =>
+          ProviderNamePresentation(
+            "#111827",
+            if (installed > 0) s"Synced with installed Provider Pack v$installed"
+            else "Provider configuration is current"
           )
-        case ProviderPresetState.Imported  =>
-          List(chip("imported", "#6d28d9", "#ede9fe", "Imported version is newer than the installed provider pack"))
-        case ProviderPresetState.LocalOnly =>
-          List(chip("local", "#4b5563", "#f3f4f6", "Local provider configuration, not present in the installed pack"))
+        case ProviderPresetState.LocalOverride =>
+          ProviderNamePresentation(
+            "#1d4ed8",
+            s"Local import v$localImport. Signed Provider Pack updates will not overwrite it automatically."
+          )
+        case ProviderPresetState.Modified      =>
+          ProviderNamePresentation(
+            "#b45309",
+            if (installed > 0) s"Modified locally from Provider Pack v$installed"
+            else "Modified local provider configuration"
+          )
+        case ProviderPresetState.Imported      =>
+          ProviderNamePresentation(
+            "#6d28d9",
+            s"Imported version v$localImport is newer than installed Provider Pack v$installed"
+          )
+        case ProviderPresetState.LocalOnly     =>
+          ProviderNamePresentation("#4b5563", "Local-only provider; not present in the installed Provider Pack")
       }
-    def denied(pageUrl: String): Future[Unit]                                   =
+    }
+    def denied(pageUrl: String): Future[Unit]                                          =
       Future.failed(new Exception(
         s"Host access was not granted for ${ProviderHostAccess.hostOf(pageUrl)}; the provider was not enabled"
       ))
-    def setEnabled(id: String, enabled: Boolean, pageUrl: String): Unit         = {
+    def setEnabled(id: String, enabled: Boolean, pageUrl: String): Unit                = {
       val action =
         if (enabled)
           ProviderHostAccess
@@ -282,7 +296,7 @@ private[ui] object ParserPanel {
         }
         .foreach(_ => ())
     }
-    def providerToggle(local: ParserProviderLocal, ready: Boolean): HtmlElement =
+    def providerToggle(local: ParserProviderLocal, ready: Boolean): HtmlElement        =
       val active  = local.status == "active"
       val tooltip =
         if (!active) s"Enable ${local.name}"
@@ -298,7 +312,7 @@ private[ui] object ParserPanel {
         tooltipSignal = Val(tooltip),
         ariaLabelSignal = Val(tooltip)
       )(_ => setEnabled(local.id, !active, local.pageUrl))
-    def grantAccess(local: ParserProviderLocal): Unit                           =
+    def grantAccess(local: ParserProviderLocal): Unit                                  =
       ProviderHostAccess
         .request(local.pageUrl)
         .flatMap(granted => if (granted) Future.successful(()) else denied(local.pageUrl))
@@ -342,6 +356,7 @@ private[ui] object ParserPanel {
     def renderRow(local: ParserProviderLocal, ready: Boolean): HtmlElement      =
       val active     = local.status == "active"
       val expanded   = expandedProviderVar.signal.map(_ == local.id)
+      val nameInfo   = providerNamePresentation(local)
       div(
         padding   := "8px 0",
         borderTop := "1px solid #eef2f7",
@@ -377,10 +392,11 @@ private[ui] object ParserPanel {
                   local.name,
                   fontSize       := "12px",
                   fontWeight.bold,
-                  color          := (if (active) "#111827" else "#6b7280"),
-                  textDecoration := (if (active) "none" else "line-through")
+                  color          := (if (active) nameInfo.color else "#6b7280"),
+                  textDecoration := (if (active) "none" else "line-through"),
+                  title          := nameInfo.tooltip,
+                  aria.label     := s"${local.name}. ${nameInfo.tooltip}"
                 ),
-                children <-- Val(presetBadges(local)),
                 providerToggle(local, ready),
                 if (active && !ready)
                   chip(
@@ -653,8 +669,11 @@ private[ui] object ParserPanel {
           ProviderPresets
             .applyImport(plan, importForceVar.now())
             .map { report =>
-              importNoteVar.set(s"Applied ${report.summary}")
-              Toast.success(s"Imported provider config: ${report.summary}")
+              importNoteVar.set(
+                s"Imported ${report.summary} as local configuration. " +
+                  "Signed Provider Pack updates will not overwrite these providers automatically."
+              )
+              Toast.success(s"Imported ${report.summary} as local configuration")
               importPlanVar.set(None)
               reload(notify = true)
             }
