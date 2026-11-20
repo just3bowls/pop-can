@@ -25,11 +25,15 @@ const main = async () => {
   const page = await usablePluginPage()
   for (const [provider, dialect] of samples) {
     const fixture = join(presetsDir, 'fixtures', provider, `${dialect}.raw.txt`)
+    const expectPath = fixture.replace(/\.raw\.txt$/, '.expect.json')
     if (!existsSync(fixture)) throw new Error(`missing benchmark fixture: ${fixture}`)
+    if (!existsSync(expectPath)) throw new Error(`missing benchmark expectation: ${expectPath}`)
+    const expectation = JSON.parse(readFileSync(expectPath, 'utf8'))
     const payload = JSON.stringify({
       type: 'RULE_REPLAY',
       rule: providerRule(provider),
-      raw: readFileSync(fixture, 'utf8')
+      raw: readFileSync(fixture, 'utf8'),
+      sourceUrl: expectation.sourceUrl || ''
     })
     const started = performance.now()
     const raw = await evalInTarget(
