@@ -136,7 +136,7 @@ object ParserProviderLocal {
                     s"ignored incompatible provider document ${key.stripPrefix(prefix)} (expected schemaVersion=1)"
                   )
                 }
-                val entries = supportedKeys.flatMap { key =>
+                val entries       = supportedKeys.flatMap { key =>
                   val id = key.stripPrefix(prefix)
                   // 注意：`js.Dictionary.get` 已经返回 `Option`，别再包一层 —— 双包会拿到 `Some(Option(…))` 当文档解析，
                   // 结果是每家 provider 都退化成 `name=id / status=draft` 的空配置（真实踩过）。

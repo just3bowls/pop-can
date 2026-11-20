@@ -9,13 +9,13 @@ object ParserRuleExplain {
   def explain(ruleJson: String): Either[String, js.Any] =
     ParserRuleDefinition.parse(ruleJson).map(rule =>
       JsBridge.obj(
-        "schemaVersion"    -> (rule.schemaVersion),
-        "memory"           -> (js.Dictionary(rule.memory.toSeq*)),
-        "mode"             -> modeJson(rule.mode),
-        "handlers"         -> (js.Array(rule.handlers.map(handlerJson)*)),
-        "finalActions"     -> (js.Array(rule.finalActions.map(actionJson)*)),
+        "schemaVersion"     -> (rule.schemaVersion),
+        "memory"            -> (js.Dictionary(rule.memory.toSeq*)),
+        "mode"              -> modeJson(rule.mode),
+        "handlers"          -> (js.Array(rule.handlers.map(handlerJson)*)),
+        "finalActions"      -> (js.Array(rule.finalActions.map(actionJson)*)),
         "contentTransforms" -> (js.Array(rule.contentTransforms.map(transformJson)*)),
-        "request"          -> requestJson(rule.request)
+        "request"           -> requestJson(rule.request)
       )
     )
 
@@ -86,7 +86,7 @@ object ParserRuleExplain {
     }
 
   private def transformJson(value: ContentTransformRule): js.Any = {
-    val settle = value.settlement match {
+    val settle          = value.settlement match {
       case TransformCandidatePrefix(prefix) => JsBridge.obj("candidatePrefix" -> (prefix))
       case TransformHoldback(chars)         => JsBridge.obj("holdback" -> (chars))
     }
