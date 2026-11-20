@@ -1,0 +1,15 @@
+{
+  "provider": "doubao",
+  "dialect": "thinking-notify-start",
+  "comment": "Exercises the STREAM_MSG_NOTIFY answer start after a thinking block is active.",
+  "expect": {
+    "markerOk": true,
+    "handlers": [
+      "answerStartNotifyInThinking"
+    ],
+    "finishReason": "stop",
+    "mustNotContain": [
+      "hidden"
+    ]
+  }
+}
