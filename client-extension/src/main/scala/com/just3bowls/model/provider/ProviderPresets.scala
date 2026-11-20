@@ -23,7 +23,8 @@ final case class ProviderPresetReport(
 ) {
   def changed: Boolean = inserted.nonEmpty || updated.nonEmpty || adopted.nonEmpty
   def summary: String  =
-    s"v$version +${inserted.size} ~${updated.size} =${adopted.size} ·kept ${kept.size} !${skipped.size}"
+    s"v$version · ${inserted.size} new · ${updated.size} updated · ${adopted.size} unchanged" +
+      s" · ${kept.size} kept · ${skipped.size} skipped"
 }
 
 /** 这一家相对**随包预设**的状态（面板徽标用）。 */
@@ -36,11 +37,30 @@ object ProviderPresetState {
   /** 本地内容与当前 Provider Pack 不同。 */
   case object Modified extends ProviderPresetState
 
+  /** 用户通过未签名 Import 主动接手的本地配置，不参与 signed pack 自动覆盖。 */
+  case object LocalOverride extends ProviderPresetState
+
   /** 本地是比随包更新的 import 版本：保持不动，也不提示"有更新"。 */
   case object Imported extends ProviderPresetState
 
   /** 随包里没有这一家（我们下掉的、或历史遗留）。 */
   case object LocalOnly extends ProviderPresetState
+
+  private[provider] def classify(
+      localHash: String,
+      presetHash: Option[String],
+      meta: Option[PresetMeta],
+      installedVersion: Int
+  ): ProviderPresetState =
+    presetHash match {
+      case None                             => LocalOnly
+      case Some(hash) if hash == localHash  => Builtin
+      case Some(_) if meta.exists(!_.owned) => LocalOverride
+      case Some(_)
+          if meta.exists(value => value.owned && value.hash == localHash && value.version > installedVersion) =>
+        Imported
+      case Some(_)                          => Modified
+    }
 }
 
 /** 导入解析结果：`owned` 决定这批内容算"预设血缘"还是"用户接手"。 */
@@ -136,19 +156,12 @@ object ProviderPresets {
 
   /** 这一家相对随包预设的状态（内容一致 / 有差别 / 本地更新 / 不在包里）。 */
   def stateOf(local: ParserProviderLocal): ProviderPresetState                                  =
-    bundle().flatMap(_.providers.find(_.id == local.id)) match {
-      case None         => ProviderPresetState.LocalOnly
-      case Some(preset) =>
-        val localHash = ParserProviderLocal.behaviorHash(local)
-        if (localHash == ParserProviderLocal.behaviorHash(preset)) ProviderPresetState.Builtin
-        else
-          local.preset match {
-            case Some(meta) if meta.owned && meta.hash == localHash && meta.version > version =>
-              ProviderPresetState.Imported
-            case _                                                                            =>
-              ProviderPresetState.Modified
-          }
-    }
+    ProviderPresetState.classify(
+      localHash = ParserProviderLocal.behaviorHash(local),
+      presetHash = bundle().flatMap(_.providers.find(_.id == local.id)).map(ParserProviderLocal.behaviorHash),
+      meta = local.preset,
+      installedVersion = version
+    )
   // ---------------------------------------------------------------- 应用
   /**
    * 落一次包。`owned=true`（随包应用）时把内容记为预设血缘；`owned=false`（单条 import）时记为"用户接手"。 无论哪种，`force=true` 都会覆盖"本地改过"的文档（仍然跳过
