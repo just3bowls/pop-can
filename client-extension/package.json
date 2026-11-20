@@ -5,15 +5,17 @@
   "version": "1.2.1",
   "type": "module",
   "scripts": {
+    "predev": "npm run presets:build",
     "dev": "vite",
     "presets:build": "node scripts/build-presets.mjs",
     "presets:check": "node scripts/build-presets.mjs --check",
     "presets:check:strict": "node scripts/build-presets.mjs --check --strict",
+    "presets:test": "node --test scripts/vite-plugin-preset-build.test.mjs",
     "fixtures:sanitize": "node scripts/sanitize-fixtures.mjs",
     "fixtures:privacy": "node scripts/check-fixture-privacy.mjs",
     "providers:capture-request": "node scripts/capture-provider-request.mjs",
     "provider-pack:build": "node scripts/build-provider-pack.mjs",
-    "prebuild": "npm run presets:check",
+    "prebuild": "npm run presets:build",
     "build": "vite build"
   },
   "dependencies": {

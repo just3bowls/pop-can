@@ -2,6 +2,7 @@ import {defineConfig} from 'vite'
 import {crx} from '@crxjs/vite-plugin'
 import manifest from './manifest.config.js'
 import scalaJSPlugin from "@scala-js/vite-plugin-scalajs";
+import {presetBuildWatchPlugin} from './scripts/vite-plugin-preset-build.mjs'
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -30,6 +31,7 @@ const scalaJSBuildResolver = () => ({
 
 export default defineConfig({
     plugins: [
+        ...(isBuild ? [] : [presetBuildWatchPlugin()]),
         // 修复：Source Map 路径重写中间件
         {
             name: 'sourcemap-path-fix',
