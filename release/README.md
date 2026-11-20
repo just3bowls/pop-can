@@ -28,7 +28,7 @@ stays in `package.*`.
 
 ```bash
 node release/check-version.mjs
-node release/check-version.mjs --tag v1.2.1
+node release/check-version.mjs --tag v1.5.0
 ```
 
 ## Build Release Bundles
@@ -99,9 +99,9 @@ GitHub release builds require a clean source tree. Local dirty builds are record
 ## Integrity Verification
 
 ```bash
-sha256sum -c pop-can-v1.2.1-linux.tar.gz.sha256
-tar -tzf pop-can-v1.2.1-linux.tar.gz | rg 'BUILD-MANIFEST|FILES.sha256|SBOM.cdx.json'
-gh attestation verify pop-can-v1.2.1-linux.tar.gz --repo just3bowls/pop-can
+sha256sum -c pop-can-v1.5.0-linux.tar.gz.sha256
+tar -tzf pop-can-v1.5.0-linux.tar.gz | rg 'BUILD-MANIFEST|FILES.sha256|SBOM.cdx.json'
+gh attestation verify pop-can-v1.5.0-linux.tar.gz --repo just3bowls/pop-can
 ```
 
 The archive itself contains the complete file hash inventory. The external `.manifest.json`
