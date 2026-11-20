@@ -47,3 +47,6 @@ extension-private-key.pem
 # Misc
 *.class
 *.jar
+
+# Local study notes (never publish)
+private-notes/
