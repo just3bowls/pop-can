@@ -24,7 +24,7 @@ object PopCanLog {
     "page",
     "parser",
     "permissions",
-    "presets",
+    "provider-catalog",
     "rewrite",
     "server",
     "tabs",

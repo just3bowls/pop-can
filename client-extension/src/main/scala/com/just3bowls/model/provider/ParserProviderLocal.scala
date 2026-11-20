@@ -132,7 +132,7 @@ object ParserProviderLocal {
                 }
                 providerKeys.filterNot(supportedKeys.contains).foreach { key =>
                   PopCanLog.warn(
-                    "presets",
+                    "provider-catalog",
                     s"ignored incompatible provider document ${key.stripPrefix(prefix)} (expected schemaVersion=1)"
                   )
                 }

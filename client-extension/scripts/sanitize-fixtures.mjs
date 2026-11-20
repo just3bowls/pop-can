@@ -9,7 +9,7 @@ const rootIndex = process.argv.indexOf('--root')
 const fixturesRoot =
   rootIndex >= 0
     ? path.resolve(process.argv[rootIndex + 1] || '')
-    : path.join(extensionRoot, 'presets', 'fixtures')
+    : path.join(extensionRoot, 'provider-catalog', 'fixtures')
 
 const sensitiveKeys = new Set([
   'authorization',

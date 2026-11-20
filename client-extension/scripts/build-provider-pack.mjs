@@ -8,7 +8,7 @@ import {fileURLToPath} from 'node:url'
 const here = dirname(fileURLToPath(import.meta.url))
 const extensionRoot = resolve(here, '..')
 const repoRoot = resolve(extensionRoot, '..')
-const bundlePath = join(extensionRoot, 'presets', 'bundle.json')
+const bundlePath = join(extensionRoot, 'provider-catalog', 'bundle.json')
 const publicKeyPath = join(extensionRoot, 'keys', 'provider-pack-public-key.spki.base64')
 const productVersion = readFileSync(join(repoRoot, 'VERSION'), 'utf8').trim()
 const outIndex = process.argv.indexOf('--out')
@@ -30,17 +30,17 @@ if (!privateKeyPem.trim()) {
   process.exit(1)
 }
 if (!existsSync(bundlePath)) {
-  console.error('presets/bundle.json is missing; run: npm run presets:build --prefix client-extension')
+  console.error('provider-catalog/bundle.json is missing; run: npm run providers:build --prefix client-extension')
   process.exit(1)
 }
 
 const bundle = JSON.parse(readFileSync(bundlePath, 'utf8'))
 if (!Number.isInteger(bundle.bundleVersion) || bundle.bundleVersion <= 0) {
-  console.error('presets/bundle.json has no positive bundleVersion')
+  console.error('provider-catalog/bundle.json has no positive bundleVersion')
   process.exit(1)
 }
 if (!Array.isArray(bundle.providers) || bundle.providers.length === 0) {
-  console.error('presets/bundle.json has no providers')
+  console.error('provider-catalog/bundle.json has no providers')
   process.exit(1)
 }
 

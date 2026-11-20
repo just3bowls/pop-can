@@ -11,7 +11,7 @@ if (distArg >= 0 && !process.argv[distArg + 1]) {
   process.exit(2)
 }
 const distDir = resolve(distArg >= 0 ? process.argv[distArg + 1] : join(extensionRoot, 'dist'))
-const bundlePath = join(extensionRoot, 'presets', 'bundle.json')
+const bundlePath = join(extensionRoot, 'provider-catalog', 'bundle.json')
 
 if (!existsSync(distDir)) {
   console.error(`provider pack exclusion check: extension build not found: ${distDir}`)

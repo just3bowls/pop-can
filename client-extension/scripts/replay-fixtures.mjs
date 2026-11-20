@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 用**真引擎**回放 `presets/fixtures/` 里的每个响应方言与请求体样本，逐条断言。
+ * 用**真引擎**回放 `provider-catalog/fixtures/` 里的每个响应方言与请求体样本，逐条断言。
  *
  * 为什么走 CDP 而不是在 node 里重写一遍解析：规则引擎只有一份实现（`background/LocalRawParser`），
  * 回归网必须打在同一份实现上，否则"fixtures 全绿"不能说明线上会成。
@@ -18,8 +18,8 @@ import { parse as parseJsonc, printParseErrorCode } from 'jsonc-parser'
 import { evalInTarget, reloadPage, usablePluginPage } from './lib/provider-cdp.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const presetsDir = join(here, '..', 'presets')
-const fixturesDir = join(presetsDir, 'fixtures')
+const catalogDir = join(here, '..', 'provider-catalog')
+const fixturesDir = join(catalogDir, 'fixtures')
 const onlyRule = process.argv.includes('--rule') ? process.argv[process.argv.indexOf('--rule') + 1] : ''
 
 const readFixtures = () => {
@@ -112,7 +112,7 @@ const compactionFixture = () => {
 }
 
 const ruleOf = provider => {
-  const path = join(presetsDir, 'providers', `${provider}.jsonc`)
+  const path = join(catalogDir, 'providers', `${provider}.jsonc`)
   if (!existsSync(path)) throw new Error(`missing rule file: ${path}`)
   const text = readFileSync(path, 'utf8')
   const errors = []

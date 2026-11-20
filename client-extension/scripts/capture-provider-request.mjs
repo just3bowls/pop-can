@@ -20,7 +20,9 @@ const here = dirname(fileURLToPath(import.meta.url))
 const extensionRoot = resolve(here, '..')
 const args = process.argv.slice(2)
 const outIndex = args.indexOf('--out-dir')
-const outDir = resolve(outIndex >= 0 ? args.splice(outIndex, 2)[1] : join(extensionRoot, 'presets', 'fixtures'))
+const outDir = resolve(
+  outIndex >= 0 ? args.splice(outIndex, 2)[1] : join(extensionRoot, 'provider-catalog', 'fixtures')
+)
 const promptIndex = args.indexOf('--prompt')
 const prompt =
   promptIndex >= 0

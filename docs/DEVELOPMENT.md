@@ -286,7 +286,7 @@ the extension/native-host layout, file hashes, SBOM and Provider-rule exclusion 
 
 ## Provider Pack
 
-Provider presets live in `client-extension/presets/providers/*.jsonc`.
+Provider definitions live in `client-extension/provider-catalog/providers/*.jsonc`.
 
 Provider rule schema v1 accepts literal `equals`, `contains`, `startsWith`, and `notStartsWith`
 match conditions. A single `appendContent` action may be written as handler-level
@@ -307,9 +307,9 @@ Effective-rule inspection also runs through the loaded extension so it uses the 
 production:
 
 ```bash
-npm run presets:explain --prefix client-extension -- --provider deepseek
-npm run presets:diff --prefix client-extension -- --provider deepseek --from HEAD~1
-npm run presets:bench --prefix client-extension
+npm run providers:explain --prefix client-extension -- --provider deepseek
+npm run providers:diff --prefix client-extension -- --provider deepseek --from HEAD~1
+npm run providers:bench --prefix client-extension
 ```
 
 Strict preset validation requires every handler that can emit content/delta to be pinned by at least
@@ -318,24 +318,24 @@ one extractor, while preserving independent handler cursors and same-frame memor
 
 After changing a preset:
 
-1. Increment `client-extension/presets/VERSION`.
+1. Increment `client-extension/provider-catalog/VERSION`.
 2. Rebuild the provider pack payload source:
 
 ```bash
-node client-extension/scripts/build-presets.mjs
+node client-extension/scripts/build-provider-catalog.mjs
 ```
 
 Both `npm run dev --prefix client-extension` and
 `npm run build --prefix client-extension` rebuild this payload through their pre-lifecycle
 scripts. During `npm run dev`, provider JSONC and `VERSION` edits are debounced and automatically
-rebuilt into `presets/bundle.json`. Re-import that bundle to apply it; Vite does not update the
+rebuilt into `provider-catalog/bundle.json`. Re-import that bundle to apply it; Vite does not update the
 installed provider configuration automatically. The explicit command remains useful when preparing
 changes without starting Vite.
 
 3. Verify that the committed bundle is current without rewriting it:
 
 ```bash
-npm run presets:check --prefix client-extension
+npm run providers:check --prefix client-extension
 ```
 
 CI and release checks still run this verification before building, so a stale committed bundle is

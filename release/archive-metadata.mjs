@@ -218,7 +218,9 @@ async function verify() {
     console.error('native host launcher is not executable')
     process.exit(1)
   }
-  const providerBundle = JSON.parse(readFileSync(join(repoRoot, 'client-extension', 'presets', 'bundle.json'), 'utf8'))
+  const providerBundle = JSON.parse(
+    readFileSync(join(repoRoot, 'client-extension', 'provider-catalog', 'bundle.json'), 'utf8')
+  )
   const needles = providerBundle.providers
     .flatMap(provider => [provider.page?.url, ...(provider.network?.apiPatterns || [])])
     .filter(value => typeof value === 'string' && value.length >= 12)
