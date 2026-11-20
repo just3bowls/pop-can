@@ -1,6 +1,6 @@
 {
   // GLM 网页 SSE：正文按增量输出，但 status=finish 帧会重复完整答案；规则用 appendDelta 吸收最终快照，并过滤页面渲染用的 turn/citation token。
-  "schemaVersion": 2,
+  "schemaVersion": 1,
   "name": "gml",
   "page": {
     // 输入框是 composer textarea，附件入口暴露 input.el-upload__input，New Chat 在页面主区域；fingerprints 用于校准文本框与新建对话入口。
@@ -134,7 +134,7 @@
   },
   "parserRule": {
     // GLM web SSE. Text streams as deltas, but the `status=finish` frame repeats the whole answer as a snapshot — and the deltas can stop early (dropping the closing markers), so that snapshot is the safety net. Provider-native turn and citation tokens are stripped because they are page-rendered chips with no URL metadata in the stream.
-    "schemaVersion": 2,
+    "schemaVersion": 1,
     "contentTransforms": [
       {
         // The page renders this turn token as a source chip and the stream carries no URL mapping.

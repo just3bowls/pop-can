@@ -5,7 +5,7 @@ import munit.FunSuite
 class LocalRawParserShorthandSpec extends FunSuite {
   private val rule =
     """{
-      |  "schemaVersion": 2,
+      |  "schemaVersion": 1,
       |  "handlers": [
       |    {
       |      "id": "answer",
@@ -39,7 +39,7 @@ class LocalRawParserShorthandSpec extends FunSuite {
   test("sse-json-line handles split chunks and ignores non-json data") {
     val transportRule =
       """{
-        |  "schemaVersion": 2,
+        |  "schemaVersion": 1,
         |  "handlers": [
         |    {
         |      "id": "answer",
@@ -61,7 +61,7 @@ class LocalRawParserShorthandSpec extends FunSuite {
   test("phase gates continuation handlers until a start handler opens the phase") {
     val phaseRule =
       """{
-        |  "schemaVersion": 2,
+        |  "schemaVersion": 1,
         |  "phases": {"inResponse": "true"},
         |  "handlers": [
         |    {
@@ -92,7 +92,7 @@ class LocalRawParserShorthandSpec extends FunSuite {
   test("phase start and continuation use the same pre-frame memory snapshot") {
     val phaseRule =
       """{
-        |  "schemaVersion": 2,
+        |  "schemaVersion": 1,
         |  "phases": {"inResponse": "true"},
         |  "handlers": [
         |    {

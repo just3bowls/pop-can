@@ -1,6 +1,6 @@
 {
   // MiMo React chat SSE：event:message 携带 reasoningContent 与 content 两类增量，event:finish 结束本轮；页面思考不进入正文。
-  "schemaVersion": 2,
+  "schemaVersion": 1,
   "name": "mimo",
   "page": {
     // MiMo 使用页面编辑器与 React 路由，输入框和 New Chat 通过指纹与结构特征定位，避免哈希路由变化影响 selector。
@@ -191,7 +191,7 @@
   },
   "parserRule": {
     // MiMo React chat SSE with named events (`event:message` / `event:finish`). Page reasoning and answer text arrive in separate JSON fields.
-    "schemaVersion": 2,
+    "schemaVersion": 1,
     "handlers": [
       {
         // React chat assistant deltas. reasoningContent is page-side thinking and is ignored because content is absent on those frames.
