@@ -28,6 +28,12 @@ final case class LocalParsedDelta(
      */
     resetContent: Boolean = false
 )
+final case class LocalParserStats(
+    rawScans: Int = 0,
+    framesParsed: Int = 0,
+    jsonParses: Int = 0,
+    handlerFanouts: Int = 0
+)
 
 /**
  * Minimal Scala.js parser that executes a PopCan ParserRule against provider raw text.
@@ -41,14 +47,18 @@ final class LocalRawParser(ruleJson: String, onHandlerHit: String => Unit = _ =>
   private val log             = PopCanLog.logger("parser")
   private val pipeline        = new ContentPipeline(rule)
   private val rawHandlers     = rule.handlers.filter(_.matchSpec.rawRegex.exists(_.nonEmpty))
-  private val rawPatterns     = mutable.Map.empty[String, js.RegExp]
-  rawHandlers.foreach { handler =>
-    handler.matchSpec.rawRegex.filter(_.nonEmpty).flatMap(regexText => JsRegex.compile(regexText, global = true)).foreach {
-      regex =>
-        rawPatterns.update(handler.id, regex)
-    }
-  }
   private val rawHandlerOrder = rawHandlers.map(_.id).zipWithIndex.toMap
+  private val rawExtractors   = rawHandlers
+    .groupBy(handler => (handler.matchSpec.rawRegex.getOrElse(""), handler.matchSpec.jsonGroup))
+    .toList
+    .sortBy { case (_, handlers) => handlers.map(handler => rawHandlerOrder(handler.id)).min }
+    .flatMap { case ((regexText, jsonGroup), handlers) =>
+      JsRegex
+        .compile(regexText, global = true)
+        .map(pattern =>
+          RawExtractor(regexText, jsonGroup, pattern, handlers.sortBy(handler => rawHandlerOrder(handler.id)))
+        )
+    }
 
   /** `mode.fromStream`：模式声明帧的取法（对象或数组，数组按声明顺序取第一个非空捕获）。 */
   private val modeSpecs: List[(js.RegExp, Int)] =
@@ -81,6 +91,7 @@ final class LocalRawParser(ruleJson: String, onHandlerHit: String => Unit = _ =>
   private var errorMessage     = ""
   private var lastErrorSent    = ""
   private val candidateStarts  = mutable.Set.empty[Int]
+  private var parserStats      = LocalParserStats()
 
   /** 规则是否已经判定"这轮到此为止"（handler 命中并执行了 `setFinishReason`）。 */
   def hasFinishSignal: Boolean = finishSignaled
@@ -93,6 +104,7 @@ final class LocalRawParser(ruleJson: String, onHandlerHit: String => Unit = _ =>
 
   /** 规则报出来的 provider 侧错误（如 kimi 排队的 `resource_exhausted`）；空 = 没有。 */
   def currentError: String                                                = errorMessage
+  def stats: LocalParserStats                                             = parserStats
   def rawChars: Int                                                       = rawBuffer.length
   rule.memory.foreach { case (key, value) => memory.update(key, value) }
   def feed(chunk: String, sourceUrl: String = ""): List[LocalParsedDelta] =
@@ -196,9 +208,16 @@ final class LocalRawParser(ruleJson: String, onHandlerHit: String => Unit = _ =>
       event: js.Any,
       sourceUrl: String
   )
+  final private case class RawExtractor(
+      regexText: String,
+      jsonGroup: Int,
+      pattern: js.RegExp,
+      handlers: List[ParserHandler]
+  )
+  final private case class ParsedRawFrame(start: Int, end: Int, event: js.Any, sourceUrl: String)
 
   /** 从累计 buffer 里锁存本轮模式标签（首个非空捕获生效，之后不再变）。 */
-  private def latchMode(): Unit                                        =
+  private def latchMode(): Unit                            =
     if (modeTag.isEmpty && modeSpecs.nonEmpty) {
       val text = rawBuffer.result()
       modeSpecs.iterator
@@ -214,51 +233,40 @@ final class LocalRawParser(ruleJson: String, onHandlerHit: String => Unit = _ =>
         .find(_.nonEmpty)
         .foreach(tag => modeTag = tag)
     }
-  private def processRawHandlers(): List[LocalParsedDelta]             = {
-    val out           = mutable.ListBuffer.empty[LocalParsedDelta]
-    if (rawPatterns.isEmpty || rawBuffer.isEmpty) return out.toList
+  private def processRawHandlers(): List[LocalParsedDelta] = {
+    val out            = mutable.ListBuffer.empty[LocalParsedDelta]
+    if (rawExtractors.isEmpty || rawBuffer.isEmpty) return out.toList
     // 模式声明在内容之前，先锁存再匹配：handler 的 `match.mode` 依赖它。
     latchMode()
-    val text          = rawBuffer.result()
-    val rawCandidates = mutable.ArrayBuffer.empty[RawCandidate]
-    rawHandlers.foreach { handler =>
-      val id = handler.id
-      rawPatterns.get(id).foreach { pattern =>
-        val cursor  = rawRuleConsumed.getOrElse(id, 0)
-        pattern.lastIndex = cursor
-        var matched = pattern.exec(text)
-        while (matched != null && !js.isUndefined(matched)) {
-          val start   = JsBridge.asInt(matched.index)
-          val end     = JsBridge.asInt(pattern.lastIndex)
-          val group   = handler.matchSpec.jsonGroup
-          val arr     = JsBridge.asStringArray(matched)
-          val rawJson =
-            if (group >= 0 && group < arr.length) arr(group)
-            else ""
-          val event   =
-            try JsBridge.asObject(js.JSON.parse(rawJson))
-            catch { case _: Throwable => null }
-          if (event != null && !js.isUndefined(event)) {
-            currentJson = event
-            if (candidateStarts.size < 5000) candidateStarts += start
-            val sourceUrl  = sourceAt(start)
+    val text           = rawBuffer.result()
+    val rawCandidates  = mutable.ArrayBuffer.empty[RawCandidate]
+    val handlerCursors = rawHandlers.map(handler => handler.id -> rawRuleConsumed.getOrElse(handler.id, 0)).toMap
+    rawExtractors.foreach { extractor =>
+      val cursor = extractor.handlers.map(handler => handlerCursors(handler.id)).min
+      val frames = parseMatches(extractor, text, cursor)
+      frames.foreach { frame =>
+        currentJson = frame.event
+        if (candidateStarts.size < 5000) candidateStarts += frame.start
+        extractor.handlers.foreach { handler =>
+          if (frame.start >= handlerCursors(handler.id)) {
             val eventsPath = handler.matchSpec.eventsPath.getOrElse("")
-            if (eventsPath.isEmpty) rawCandidates += RawCandidate(handler, start, end, event, sourceUrl)
-            else {
-              val items = JsonPath.expand(event, eventsPath)
+            if (eventsPath.isEmpty) {
+              rawCandidates += RawCandidate(handler, frame.start, frame.end, frame.event, frame.sourceUrl)
+              parserStats = parserStats.copy(handlerFanouts = parserStats.handlerFanouts + 1)
+            } else {
+              val items = JsonPath.expand(frame.event, eventsPath)
               if (items.isEmpty) log.debug(s"eventsPath matched nothing handler=${handler.id} path=$eventsPath")
               else
-                items.foreach(item =>
-                  rawCandidates += RawCandidate(handler, start, end, item, sourceUrl)
-                )
+                items.foreach { item =>
+                  rawCandidates += RawCandidate(handler, frame.start, frame.end, item, frame.sourceUrl)
+                  parserStats = parserStats.copy(handlerFanouts = parserStats.handlerFanouts + 1)
+                }
             }
           }
-          if (end == start) pattern.lastIndex = start + 1
-          matched = pattern.exec(text)
         }
       }
     }
-    var remaining     = rawCandidates.toList
+    var remaining      = rawCandidates.toList
     while (remaining.nonEmpty) {
       val ordered           = remaining.sortBy(candidate => (candidate.start, rawHandlerOrder(candidate.handler.id)))
       val head              = ordered.head
@@ -332,10 +340,37 @@ final class LocalRawParser(ruleJson: String, onHandlerHit: String => Unit = _ =>
       }
       remaining = remaining.filterNot(_.start == head.start)
     }
-    rawConsumed = rawPatterns.keys.toList.map(id => rawRuleConsumed.getOrElse(id, 0)).minOption.getOrElse(0)
+    rawConsumed = rawHandlers.map(handler => rawRuleConsumed.getOrElse(handler.id, 0)).minOption.getOrElse(0)
     compactRawBuffer()
     validateCursors()
     out.toList
+  }
+
+  private def parseMatches(extractor: RawExtractor, text: String, cursor: Int): List[ParsedRawFrame] = {
+    val frames  = mutable.ListBuffer.empty[ParsedRawFrame]
+    extractor.pattern.lastIndex = cursor
+    parserStats = parserStats.copy(rawScans = parserStats.rawScans + 1)
+    var matched = extractor.pattern.exec(text)
+    while (matched != null && !js.isUndefined(matched)) {
+      val start   = JsBridge.asInt(matched.index)
+      val end     = JsBridge.asInt(extractor.pattern.lastIndex)
+      val group   = extractor.jsonGroup
+      val arr     = JsBridge.asStringArray(matched)
+      val rawJson =
+        if (group >= 0 && group < arr.length) arr(group)
+        else ""
+      parserStats = parserStats.copy(jsonParses = parserStats.jsonParses + 1)
+      val event   =
+        try JsBridge.asObject(js.JSON.parse(rawJson))
+        catch { case _: Throwable => null }
+      if (event != null && !js.isUndefined(event)) {
+        frames += ParsedRawFrame(start, end, event, sourceAt(start))
+        parserStats = parserStats.copy(framesParsed = parserStats.framesParsed + 1)
+      }
+      if (end == start) extractor.pattern.lastIndex = start + 1
+      matched = extractor.pattern.exec(text)
+    }
+    frames.toList
   }
   private def rawMatches(
       condition: MatchSpec,
@@ -429,13 +464,13 @@ final class LocalRawParser(ruleJson: String, onHandlerHit: String => Unit = _ =>
         }
     }
   }
-  private def resolveValue(action: RuleAction, event: js.Any): String  =
+  private def resolveValue(action: RuleAction, event: js.Any): String                                =
     action.path
       .flatMap(path => evalPath(event, path))
       .map(stringify)
       .orElse(action.value)
       .getOrElse("")
-  private def evalPath(json: js.Any, path: String): Option[js.Any]     = {
+  private def evalPath(json: js.Any, path: String): Option[js.Any]                                   = {
     // `[*]` 只服务 handler 的 `eventsPath`（由 `JsonPath.expand` 扇出）；match / action 的普通路径遇到它按"不匹配"处理。
     val trimmed = path.trim.stripPrefix("$")
     if (path.contains("[*]")) None
@@ -447,15 +482,15 @@ final class LocalRawParser(ruleJson: String, onHandlerHit: String => Unit = _ =>
           throw new IllegalStateException(s"JsonPath.get failed for '$path'", error)
       }
   }
-  private def stringify(value: js.Any): String                         =
+  private def stringify(value: js.Any): String                                                       =
     if (value == null || js.isUndefined(value)) ""
     else if (js.typeOf(value) == "string") JsBridge.asString(value)
     else js.JSON.stringify(value)
-  private def regexMatches(value: String, pattern: String): Boolean    =
+  private def regexMatches(value: String, pattern: String): Boolean                                  =
     JsRegex.compile(pattern).exists(_.test(value))
-  private def runFinalActions(): Unit                                  =
+  private def runFinalActions(): Unit                                                                =
     rule.finalActions.foreach(action => runAction(action, currentJson, mutable.Set.empty[String]))
-  private def compactRawBuffer(): Unit                                 =
+  private def compactRawBuffer(): Unit                                                               =
     if (rawConsumed > 65536) {
       val shift = rawConsumed
       rawBuffer.delete(0, shift)
@@ -470,7 +505,7 @@ final class LocalRawParser(ruleJson: String, onHandlerHit: String => Unit = _ =>
       sourceSpans ++= kept
       if (sourceSpans.isEmpty) sourceSpans += ((rawBuffer.length, ""))
     }
-  private def validateCursors(): Unit                                  = {
+  private def validateCursors(): Unit                                                                = {
     val invalid = rawRuleConsumed.collect {
       case (id, cursor) if cursor < 0 || cursor > rawBuffer.length => id -> cursor
     }
@@ -479,7 +514,7 @@ final class LocalRawParser(ruleJson: String, onHandlerHit: String => Unit = _ =>
         s"raw parser cursor out of bounds buffer=${rawBuffer.length} invalid=${invalid.mkString(",")}"
       )
   }
-  private def emit(forceDone: Boolean = false): List[LocalParsedDelta] = {
+  private def emit(forceDone: Boolean = false): List[LocalParsedDelta]                               = {
     val rawText         = content.result()
     val visible         = pipeline.render(rawText, complete = forceDone)
     // 正常路径 visible 永远是 emittedContent 的延长；一旦过滤回退了已下发内容（正则超出结算假设），
