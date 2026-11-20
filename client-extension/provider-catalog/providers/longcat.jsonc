@@ -1,7 +1,6 @@
 {
   // Longcat 标准 SSE：event.type=content 输出正文增量，event.type=finish 显式收尾。
   "schemaVersion": 1,
-  "name": "longcat",
   "page": {
     // Longcat 使用 composer 内的可编辑输入区，New Chat 走页面导航；fingerprints 用于输入框与新建对话按钮的定位校准。
     "url": "https://longcat.chat/",
@@ -16,38 +15,21 @@
           "my-mtd-textarea",
           "textarea-wrap"
         ],
-        "ancestorTexts": [],
-        "anchorDeltaX": 0,
-        "anchorDeltaY": 0,
-        "ariaLabel": "",
         "capturedAt": 1790644227853,
         "classes": [
           "tiptap",
           "ProseMirror",
           "ProseMirror-focused"
         ],
-        "clickable": false,
-        "dataTestId": "",
         "docX": 774.8000183105469,
         "docY": 365.2437686920166,
         "editable": true,
         "height": 25.137500762939453,
-        "id": "",
         "innerHeight": 711,
         "innerWidth": 1298,
-        "name": "",
-        "nearInput": false,
-        "nearestText": "",
-        "parentClasses": [],
         "parentTag": "div",
-        "parentText": "",
-        "placeholder": "",
         "role": "input",
-        "scrollX": 0,
-        "scrollY": 0,
-        "siblingTexts": [],
         "tag": "div",
-        "text": "",
         "width": 762.4000244140625,
         "x": 774.8000183105469,
         "y": 365.2437686920166
@@ -63,35 +45,20 @@
           "开启新对话",
           "开启新对话下载手机应用请先登录简体中文"
         ],
-        "anchorDeltaX": 0,
-        "anchorDeltaY": 0,
-        "ariaLabel": "",
         "capturedAt": 1790644226323,
         "classes": [
           "new-content"
         ],
-        "clickable": false,
-        "dataTestId": "",
         "docX": 80,
         "docY": 111,
-        "editable": false,
         "height": 46,
-        "id": "",
         "innerHeight": 767,
         "innerWidth": 1298,
-        "name": "",
-        "nearInput": false,
-        "nearestText": "",
         "parentClasses": [
           "slider-header"
         ],
         "parentTag": "div",
-        "parentText": "",
-        "placeholder": "",
         "role": "new-chat",
-        "scrollX": 0,
-        "scrollY": 0,
-        "siblingTexts": [],
         "tag": "div",
         "text": "开启新对话",
         "width": 120,

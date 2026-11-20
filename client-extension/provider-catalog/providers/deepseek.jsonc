@@ -1,7 +1,6 @@
 {
   // DeepSeek 网页 SSE：请求走 /api/v0/chat/completion，答案先以 RESPONSE 片段开局，后面是裸 data 文本增量；规则用 inResponse 阶段门屏蔽搜索、状态等非正文帧。
   "schemaVersion": 1,
-  "name": "deepseek",
   "page": {
     // DeepSeek 的输入框是 textarea，New Chat 位于侧栏；fingerprints 用可编辑控件、父级布局和侧栏导航结构做二次定位，避免 XPath 漂移后误点。
     "url": "https://chat.deepseek.com/",
@@ -22,9 +21,6 @@
           "深度思考智能搜索",
           "深度思考智能搜索"
         ],
-        "anchorDeltaX": 0,
-        "anchorDeltaY": 0,
-        "ariaLabel": "",
         "capturedAt": 1791666774414,
         "classes": [
           "_27c9245",
@@ -33,30 +29,20 @@
           "ds-scroll-area--enabled",
           "d96f2d2a"
         ],
-        "clickable": false,
-        "dataTestId": "",
         "docX": 779.3000183105469,
         "docY": 326.1000061035156,
         "editable": true,
         "height": 60,
-        "id": "",
         "innerHeight": 711,
         "innerWidth": 1298,
         "name": "search",
-        "nearInput": false,
-        "nearestText": "",
         "parentClasses": [
           "_24fad49"
         ],
         "parentTag": "div",
-        "parentText": "",
         "placeholder": "给 DeepSeek 发送消息 ",
         "role": "input",
-        "scrollX": 0,
-        "scrollY": 0,
-        "siblingTexts": [],
         "tag": "textarea",
-        "text": "",
         "width": 774.4000244140625,
         "x": 779.3000183105469,
         "y": 326.1000061035156
@@ -74,34 +60,18 @@
           "开启新对话",
           "开启新对话"
         ],
-        "anchorDeltaX": 0,
-        "anchorDeltaY": 0,
-        "ariaLabel": "",
         "capturedAt": 1791666772517,
-        "classes": [],
-        "clickable": false,
-        "dataTestId": "",
         "docX": 141.0999984741211,
         "docY": 90.00000476837158,
-        "editable": false,
         "height": 17.600000381469727,
-        "id": "",
         "innerHeight": 711,
         "innerWidth": 1298,
-        "name": "",
-        "nearInput": false,
-        "nearestText": "",
         "parentClasses": [
           "_5a8ac7a",
           "a084f19e"
         ],
         "parentTag": "div",
-        "parentText": "",
-        "placeholder": "",
         "role": "new-chat",
-        "scrollX": 0,
-        "scrollY": 0,
-        "siblingTexts": [],
         "tag": "span",
         "text": "开启新对话",
         "width": 70,
@@ -118,8 +88,7 @@
   },
   "attachment": {
     // file 模式使用页面中的隐藏 file input；selector 留空时由引擎从可用 text-like 文件输入中择优，避免绑定易变的生成类名。
-    "strategy": "input",
-    "selector": ""
+    "strategy": "input"
   },
   "parserRule": {
     // deepseek SSE. The answer starts with a RESPONSE fragment event and then streams as bare `data: {"v":"..."}` deltas; a memory flag marks that we are inside the response so status/search events are ignored.

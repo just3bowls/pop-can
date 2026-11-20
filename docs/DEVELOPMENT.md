@@ -288,6 +288,10 @@ the extension/native-host layout, file hashes, SBOM and Provider-rule exclusion 
 
 Provider definitions live in `client-extension/provider-catalog/providers/*.jsonc`.
 
+Provider `name` defaults to the provider id, empty selector defaults are omitted, and fingerprint
+objects contain only non-default captured fields. Run `npm run providers:normalize --prefix
+client-extension` before building the catalog; `-- --check` is the non-mutating verification.
+
 Provider rule schema v1 accepts literal `equals`, `contains`, `startsWith`, and `notStartsWith`
 match conditions. A single `appendContent` action may be written as handler-level
 `content: "$.path"`. These are runtime shorthands shared by built-in JSONC, fixture replay, and

@@ -97,6 +97,16 @@ The resulting unpacked extension is written to `dist`.
 
 Provider definitions are JSONC files under `provider-catalog/providers`.
 
+Provider `name` is optional and defaults to the filename/id. Empty selectors and fingerprint fields
+whose values equal runtime defaults should be omitted. Normalize all catalog sources with:
+
+```bash
+npm run providers:normalize
+```
+
+Strict checking rejects redundant metadata; `providers:normalize -- --check` verifies the catalog
+without rewriting files.
+
 Inside `parserRule.schemaVersion: 1`, simple match conditions may use `equals`, `contains`,
 `startsWith`, or `notStartsWith` instead of a regex. A handler may use `content: "$.path"` when its
 only action is `appendContent`; handlers with multiple actions keep the explicit `actions` array.
