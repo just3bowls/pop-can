@@ -1366,47 +1366,31 @@ private[ui] object ConfigPanel {
             )
           ),
           div(
-            display.flex,
-            gap          := "8px",
-            marginBottom := "6px",
-            div(
-              display <-- showCreateKeyVar.signal.map(open => if (open) "flex" else "none"),
-              gap             := "8px",
-              flexGrow        := "1",
-              marginBottom    := "10px",
-              padding         := "8px",
-              backgroundColor := "#ffffff",
-              border          := "1px solid #e5e7eb",
-              borderRadius    := "6px",
-              input(
-                placeholder  := "Key name",
-                flexGrow     := "1",
-                padding      := "6px 8px",
-                boxSizing.borderBox,
-                fontSize     := "12px",
-                border       := "1px solid #d1d5db",
-                borderRadius := "4px",
-                value <-- newApiKeyNameVar,
-                onInput.mapToValue --> newApiKeyNameVar.set
-              ),
-              configButton(
-                span("Create"),
-                () => {
-                  ctx.generateApiKey(newApiKeyNameVar.now())
-                  // 新建后自动展开它的 Advanced（prompt mode / routing），创建时就能把候选配上。
-                  ctx.apiKeys.now().lastOption.foreach(key => advancedOpenVar.update(_ + key.id))
-                  newApiKeyNameVar.set("")
-                  showCreateKeyVar.set(false)
-                },
-                textSize = "12px",
-                spacing = "6px 10px"
-              ),
-              configButton(
-                span("Cancel"),
-                () => showCreateKeyVar.set(false),
-                textSize = "12px",
-                spacing = "6px 10px"
-              )
+            child <-- showCreateKeyVar.signal.map(
+              if (_) {
+                div(
+                  marginTop    := "10px",
+                  marginBottom := "10px",
+                  InlineNameEditor.render(
+                    valueSignal = newApiKeyNameVar.signal,
+                    onInputValue = newApiKeyNameVar.set,
+                    onSave = () => {
+                      ctx.generateApiKey(newApiKeyNameVar.now())
+                      // 新建后自动展开它的 Advanced（prompt mode / routing），创建时就能把候选配上。
+                      ctx.apiKeys.now().lastOption.foreach(key => advancedOpenVar.update(_ + key.id))
+                      newApiKeyNameVar.set("")
+                      showCreateKeyVar.set(false)
+                    },
+                    onCancel = () => {
+                      newApiKeyNameVar.set("")
+                      showCreateKeyVar.set(false)
+                    },
+                    placeholderText = "Key name",
+                    saveTooltip = "Create API key",
+                    cancelTooltip = "Cancel new API key"
+                  )
+                )
+              } else emptyNode
             )
           ),
           div(
@@ -1432,35 +1416,18 @@ private[ui] object ConfigPanel {
                         children <-- editingKeyIdVar.signal.map { editing =>
                           if (editing == key.id) {
                             List(
-                              div(
-                                display.flex,
-                                gap := "4px",
-                                input(
-                                  value <-- editNameVar,
-                                  placeholder  := "unnamed",
-                                  padding      := "4px 6px",
-                                  fontSize     := "11px",
-                                  border       := "1px solid #e5e7eb",
-                                  borderRadius := "4px",
-                                  disabled     := key.revoked || systemKey,
-                                  onInput.mapToValue --> editNameVar.set
-                                ),
-                                configButton(
-                                  span("Save"),
-                                  () => {
-                                    ctx.renameApiKey(key.id, editNameVar.now())
-                                    editingKeyIdVar.set("")
-                                  },
-                                  disabledSignal = Val(key.revoked || systemKey),
-                                  textSize = "10px",
-                                  spacing = "2px 6px"
-                                ),
-                                configButton(
-                                  span("Cancel"),
-                                  () => editingKeyIdVar.set(""),
-                                  textSize = "12px",
-                                  spacing = "2px 6px"
-                                )
+                              InlineNameEditor.render(
+                                valueSignal = editNameVar.signal,
+                                onInputValue = editNameVar.set,
+                                onSave = () => {
+                                  ctx.renameApiKey(key.id, editNameVar.now())
+                                  editingKeyIdVar.set("")
+                                },
+                                onCancel = () => editingKeyIdVar.set(""),
+                                disabledSignal = Val(key.revoked || systemKey),
+                                placeholderText = "unnamed",
+                                saveTooltip = "Save API key name",
+                                cancelTooltip = "Cancel API key rename"
                               )
                             )
                           } else {

@@ -1,8 +1,7 @@
 package com.just3bowls.ui.content.webchat
 
 import com.just3bowls.facade.JsBridge
-import com.just3bowls.facade.BrowserEvents
-import com.just3bowls.ui.components.{InlineDeleteConfirmation, NeutralActionButton, NeutralIconButton}
+import com.just3bowls.ui.components.{InlineDeleteConfirmation, InlineNameEditor, NeutralActionButton}
 
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.nodes.CommentNode
@@ -201,49 +200,19 @@ object WebChatView {
         alignItems.center,
         gap   := "4px",
         width := "100%",
-        input(
-          typ          := "text",
-          value        := state.renameDraft,
-          width        := "120px",
-          maxWidth     := "120px",
-          minWidth     := "0",
-          fontSize     := "11px",
-          padding      := "2px 5px",
-          border       := "1px solid #93c5fd",
-          borderRadius := "4px",
-          outline      := "none",
-          onMountFocus,
-          onMountCallback { context =>
-            val input = context.thisNode.ref
-            js.timers.setTimeout(0) {
-              input.focus()
-              input.select()
-            }
-          },
-          onInput.mapToValue --> cb.changeRenameDraft,
-          onKeyDown --> { event =>
-            if (
-              !BrowserEvents.isComposing(event) &&
-              event.key == "Enter"
-            ) {
-              event.preventDefault()
-              cb.saveRename()
-            } else if (
-              !BrowserEvents.isComposing(event) &&
-              event.key == "Escape"
-            ) {
-              event.preventDefault()
-              cb.cancelRename()
-            }
-          },
-          onBlur --> { event =>
+        InlineNameEditor.render(
+          valueSignal = Val(state.renameDraft),
+          onInputValue = cb.changeRenameDraft,
+          onSave = () => cb.saveRename(),
+          onCancel = () => cb.cancelRename(),
+          saveTooltip = "Save session name",
+          cancelTooltip = "Cancel session rename",
+          onInputBlur = Some { event =>
             val editor = event.currentTarget.asInstanceOf[org.scalajs.dom.HTMLElement].parentElement
             val next   = event.relatedTarget.asInstanceOf[org.scalajs.dom.Node]
             if (editor == null || next == null || !editor.contains(next)) cb.cancelRename()
           }
-        ),
-        NeutralIconButton.render("✓", "Save session name", () => cb.saveRename()),
-        NeutralIconButton.render("×", "Cancel session rename", () => cb.cancelRename())
+        )
       )
     else
       div(
