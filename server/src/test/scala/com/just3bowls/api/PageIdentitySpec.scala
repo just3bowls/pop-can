@@ -18,6 +18,14 @@ object PageIdentitySpec extends ZIOSpecDefault {
       "https://chatglm.cn/main/alltoolsdetail?t=1#x",
       true
     ),
+    ("GML 根路径覆盖会话页", "https://chatglm.cn/", "https://chatglm.cn/chat/general/abc", true),
+    ("文心根路径覆盖搜索页", "https://wenxin.baidu.com/", "https://wenxin.baidu.com/search/123", true),
+    (
+      "元宝 /chat 根路径覆盖具体会话",
+      "https://yuanbao.tencent.com/chat/",
+      "https://yuanbao.tencent.com/chat/naQivTmsDa/abc",
+      true
+    ),
     ("末尾斜杠等价", "https://www.kimi.com/chat/", "https://www.kimi.com/chat", true),
     ("不同 host", "https://www.kimi.com/chat", "https://www.moonshot.cn/chat", false),
     ("不同路径", "https://www.doubao.com/chat", "https://www.doubao.com/settings", false),

@@ -5,8 +5,8 @@
     // Doubao 使用 Tiptap/ProseMirror contenteditable 作为输入框，New Chat 在左侧导航；fingerprints 优先匹配编辑器角色、classes 与容器层级。
     "url": "https://www.doubao.com/chat",
     "selectors": {
-      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='main'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]",
-      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='nav'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][1]"
+      "input": "div.tiptap.ProseMirror[contenteditable=\"true\"]",
+      "new-chat": "//div[@role='button' and contains(@class,'sidebar_nav_item')][.//*[contains(normalize-space(.),'新对话')]]"
     },
     "fingerprints": {
       "input": {
@@ -26,28 +26,26 @@
           "container-ObLj2X",
           "w-full"
         ],
-        "capturedAt": 1790673710133,
+        "capturedAt": 1795191552988,
         "classes": [
           "tiptap",
-          "ProseMirror",
-          "ProseMirror-focused"
+          "ProseMirror"
         ],
-        "docX": 788.8000183105469,
-        "docY": 623.2000122070312,
+        "docX": 781.6000061035156,
+        "docY": 615.2000122070312,
         "editable": true,
         "height": 24,
-        "innerHeight": 711,
-        "innerWidth": 1298,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "parentClasses": [
           "w-full",
           "text-16"
         ],
         "parentTag": "div",
-        "role": "input",
         "tag": "div",
-        "width": 945.6000366210938,
-        "x": 788.8000183105469,
-        "y": 623.2000122070312
+        "width": 931.2000122070312,
+        "x": 781.6000061035156,
+        "y": 615.2000122070312
       },
       "new-chat": {
         "ancestorClasses": [
@@ -71,19 +69,14 @@
           "ease-[var(--ease-in-out)]",
           "transform",
           "transform",
-          "[&_:is(a,button,[role=button]):focus-visible]:![outline:2px_solid_var(--dbx-fill-highlight)]",
+          "[&_:is(a,button,[role=button]):focus-visible]:![outline:2px_solid_var(--dbd-theme-action-bg,var(--dbx-fill-highlight))]",
           "[&_:is(a,button,[role=button]):focus-visible]:!outline-offset-[-2px]",
           "pt-g-sidebar-wrapper-padding-top",
           "pl-g-sidebar-wrapper-padding-left",
           "pr-g-sidebar-wrapper-padding-right",
           "h-full"
         ],
-        "ancestorTexts": [
-          "新对话Ctrl Shift K",
-          "豆包新工作任务Ctrl J新对话Ctrl Shift K",
-          "豆包新工作任务Ctrl J新对话Ctrl Shift K定时任务Ctrl Shift T插件 · 技能 · 伙伴Ctrl Shift S云盘Ctrl Shift DAPI 服务更多 To pick up a draggable item, "
-        ],
-        "capturedAt": 1790673707630,
+        "capturedAt": 1795191552989,
         "classes": [
           "group/sidebar_nav_item",
           "cursor-pointer",
@@ -101,12 +94,12 @@
         "docX": 140.00000476837158,
         "docY": 104.80000305175781,
         "height": 32,
-        "innerHeight": 767,
-        "innerWidth": 1298,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "parentTag": "div",
-        "role": "new-chat",
+        "role": "button",
         "tag": "div",
-        "text": "新对话Ctrl Shift K",
+        "text": "新对话Ctrl Shift KCtrlShiftK",
         "width": 254.40000915527344,
         "x": 140.00000476837158,
         "y": 104.80000305175781

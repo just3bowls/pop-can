@@ -5,8 +5,8 @@
     // DeepSeek 的输入框是 textarea，New Chat 位于侧栏；fingerprints 用可编辑控件、父级布局和侧栏导航结构做二次定位，避免 XPath 漂移后误点。
     "url": "https://chat.deepseek.com/",
     "selectors": {
-      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='textarea'][1]",
-      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='span'][1]"
+      "input": "textarea[name=\"search\"]",
+      "new-chat": "//span[normalize-space()='开启新对话']"
     },
     "fingerprints": {
       "input": {
@@ -14,14 +14,10 @@
           "_24fad49",
           "_020ab5b",
           "_77cefa5",
-          "_9996a53",
+          "_3d616d3",
           "focused"
         ],
-        "ancestorTexts": [
-          "深度思考智能搜索",
-          "深度思考智能搜索"
-        ],
-        "capturedAt": 1791666774414,
+        "capturedAt": 1795191552856,
         "classes": [
           "_27c9245",
           "ds-scroll-area",
@@ -29,23 +25,22 @@
           "ds-scroll-area--enabled",
           "d96f2d2a"
         ],
-        "docX": 779.3000183105469,
-        "docY": 326.1000061035156,
+        "docX": 772.1000061035156,
+        "docY": 586.2000122070312,
         "editable": true,
         "height": 60,
-        "innerHeight": 711,
-        "innerWidth": 1298,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "name": "search",
         "parentClasses": [
           "_24fad49"
         ],
         "parentTag": "div",
         "placeholder": "给 DeepSeek 发送消息 ",
-        "role": "input",
         "tag": "textarea",
         "width": 774.4000244140625,
-        "x": 779.3000183105469,
-        "y": 326.1000061035156
+        "x": 772.1000061035156,
+        "y": 586.2000122070312
       },
       "new-chat": {
         "ancestorClasses": [
@@ -55,23 +50,17 @@
           "_4bcc731",
           "_7b40dad"
         ],
-        "ancestorTexts": [
-          "开启新对话",
-          "开启新对话",
-          "开启新对话"
-        ],
-        "capturedAt": 1791666772517,
+        "capturedAt": 1795191552856,
         "docX": 141.0999984741211,
         "docY": 90.00000476837158,
         "height": 17.600000381469727,
-        "innerHeight": 711,
-        "innerWidth": 1298,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "parentClasses": [
           "_5a8ac7a",
           "a084f19e"
         ],
         "parentTag": "div",
-        "role": "new-chat",
         "tag": "span",
         "text": "开启新对话",
         "width": 70,
