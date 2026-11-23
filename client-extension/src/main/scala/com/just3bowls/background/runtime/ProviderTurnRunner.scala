@@ -105,15 +105,7 @@ private[background] object ProviderTurnRunner {
                 gen = generationId,
                 onProgress = report
               )
-                .flatMap { case (tabId, managed) =>
-                  if (inputSessionId.isEmpty) Future.successful(Right((tabId, managed)))
-                  else
-                    // 会话 URL 列表据此知道「这条会话用过哪些 provider tab」；顺手把「待新对话」的待办清掉。
-                    ManagedTabManager
-                      .noteSessionUsage(provider, managedKeyId, inputSessionId)
-                      .flatMap(_ => SessionFreshChats.clear(inputSessionId, provider))
-                      .map(_ => Right((tabId, managed)))
-                }
+                .map { case (tabId, managed) => Right((tabId, managed)) }
                 .recover { case e =>
                   PopCanLog.error("background", s"allocate server tab failed provider=$provider", e)
                   Left(
@@ -139,19 +131,13 @@ private[background] object ProviderTurnRunner {
         allocation match {
           case Right((tabId, _)) =>
             if (BackgroundState.cancelledCdpTasks.contains(generationId)) {
-              val bindF =
-                if (inputBindConv && inputSessionId.nonEmpty)
-                  WebChatService.bindTabConversation(tabId, inputSessionId, provider, inputToolProfileId)
-                else Future.successful(())
-              bindF
-                .flatMap(_ =>
-                  ManagedTabManager.finishTask(
-                    provider,
-                    managedKeyId,
-                    generationId,
-                    ok = false,
-                    reason = Some("Task canceled")
-                  )
+              ManagedTabManager
+                .finishTask(
+                  provider,
+                  managedKeyId,
+                  generationId,
+                  ok = false,
+                  reason = Some("Task canceled")
                 )
                 .foreach(_ => finishWith(Msg.promptResponse(false, "Task canceled")))
             } else {
@@ -167,24 +153,40 @@ private[background] object ProviderTurnRunner {
               )
               ManagedTabManager
                 .startTask(provider, managedKeyId, task)
-                // 分配已经做完（New Chat 也点过了）：先把这条对话绑给会话，胶囊在模型思考期间就是对的；
-                // 成功 / 失败都在这里绑，不能只靠成功路径的 `commitTip`。
-                .flatMap(_ =>
-                  if (inputBindConv && inputSessionId.nonEmpty)
-                    WebChatService.bindTabConversation(tabId, inputSessionId, provider, inputToolProfileId)
-                  else Future.successful(())
-                )
                 .flatMap { _ =>
                   BackgroundState.activeCdpTasks.update(generationId, tabId)
-                  val flowLog    = PopCanLog.withContext(
+                  val flowLog                           = PopCanLog.withContext(
                     "cdp",
                     "gen"      -> generationId,
                     "provider" -> provider,
                     "tab"      -> tabId.toString
                   )
                   flowLog.info("preparing managed tab for task")
-                  var rawStarted = false
-                  val cdpFuture  =
+                  var rawStarted                        = false
+                  var requestObserved                   = false
+                  def onRequestObserved(): Future[Unit] = {
+                    requestObserved = true
+                    val usageF =
+                      if (inputSessionId.isEmpty) Future.successful(())
+                      else
+                        ManagedTabManager
+                          .noteSessionUsage(provider, managedKeyId, inputSessionId)
+                          .flatMap(_ => SessionFreshChats.clear(inputSessionId, provider))
+                    val bindF  =
+                      if (inputBindConv && inputSessionId.nonEmpty)
+                        WebChatService.bindTabConversation(tabId, inputSessionId, provider, inputToolProfileId)
+                      else Future.successful(())
+                    usageF
+                      .flatMap(_ => bindF)
+                      .map { _ =>
+                        TraceStore.noteEvidence(generationId, "request observed: session usage / binding committed")
+                        ()
+                      }
+                      .recover { case e =>
+                        flowLog.warn(s"request observed binding failed: ${e.getMessage}")
+                      }
+                  }
+                  val cdpFuture                         =
                     TabKeepAlive.ensureTabReady(tabId).flatMap { _ =>
                       ServerTabManager.loadProviderConfig(provider).flatMap { config =>
                         BackgroundState.localRawParsers.update(
@@ -317,6 +319,7 @@ private[background] object ProviderTurnRunner {
                             injectTemplate = injection.template,
                             injectRule = ruleJson,
                             onDelivered = injection.commit.getOrElse(() => ()),
+                            onRequestObserved = onRequestObserved,
                             onInjectFailed = message => {
                               // 注入失败：记住这家 provider 不可注入（规则改了会自动重试），本轮已经以可读错误结束。
                               TemplateInjection.markBlocked(provider, ruleJson).foreach(_ => ())
@@ -348,9 +351,8 @@ private[background] object ProviderTurnRunner {
                           tabId,
                           new Exception(reasonOpt.get)
                         )
-                      // 收口绑定：URL 可能在跑的过程中细化（`/chat` → `/chat/<id>`），失败也要绑（新对话不能变孤儿）。
                       val bindF       =
-                        if (inputBindConv && inputSessionId.nonEmpty)
+                        if (requestObserved && inputBindConv && inputSessionId.nonEmpty)
                           WebChatService.bindTabConversation(tabId, inputSessionId, provider, inputToolProfileId)
                         else Future.successful(())
                       bindF
@@ -370,7 +372,7 @@ private[background] object ProviderTurnRunner {
                       BackgroundState.activeCdpTasks.remove(generationId)
                       BackgroundState.clearChunkParsingState(generationId)
                       val bindF =
-                        if (inputBindConv && inputSessionId.nonEmpty)
+                        if (requestObserved && inputBindConv && inputSessionId.nonEmpty)
                           WebChatService.bindTabConversation(tabId, inputSessionId, provider, inputToolProfileId)
                         else Future.successful(())
                       bindF
