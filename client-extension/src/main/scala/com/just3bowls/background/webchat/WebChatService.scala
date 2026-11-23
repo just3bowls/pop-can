@@ -194,10 +194,10 @@ private[background] object WebChatService {
     }
 
   /**
-   * 插件页的 chat / Retry 轮用过的这条 provider 对话**绑给会话**（`thWebChatHosts`）：成功失败都绑。
+   * 插件页的 chat / Retry 轮**观察到 provider 请求后**把这条对话绑给会话（`thWebChatHosts`）。
    *
-   * 为什么不能只在"投递成功"时绑：重试是"先 New Chat 再重问"，`SESSION_URL_END` 已经把旧 URL 解绑了；这一轮要是失败 （provider 卡在自己的思考里、超时、注入失败…），新对话就没人认领 ——
-   * 胶囊停在 Unassigned，用户也没法接着那段对话聊。
+   * 绑定时机是"请求真的发出"，不是"tab 分配完"：附件未挂载、focus/type 失败等 pre-send 错误不能产生 session usage 或幽灵对话。 请求一旦发出，
+   * 即使后续思考超时、流断开或解析失败，也要保留绑定，因为 provider 页面里的对话上下文已经真实变化。
    *
    * 只写 URL / tab / session / tool revision，**不动水位线**（`seedToMessageId` / `seedToBodyCount` / `lastTurnAt` 原样保留，
    * 绑定不等于跑完一轮）：没有水位线的对话，下一轮自然走全量投递。
