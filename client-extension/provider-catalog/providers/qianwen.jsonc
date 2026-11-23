@@ -5,8 +5,8 @@
     // Qianwen 使用 Slate/contenteditable 编辑器，New Chat 在侧栏；fingerprints 用于稳定定位该富文本输入区。
     "url": "https://www.qianwen.com/",
     "selectors": {
-      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]",
-      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='aside'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='span'][2]"
+      "input": "div[contenteditable=\"true\"][role=\"textbox\"][class*=\"whitespace-pre-wrap\"]",
+      "new-chat": "//span[normalize-space()='新对话']"
     },
     "fingerprints": {
       "input": {
@@ -25,7 +25,7 @@
           "ease-out",
           "overflow-clip"
         ],
-        "capturedAt": 1791685802297,
+        "capturedAt": 1795191554462,
         "classes": [
           "relative",
           "min-h-[24px]",
@@ -45,22 +45,23 @@
           "placeholder:text-disabled",
           "px-2"
         ],
-        "docX": 773.7875061035156,
-        "docY": 341.0999946594238,
+        "docX": 766.5875244140625,
+        "docY": 304.6499938964844,
         "editable": true,
-        "height": 49.400001525878906,
-        "innerHeight": 711,
-        "innerWidth": 1298,
+        "height": 32.5,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "parentClasses": [
           "relative",
           "w-full"
         ],
         "parentTag": "div",
-        "role": "input",
+        "role": "textbox",
         "tag": "div",
+        "text": "向千问提问",
         "width": 734.4000244140625,
-        "x": 773.7875061035156,
-        "y": 341.0999946594238
+        "x": 766.5875244140625,
+        "y": 304.6499938964844
       },
       "new-chat": {
         "ancestorClasses": [
@@ -84,12 +85,7 @@
           "h-9",
           "px-3"
         ],
-        "ancestorTexts": [
-          "新对话",
-          "新对话",
-          "新对话"
-        ],
-        "capturedAt": 1791685800504,
+        "capturedAt": 1795191554462,
         "classes": [
           "truncate",
           "font-400"
@@ -97,8 +93,8 @@
         "docX": 67,
         "docY": 134,
         "height": 20,
-        "innerHeight": 711,
-        "innerWidth": 1298,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "parentClasses": [
           "flex",
           "h-full",
@@ -116,7 +112,6 @@
           "cursor-pointer"
         ],
         "parentTag": "div",
-        "role": "new-chat",
         "tag": "span",
         "text": "新对话",
         "width": 42,

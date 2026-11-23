@@ -5,44 +5,42 @@
     // Kimi 的编辑器是 contenteditable，New Chat 在侧栏；fingerprints 依赖编辑器角色与页面布局，而不是容易变化的深层节点序号。
     "url": "https://www.kimi.com/",
     "selectors": {
-      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][2]",
-      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='aside'][1]/*[local-name()='div'][2]/*[local-name()='a'][1]"
+      "input": ".chat-input-editor[contenteditable=\"true\"]",
+      "new-chat": "a[data-testid=\"sidebar-new-chat\"]"
     },
     "fingerprints": {
       "input": {
         "ancestorClasses": [
-          "chat-input-editor-container",
-          "chat-input",
-          "chat-editor-input-wrap"
+          "chat-input-editor-content",
+          "kimi-scroll-fade__scroll",
+          "kimi-scroll-fade",
+          "kimi-scroll-fade--vertical",
+          "kimi-scroll-fade--mask",
+          "chat-input-editor-container"
         ],
-        "ancestorTexts": [
-          "输入 \"/\" 唤起插件和技能",
-          "输入 \"/\" 唤起插件和技能",
-          "输入 \"/\" 唤起插件和技能"
-        ],
-        "capturedAt": 1791509633882,
+        "capturedAt": 1795191553967,
         "classes": [
           "chat-input-editor"
         ],
-        "docX": 758.2000122070312,
-        "docY": 312.20001220703125,
+        "docX": 751.0000610351562,
+        "docY": 600,
         "editable": true,
-        "height": 48,
-        "innerHeight": 711,
-        "innerWidth": 1298,
-        "nearestText": "输入 \"/\" 唤起插件和技能",
+        "height": 47.0400390625,
+        "innerHeight": 703,
+        "innerWidth": 1283,
+        "nearestText": "尽管问，带图也行",
         "parentClasses": [
-          "chat-input-editor-container"
+          "chat-input-editor-content"
         ],
         "parentTag": "div",
-        "role": "input",
+        "role": "textbox",
         "siblingTexts": [
-          "输入 \"/\" 唤起插件和技能"
+          "尽管问，带图也行"
         ],
         "tag": "div",
-        "width": 734.4000244140625,
-        "x": 758.2000122070312,
-        "y": 312.20001220703125
+        "width": 719.7120971679688,
+        "x": 751.0000610351562,
+        "y": 600
       },
       "new-chat": {
         "ancestorClasses": [
@@ -52,12 +50,7 @@
           "sidebar-shell",
           "sidebar-shell--interactive"
         ],
-        "ancestorTexts": [
-          "#NewChatAnimatedIcon-svg-rs-ew8n6j-p1{transform-box:view-box;transform-origin:0 0;animation:NewChatAnimatedIcon-svg-rs-e",
-          "#LeftBarAnimatedIcon-enter-rs-1sihg8c-mh2{transform-box:view-box;transform-origin:0 0;animation:LeftBarAnimatedIcon-ente",
-          "#LeftBarAnimatedIcon-enter-rs-1sihg8c-mh2{transform-box:view-box;transform-origin:0 0;animation:LeftBarAnimatedIcon-ente"
-        ],
-        "capturedAt": 1791509632154,
+        "capturedAt": 1795191553967,
         "classes": [
           "new-chat-btn"
         ],
@@ -66,13 +59,12 @@
         "docX": 120,
         "docY": 82.80000114440918,
         "height": 41.60000228881836,
-        "innerHeight": 711,
-        "innerWidth": 1298,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "parentClasses": [
           "sidebar-new-chat"
         ],
         "parentTag": "div",
-        "role": "new-chat",
         "tag": "a",
         "text": "#NewChatAnimatedIcon-svg-rs-ew8n6j-p1{transform-box:view-box;transform-origin:0 0;animation:NewChatAnimatedIcon-svg-rs-ew8n6j-p1 0.4167s linear 1 forwards}@keyframes NewChatAnimatedIcon-svg-rs-ew8n6j-",
         "width": 224,

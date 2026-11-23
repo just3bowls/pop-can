@@ -3,92 +3,71 @@
   "schemaVersion": 1,
   "page": {
     // 输入框是 composer textarea，附件入口暴露 input.el-upload__input，New Chat 在页面主区域；fingerprints 用于校准文本框与新建对话入口。
-    "url": "https://chatglm.cn/main/alltoolsdetail?t=1788611652123&lang=zh",
+    "url": "https://chatglm.cn/",
     "selectors": {
-      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='section'][1]/*[local-name()='main'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][5]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='textarea'][1]",
-      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='section'][1]/*[local-name()='aside'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]"
+      "input": ".chat-textarea textarea",
+      "new-chat": "button[aria-label=\"新对话\"][class*=\"sidebar-nav__item\"]"
     },
     "fingerprints": {
       "input": {
         "ancestorClasses": [
-          "input-box-inner",
-          "input-wrap",
-          "flex",
-          "flex-col",
-          "input-box",
-          "noTopBorder"
+          "el-textarea",
+          "chat-textarea",
+          "input-area",
+          "input-box-wrapper"
         ],
-        "ancestorTexts": [
-          "和我聊聊天吧",
-          "和我聊聊天吧GLM-Flash极致新对话",
-          "和我聊聊天吧GLM-Flash极致新对话"
-        ],
-        "capturedAt": 1788611790947,
+        "capturedAt": 1795191553930,
         "classes": [
-          "scroll-display-none"
+          "el-textarea__inner"
         ],
-        "docX": 875.2000122070312,
-        "docY": 307.7749938964844,
+        "docX": 772.6000061035156,
+        "docY": 320.3999938964844,
         "editable": true,
-        "height": 68,
-        "innerHeight": 694,
-        "innerWidth": 1490,
-        "nearestText": "和我聊聊天吧",
+        "height": 54,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "parentClasses": [
-          "input-box-inner"
+          "el-textarea",
+          "chat-textarea"
         ],
         "parentTag": "div",
-        "role": "input",
-        "siblingTexts": [
-          "和我聊聊天吧"
-        ],
+        "placeholder": "和我聊聊天吧～",
         "tag": "textarea",
-        "width": 774.4000244140625,
-        "x": 875.2000122070312,
-        "y": 307.7749938964844
+        "width": 874.4000244140625,
+        "x": 772.6000061035156,
+        "y": 320.3999938964844
       },
       "new-chat": {
         "ancestorClasses": [
-          "new-session",
+          "sidebar-nav",
+          "sidebar-top-group",
           "flex",
-          "flex-x-start",
-          "flex-y-center",
-          "el-tooltip__trigger",
-          "el-tooltip__trigger",
-          "aside-subjects",
-          "el-aside",
-          "aside-container",
-          "scroll-display-none"
+          "min-h-0",
+          "flex-1",
+          "flex-col"
         ],
-        "ancestorTexts": [
-          "新对话",
-          "新对话学习搭子AI画图AI阅读AI生视频AgentMore云知识库智能体最近对话获取下一步请求数据批量操作重命名删除对话解析JSON请求内容批量操作重命名删除对话读取下一步请求数据批量操作重命名删除对话",
-          "新对话学习搭子AI画图AI阅读AI生视频AgentMore云知识库智能体最近对话获取下一步请求数据批量操作重命名删除对话解析JSON请求内容批量操作重命名删除对话读取下一步请求数据批量操作重命名删除对话只喝三碗吖积分 7666.00全选已选"
-        ],
-        "capturedAt": 1788611786801,
+        "ariaLabel": "新对话",
+        "capturedAt": 1795191553931,
         "classes": [
-          "text"
-        ],
-        "docX": 69.79999923706055,
-        "docY": 74,
-        "height": 20,
-        "innerHeight": 740,
-        "innerWidth": 1490,
-        "parentClasses": [
-          "new-session",
-          "flex",
-          "flex-x-start",
-          "flex-y-center",
+          "sidebar-nav__item",
           "el-tooltip__trigger",
           "el-tooltip__trigger"
         ],
-        "parentTag": "div",
-        "role": "new-chat",
-        "tag": "div",
+        "clickable": true,
+        "docX": 130.5999984741211,
+        "docY": 76,
+        "height": 32,
+        "innerHeight": 703,
+        "innerWidth": 1283,
+        "parentClasses": [
+          "sidebar-nav"
+        ],
+        "parentTag": "nav",
+        "tag": "button",
         "text": "新对话",
-        "width": 42,
-        "x": 69.79999923706055,
-        "y": 74
+        "width": 237.1999969482422,
+        "x": 130.5999984741211,
+        "y": 76
       }
     }
   },
@@ -99,9 +78,9 @@
     ]
   },
   "attachment": {
-    // file 模式直接使用 el-upload 的隐藏 input；固定 selector 比自动择优更稳定，避免误选其他上传组件。
+    // file 模式直接使用 composer 附件选择器下的隐藏 input；固定 selector 比自动择优更稳定，避免误选头像上传框。
     "strategy": "input",
-    "selector": "input.el-upload__input"
+    "selector": ".upload-attachment-picker > input.file-input"
   },
   "parserRule": {
     // GLM web SSE. Text streams as deltas, but the `status=finish` frame repeats the whole answer as a snapshot — and the deltas can stop early (dropping the closing markers), so that snapshot is the safety net. Provider-native turn and citation tokens are stripped because they are page-rendered chips with no URL metadata in the stream.
