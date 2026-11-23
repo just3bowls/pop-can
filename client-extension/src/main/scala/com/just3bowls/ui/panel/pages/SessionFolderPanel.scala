@@ -831,45 +831,15 @@ final private[ui] class SessionFolderPanel(
             minWidth      := "0",
             paddingTop    := "3px",
             paddingBottom := "3px",
-            input(
-              idAttr       := SessionNameId,
-              `type`       := "text",
-              minWidth     := "0",
-              flexGrow     := "1",
-              padding      := "2px 5px",
-              fontSize     := "11px",
-              border       := "1px solid #93c5fd",
-              borderRadius := "4px",
-              outline      := "none",
-              controlled(
-                value <-- sessionDraft,
-                onInput.mapToValue --> sessionDraft.set
-              ),
-              onKeyDown --> { event =>
-                event.key match {
-                  case "Enter"  =>
-                    event.preventDefault()
-                    event.stopPropagation()
-                    saveSessionRename()
-                  case "Escape" =>
-                    event.preventDefault()
-                    event.stopPropagation()
-                    cancelSessionRename()
-                  case _        => ()
-                }
-              }
-            ),
-            NeutralIconButton.render(
-              "✓",
-              "Save session name",
-              saveSessionRename,
-              disabledSignal = busy.signal
-            ),
-            NeutralIconButton.render(
-              "×",
-              "Cancel session rename",
-              cancelSessionRename,
-              disabledSignal = busy.signal
+            InlineNameEditor.render(
+              valueSignal = sessionDraft.signal,
+              onInputValue = sessionDraft.set,
+              onSave = saveSessionRename,
+              onCancel = cancelSessionRename,
+              disabledSignal = busy.signal,
+              inputId = Some(SessionNameId),
+              saveTooltip = "Save session name",
+              cancelTooltip = "Cancel session rename"
             )
           )
         case false =>
@@ -1018,37 +988,17 @@ final private[ui] class SessionFolderPanel(
       minWidth      := "0",
       paddingTop    := "3px",
       paddingBottom := "3px",
-      input(
-        idAttr       := NameId,
-        `type`       := "text",
-        placeholder  := hint,
-        minWidth     := "0",
-        flexGrow     := "1",
-        padding      := "2px 5px",
-        fontSize     := "11px",
-        border       := "1px solid #93c5fd",
-        borderRadius := "4px",
-        outline      := "none",
-        controlled(
-          value <-- draft,
-          onInput.mapToValue --> draft.set
-        ),
-        onKeyDown --> { event =>
-          event.key match {
-            case "Enter"  =>
-              event.preventDefault()
-              event.stopPropagation()
-              onSave()
-            case "Escape" =>
-              event.preventDefault()
-              event.stopPropagation()
-              onCancel()
-            case _        => ()
-          }
-        }
-      ),
-      NeutralIconButton.render("✓", "Save folder name", onSave, disabledSignal = busy.signal),
-      NeutralIconButton.render("×", "Cancel folder rename", onCancel, disabledSignal = busy.signal)
+      InlineNameEditor.render(
+        valueSignal = draft.signal,
+        onInputValue = draft.set,
+        onSave = onSave,
+        onCancel = onCancel,
+        disabledSignal = busy.signal,
+        placeholderText = hint,
+        inputId = Some(NameId),
+        saveTooltip = "Save folder name",
+        cancelTooltip = "Cancel folder rename"
+      )
     )
   private def actionIcon(label: String, tooltip: String, run: () => Unit): HtmlElement =
     button(
@@ -1106,7 +1056,6 @@ final private[ui] class SessionFolderPanel(
     editing.set("")
     draft.set("")
     cancelSessionRename()
-    focusNameEditor()
   }
   private def beginRename(folderId: String): Unit                                      =
     folders.now().find(_.id == folderId).foreach { folder =>
@@ -1117,7 +1066,6 @@ final private[ui] class SessionFolderPanel(
       creatingParentId.set("")
       draft.set(folder.name)
       cancelSessionRename()
-      focusNameEditor()
     }
   private def beginSessionRename(session: ChatSession): Unit                           = {
     confirmDelete.set(None)
@@ -1125,12 +1073,6 @@ final private[ui] class SessionFolderPanel(
     selected.set(SessionSelection(session.id))
     editingSessionId.set(session.id)
     sessionDraft.set(Option(session.title).map(_.trim).getOrElse(""))
-    js.timers.setTimeout(0) {
-      Option(dom.document.getElementById(SessionNameId).asInstanceOf[dom.HTMLInputElement]).foreach { input =>
-        input.focus()
-        input.select()
-      }
-    }
   }
   private def cancelEditing(): Unit                                                    = {
     creating.set(false)
@@ -1225,13 +1167,6 @@ final private[ui] class SessionFolderPanel(
           Toast.error(s"Delete folder failed: ${Option(error.getMessage).getOrElse("unknown error")}")
         }
         .foreach(_ => busy.set(false))
-    }
-  private def focusNameEditor(): Unit                                                  =
-    js.timers.setTimeout(0) {
-      Option(dom.document.getElementById(NameId).asInstanceOf[dom.HTMLInputElement]).foreach { input =>
-        input.focus()
-        input.select()
-      }
     }
 }
 private[ui] object SessionFolderPanel {

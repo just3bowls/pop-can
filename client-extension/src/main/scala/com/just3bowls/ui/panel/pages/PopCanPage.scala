@@ -564,10 +564,12 @@ object PopCanPage {
       else resolved
     }
 
-    /** 发送用掉那份一次性覆盖（只有命中这家 provider 才清；别家等着自己的下一次发送）。 */
-    def consumePendingSend(provider: String): Unit  =
-      if (pendingSendVar.now().exists(_.provider == provider)) pendingSendVar.set(None)
-    def consumeUndoNew(sessionId: String): Unit     =
+    def consumePendingSendSnapshot(snapshot: Option[PendingSend]): Unit =
+      if (
+        snapshot.nonEmpty &&
+        pendingSendVar.now().contains(snapshot.get)
+      ) pendingSendVar.set(None)
+    def consumeUndoNew(sessionId: String): Unit                         =
       if (undoForcesNew(sessionId)) undoForcesNewSessions.update(_ - sessionId)
     def effectiveBaseline(
         provider: String,
@@ -581,7 +583,7 @@ object PopCanPage {
       if (sessionId.nonEmpty && undoSessions.contains(sessionId)) ChatSendPolicy.afterUndo(used)
       else ChatSendPolicy.baseline(used)
     }
-    val undoForcesNewCurrentSignal: Signal[Boolean] =
+    val undoForcesNewCurrentSignal: Signal[Boolean]                     =
       Signal
         .combine(currentSessionIdVar.signal, undoForcesNewSessions.signal)
         .map { case (sessionId, sessions) => sessionId.nonEmpty && sessions.contains(sessionId) }
@@ -2418,12 +2420,13 @@ object PopCanPage {
                 setRunProgress(RunProgress(RunPhase.PreparingRequest, provider = chosenProvider))
                 // 先按清除/Undo 的强制状态算出本轮设置，再作废 redo；否则 clear 的 new 会被提前消费掉。
                 val sendSettings                = sendSettingsFor(chosenProvider)
+                val pendingAtSend               = pendingSendVar.now().filter(_.provider == chosenProvider)
                 // 重新发送新消息后，之前 undo 掉的内容不再可 redo。
                 clearRedoStack(sessionId)
                 val onEvent: TabAiEvent => Unit =
                   applyTabEvent(generationId + "-assistant", s"$generationId-assistant:1")
-                // 这一次发送的设置 = 行内参数 > 固定值 > 会话推导默认（与 `@` 面板显示同源）；用掉就作废这份一次性覆盖。
-                consumePendingSend(chosenProvider)
+                // 这一次发送的设置 = 行内参数 > 固定值 > 会话推导默认（与 `@` 面板显示同源）；
+                // 一次性覆盖要等本轮真正收口后再消费，生成期间继续显示用户选择的模式。
                 consumeUndoNew(sessionId)
                 val recentMemoryContext         =
                   visibleMessages().takeRight(4).map(message => s"${message.role}: ${message.content.take(1200)}")
@@ -2456,6 +2459,9 @@ object PopCanPage {
                       modeReason = decision.reason
                     )
                   )
+                    .andThen { case _ =>
+                      consumePendingSendSnapshot(pendingAtSend)
+                    }
                 runF.map { assistant =>
                   pendingAgentPlanVar.set(None)
                   abortCurrentChat = None
@@ -3047,54 +3053,15 @@ object PopCanPage {
                               editor == null || !editor.contains(target)
                             }
                           } --> { _ => cancelCurrentSessionTitleEdit() },
-                          input(
-                            `type`       := "text",
-                            maxLength    := 120,
-                            onMountFocus,
-                            onMountCallback { context =>
-                              val input = context.thisNode.ref
-                              js.timers.setTimeout(0) {
-                                input.focus()
-                                input.select()
-                              }
-                            },
-                            minWidth     := "0",
-                            width        := "120px",
-                            maxWidth     := "120px",
-                            padding      := "2px 6px",
-                            fontSize     := "12px",
-                            border       := "1px solid #93c5fd",
-                            borderRadius := "4px",
-                            outline      := "none",
-                            disabled <-- currentSessionTitleBusyVar.signal,
-                            controlled(
-                              value <-- currentSessionTitleDraftVar,
-                              onInput.mapToValue --> currentSessionTitleDraftVar.set
-                            ),
-                            onKeyDown --> { event =>
-                              event.stopPropagation()
-                              event.key match {
-                                case "Enter"  =>
-                                  event.preventDefault()
-                                  saveCurrentSessionTitle()
-                                case "Escape" =>
-                                  event.preventDefault()
-                                  cancelCurrentSessionTitleEdit()
-                                case _        => ()
-                              }
-                            }
-                          ),
-                          NeutralIconButton.render(
-                            "✓",
-                            "Save session name",
-                            saveCurrentSessionTitle,
-                            disabledSignal = currentSessionTitleBusyVar.signal
-                          ),
-                          NeutralIconButton.render(
-                            "×",
-                            "Cancel session rename",
-                            cancelCurrentSessionTitleEdit,
-                            disabledSignal = currentSessionTitleBusyVar.signal
+                          InlineNameEditor.render(
+                            valueSignal = currentSessionTitleDraftVar.signal,
+                            onInputValue = currentSessionTitleDraftVar.set,
+                            onSave = saveCurrentSessionTitle,
+                            onCancel = cancelCurrentSessionTitleEdit,
+                            disabledSignal = currentSessionTitleBusyVar.signal,
+                            maxLengthValue = Some(120),
+                            saveTooltip = "Save session name",
+                            cancelTooltip = "Cancel session rename"
                           )
                         )
                     }
