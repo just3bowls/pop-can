@@ -1,7 +1,9 @@
 package com.just3bowls.ui.components
 
+import com.just3bowls.facade.BrowserEvents
 import com.raquo.laminar.api.L._
 import org.scalajs.dom
+import scala.scalajs.js
 
 /** Neutral action button shared by Config, Providers, and session management surfaces. */
 private[ui] object NeutralActionButton {
@@ -78,6 +80,103 @@ private[ui] object NeutralIconButton {
       stopPropagation = stopPropagation,
       titleText = Some(tooltip),
       ariaLabel = Some(tooltip)
+    )
+}
+
+/** Compact inline name editor shared by session, folder, and API-key naming surfaces. */
+private[ui] object InlineNameEditor {
+  def render(
+      valueSignal: Signal[String],
+      onInputValue: String => Unit,
+      onSave: () => Unit,
+      onCancel: () => Unit,
+      disabledSignal: Signal[Boolean] = Val(false),
+      placeholderText: String = "",
+      inputId: Option[String] = None,
+      inputWidth: String = "120px",
+      maxLengthValue: Option[Int] = None,
+      stopPropagation: Boolean = true,
+      saveTooltip: String = "Save name",
+      cancelTooltip: String = "Cancel editing",
+      onInputBlur: Option[dom.FocusEvent => Unit] = None
+  ): HtmlElement    =
+    div(
+      display    := "flex",
+      alignItems.center,
+      gap        := "4px",
+      minWidth   := "0",
+      width      := "max-content",
+      maxWidth   := "100%",
+      flexShrink := 0,
+      input(
+        inputId.fold(emptyNode)(value => idAttr := value),
+        `type`          := "text",
+        maxLengthValue.fold(emptyNode)(value => maxLength := value),
+        placeholder     := placeholderText,
+        minWidth        := "0",
+        width           := inputWidth,
+        maxWidth        := inputWidth,
+        flexBasis       := inputWidth,
+        flexGrow        := 0,
+        flexShrink      := 1,
+        height          := "22px",
+        boxSizing.borderBox,
+        padding         := "0 6px",
+        fontSize        := "12px",
+        lineHeight      := "20px",
+        color           := "#111827",
+        backgroundColor := "#ffffff",
+        border          := "1px solid #d1d5db",
+        borderRadius    := "4px",
+        outline         := "none",
+        disabled <-- disabledSignal,
+        controlled(
+          value <-- valueSignal,
+          onInput.mapToValue --> onInputValue
+        ),
+        onMountCallback { context =>
+          val input = context.thisNode.ref.asInstanceOf[dom.HTMLInputElement]
+          js.timers.setTimeout(0) {
+            input.focus()
+            input.select()
+            input.style.borderColor = "#94a3b8"
+          }
+        },
+        onFocus --> { event =>
+          event.currentTarget.asInstanceOf[dom.HTMLInputElement].style.borderColor = "#94a3b8"
+        },
+        onBlur --> { event =>
+          event.currentTarget.asInstanceOf[dom.HTMLInputElement].style.borderColor = "#d1d5db"
+          onInputBlur.foreach(_(event))
+        },
+        onKeyDown --> { event =>
+          if (!BrowserEvents.isComposing(event)) {
+            event.key match {
+              case "Enter"  =>
+                event.preventDefault()
+                if (stopPropagation) event.stopPropagation()
+                onSave()
+              case "Escape" =>
+                event.preventDefault()
+                if (stopPropagation) event.stopPropagation()
+                onCancel()
+              case _        => ()
+            }
+          }
+        }
+      ),
+      NeutralIconButton.render(
+        "✓",
+        saveTooltip,
+        onSave,
+        disabledSignal = disabledSignal
+      ),
+      NeutralIconButton.render(
+        "×",
+        cancelTooltip,
+        onCancel,
+        disabledSignal = disabledSignal
+      )
     )
 }
 

@@ -887,23 +887,6 @@ private[ui] object ParserPanel {
           flexWrap.wrap,
           gap       := "14px",
           rowGap    := "8px",
-          div(
-            display.flex,
-            alignItems.center,
-            flexWrap.wrap,
-            gap        := "6px",
-            panelButton(
-              "+ Import",
-              () => {
-                importOpenVar.set(true)
-                importSourceVar.set("online")
-                importPlanVar.set(None)
-                importNoteVar.set("")
-                importErrorVar.set("")
-                importFileNameVar.set("")
-              }
-            )
-          ),
           child <-- packStatusVar.signal.map { status =>
             if (!status.installed) emptyNode
             else
@@ -965,13 +948,26 @@ private[ui] object ParserPanel {
         div(
           display.flex,
           alignItems.center,
-          justifyContent <-- providersVar.signal.map(list => if (list.isEmpty) "flex-start" else "flex-end"),
-          gap       := "8px",
+          flexWrap.wrap,
+          gap       := "14px",
+          rowGap    := "8px",
           marginTop := "8px",
+          panelButton(
+            "+ Import",
+            () => {
+              importOpenVar.set(true)
+              importSourceVar.set("online")
+              importPlanVar.set(None)
+              importNoteVar.set("")
+              importErrorVar.set("")
+              importFileNameVar.set("")
+            }
+          ),
           span(
             child.text <-- providerSummary,
-            fontSize := "11px",
-            color    := "#6b7280"
+            marginLeft := "auto",
+            fontSize   := "11px",
+            color      := "#6b7280"
           ),
           child <-- packStatusVar.signal.map { status =>
             if (status.installed)
