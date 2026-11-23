@@ -62,6 +62,8 @@ private[background] object CdpFlowExecutor {
       sendWaitMs: Int = 30000,
       /** 请求确认发出后回调：用来推进"这一轮投递到哪里"的上下文水位线（模板是打进去的还是注入的都算）。 */
       onDelivered: () => Unit = () => (),
+      /** 观察到本轮 provider 请求后回调：只有这时才允许写 session usage / 对话绑定。 */
+      onRequestObserved: () => Future[Unit] = () => Future.successful(()),
       onInjectFailed: String => Unit = _ => (),
       /** `file` 模式：先把这份 body 造成附件上传，再打 `prompt`（上传失败即整轮失败，不回退）。 */
       attachment: Option[PromptAttachment] = None,
@@ -604,6 +606,7 @@ private[background] object CdpFlowExecutor {
           }
       }
       var waitingForResponse                                = false
+      var attachmentVerified                                = false
       log.info("waiting for tab lock")
       ServerTabManager.withTabLock(tabId) {
         log.debug("attaching to tab")
@@ -683,6 +686,7 @@ private[background] object CdpFlowExecutor {
                       attachmentSelector
                     )
                     .map { tag =>
+                      attachmentVerified = true
                       TraceStore.noteEvidence(
                         generationId,
                         s"attach=$tag name=${attach.name} bytes=${attach.content.length}"
@@ -693,8 +697,21 @@ private[background] object CdpFlowExecutor {
                         )
                       ()
                     }
+                    .recover { case e =>
+                      TraceStore.noteEvidence(
+                        generationId,
+                        s"attach failed: ${PopCanLog.short(Option(e.getMessage).getOrElse("unknown error"), 200)}"
+                      )
+                      throw e
+                    }
                 )
             }
+          }
+          .flatMap { _ =>
+            if (attachment.isDefined && !attachmentVerified) {
+              TraceStore.noteEvidence(generationId, "send gate blocked: attachment was not verified")
+              Future.failed(new Exception(s"File prompt mode: $provider attachment was not verified before send"))
+            } else Future.successful(())
           }
           // 附件投递可能把 composer 重渲染 / 把焦点抢走，回车就会落空：回车前重新聚焦一次；标记没了就先让内容脚本重打。
           .flatMap { _ =>
@@ -749,6 +766,13 @@ private[background] object CdpFlowExecutor {
           .flatMap { _ =>
             onProgress(RunProgress(RunPhase.SendingPrompt, provider))
             PhaseTiming.timedFuture(generationId, "send")(armInjection().flatMap(_ => pressEnterAndWaitForRequest()))
+          }
+          .flatMap { _ =>
+            onRequestObserved()
+              .recover { case e =>
+                log.warn(s"request observed callback failed: ${e.getMessage}")
+                ()
+              }
           }
           .flatMap { _ =>
             captureLog.info("send confirmed by observed request")
