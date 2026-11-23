@@ -5,8 +5,8 @@
     // MiMo 使用页面编辑器与 React 路由，输入框和 New Chat 通过指纹与结构特征定位，避免哈希路由变化影响 selector。
     "url": "https://aistudio.xiaomimimo.com/#/c",
     "selectors": {
-      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='textarea'][1]",
-      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][4]/*[local-name()='button'][1]"
+      "input": "textarea[placeholder^=\"有问题\"]",
+      "new-chat": "//div[contains(@class,'justify-between')][.//*[normalize-space()='MiMo Chat']]/button[@aria-label='新对话']"
     },
     "fingerprints": {
       "input": {
@@ -14,11 +14,13 @@
           "flex",
           "gap-2",
           "items-end",
+          "-mr-2",
+          "md:-mr-3",
           "p-4",
           "py-2.5",
           "px-3",
-          "md:p-4",
-          "md:pb-2.5",
+          "md:px-4",
+          "md:py-[0.8125rem]",
           "relative",
           "rounded-2xl",
           "border",
@@ -27,11 +29,7 @@
           "transition-none",
           "bg-mimo-bg-outlined"
         ],
-        "ancestorTexts": [
-          "翻译解题答疑智拍问答",
-          "翻译解题答疑智拍问答"
-        ],
-        "capturedAt": 1790590117672,
+        "capturedAt": 1795191554265,
         "classes": [
           "relative",
           "mb-1",
@@ -52,26 +50,32 @@
           "dark:text-gray-50",
           "dark:placeholder-gray-500",
           "retina:placeholder:font-normal",
-          "md:text-sm"
+          "md:mb-[1.375rem]",
+          "md:min-h-[1.375rem]",
+          "md:text-sm",
+          "md:leading-[1.375rem]",
+          "pr-2",
+          "md:pr-3"
         ],
-        "docX": 776.8000183105469,
-        "docY": 610.4000244140625,
+        "docX": 775.6000061035156,
+        "docY": 582.4000244140625,
         "editable": true,
-        "height": 32,
-        "innerHeight": 711,
-        "innerWidth": 1298,
+        "height": 22,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "parentClasses": [
           "flex",
           "gap-2",
-          "items-end"
+          "items-end",
+          "-mr-2",
+          "md:-mr-3"
         ],
         "parentTag": "div",
         "placeholder": "有问题，尽管问，Shift + Enter 换行",
-        "role": "input",
         "tag": "textarea",
-        "width": 766.4000244140625,
-        "x": 776.8000183105469,
-        "y": 610.4000244140625
+        "width": 778.4000244140625,
+        "x": 775.6000061035156,
+        "y": 582.4000244140625
       },
       "new-chat": {
         "ancestorClasses": [
@@ -85,8 +89,9 @@
           "px-2",
           "cursor-pointer",
           "sticky",
+          "bg-mimo-bg-body",
           "shadow-[0_-1px_0_0_var(--mimo-bg-body)]",
-          "bg-mimo-fill-neutral-active",
+          "hover:bg-mimo-fill-neutral-hover",
           "flex",
           "flex-col",
           "hover-scrollbar",
@@ -95,16 +100,10 @@
           "flex-1",
           "flex-col",
           "overflow-y-auto",
-          "px-2",
-          "scrollbar-visible"
-        ],
-        "ancestorTexts": [
-          "MiMo Chat",
-          "UltraSpeedNewZIO函数式异步编程库介绍MiMo ClawMiMo V2.6MiMo ChatZIO框架趋势与热度分析",
-          "UltraSpeedNewZIO函数式异步编程库介绍MiMo ClawMiMo V2.6MiMo ChatZIO框架趋势与热度分析"
+          "px-2"
         ],
         "ariaLabel": "新对话",
-        "capturedAt": 1790590113506,
+        "capturedAt": 1795191554265,
         "classes": [
           "ml-auto",
           "flex",
@@ -122,8 +121,8 @@
         "docX": 231.1999969482422,
         "docY": 156,
         "height": 20,
-        "innerHeight": 767,
-        "innerWidth": 1298,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "nearestText": "MiMo Chat",
         "parentClasses": [
           "flex",
@@ -136,11 +135,11 @@
           "px-2",
           "cursor-pointer",
           "sticky",
+          "bg-mimo-bg-body",
           "shadow-[0_-1px_0_0_var(--mimo-bg-body)]",
-          "bg-mimo-fill-neutral-active"
+          "hover:bg-mimo-fill-neutral-hover"
         ],
         "parentTag": "div",
-        "role": "new-chat",
         "siblingTexts": [
           "MiMo Chat"
         ],

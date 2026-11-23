@@ -3,10 +3,10 @@
   "schemaVersion": 1,
   "page": {
     // Yuanbao 使用 Quill ql-editor 富文本输入，New Chat 在会话导航中；fingerprints 依赖编辑器 class 和页面结构。
-    "url": "https://yuanbao.tencent.com/chat/naQivTmsDa",
+    "url": "https://yuanbao.tencent.com/chat/",
     "selectors": {
-      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][5]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='section'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]",
-      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][2]/*[local-name()='div'][4]/*[local-name()='div'][2]/*[local-name()='div'][1]"
+      "input": ".chat-command-editor-specail .ql-editor[contenteditable=\"true\"]",
+      "new-chat": ".yb-new-chat-entry__item"
     },
     "fingerprints": {
       "input": {
@@ -15,34 +15,33 @@
           "InputTextArea_hightLightTextAreaNew__aKxTD",
           "ql-container",
           "flex",
-          "min-h-5",
           "w-full",
           "items-start",
-          "px-[6px]",
-          "[&>#search-bar]:!pl-0"
+          "[&>#search-bar]:!pl-0",
+          "min-h-5",
+          "px-[6px]"
         ],
-        "capturedAt": 1790592417441,
+        "capturedAt": 1795191556036,
         "classes": [
           "ql-editor",
           "ql-blank"
         ],
-        "docX": 775.8000183105469,
-        "docY": 594.4000244140625,
+        "docX": 768.6000061035156,
+        "docY": 586.4000244140625,
         "editable": true,
         "height": 20,
-        "innerHeight": 711,
-        "innerWidth": 1298,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "parentClasses": [
           "chat-command-editor-specail",
           "InputTextArea_hightLightTextAreaNew__aKxTD",
           "ql-container"
         ],
         "parentTag": "div",
-        "role": "input",
         "tag": "div",
-        "width": 914.4000244140625,
-        "x": 775.8000183105469,
-        "y": 594.4000244140625
+        "width": 878.4000244140625,
+        "x": 768.6000061035156,
+        "y": 586.4000244140625
       },
       "new-chat": {
         "ancestorClasses": [
@@ -50,32 +49,27 @@
           "yb-nav__content",
           "yb-nav__content-wrapper"
         ],
-        "ancestorTexts": [
-          "新建对话",
-          "新建对话AI 创作分组分组示例最近Flink 作业流生产问题及解决OpenClaw记忆系统设计解析Hermes与OpenClaw的区别Flink Doris 面试核心问题解析Doris索引类型及底层原理Debezium底层实现及CDC原理大",
-          "元宝新建对话AI 创作分组分组示例最近Flink 作业流生产问题及解决OpenClaw记忆系统设计解析Hermes与OpenClaw的区别Flink Doris 面试核心问题解析Doris索引类型及底层原理Debezium底层实现及CDC原"
-        ],
         "ariaLabel": "新建对话",
-        "capturedAt": 1790592411169,
+        "capturedAt": 1795191556036,
         "classes": [
           "yb-new-chat-entry__item"
         ],
         "clickable": true,
         "docX": 130,
-        "docY": 118,
+        "docY": 78,
         "height": 32,
-        "innerHeight": 767,
-        "innerWidth": 1298,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "parentClasses": [
           "yb-new-chat-entry"
         ],
         "parentTag": "div",
-        "role": "new-chat",
+        "role": "button",
         "tag": "div",
         "text": "新建对话",
         "width": 232,
         "x": 130,
-        "y": 118
+        "y": 78
       }
     }
   },

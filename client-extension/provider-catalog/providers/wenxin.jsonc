@@ -3,10 +3,10 @@
   "schemaVersion": 1,
   "page": {
     // Wenxin 使用 textarea 作为输入框，New Chat 在页面导航；fingerprints 用于定位编辑器和新建对话入口。
-    "url": "https://wenxin.baidu.com/?enter_type=wenxin_logo",
+    "url": "https://wenxin.baidu.com/",
     "selectors": {
-      "input": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][4]/*[local-name()='div'][1]/*[local-name()='div'][2]/*[local-name()='div'][1]/*[local-name()='textarea'][1]",
-      "new-chat": "/*[local-name()='html']/*[local-name()='body'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='div'][3]/*[local-name()='div'][1]/*[local-name()='div'][1]/*[local-name()='span'][1]"
+      "input": "textarea#chat-textarea",
+      "new-chat": "//span[contains(@class,'cos-line-clamp-1') and normalize-space()='新对话']"
     },
     "fingerprints": {
       "input": {
@@ -14,63 +14,49 @@
           "ci-file-input-wrapper",
           "ci-container"
         ],
-        "ancestorTexts": [
-          "快速 👈 复杂问题文心助手回答更优"
-        ],
-        "capturedAt": 1788612759178,
+        "capturedAt": 1795191554586,
         "classes": [
           "ci-textarea",
           "ci-scroll-style"
         ],
-        "docX": 845.2000122070312,
-        "docY": 239.58750915527344,
+        "docX": 763.1000061035156,
+        "docY": 603.9000244140625,
         "editable": true,
-        "height": 56,
+        "height": 30,
         "id": "chat-textarea",
-        "innerHeight": 694,
-        "innerWidth": 1490,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "parentTag": "div",
-        "placeholder": "帮我生成PPT，主题为民权运动的历史和重要性",
-        "role": "input",
         "tag": "textarea",
-        "width": 794.4000244140625,
-        "x": 845.2000122070312,
-        "y": 239.58750915527344
+        "width": 775.4000244140625,
+        "x": 763.1000061035156,
+        "y": 603.9000244140625
       },
       "new-chat": {
         "ancestorClasses": [
-          "new-dialog-container-button",
-          "new-dialog-container-button-sample",
+          "new-dialog-container-plain",
           "new-dialog-container",
-          "_chat-aside-header-new-dialog_134i6_38",
-          "_btn-box_134i6_104"
+          "_chat-aside-header-new-dialog_tnqjy_38",
+          "_btn-box_tnqjy_104"
         ],
-        "ancestorTexts": [
-          "开启新对话",
-          "开启新对话",
-          "开启新对话"
-        ],
-        "capturedAt": 1788612756716,
+        "capturedAt": 1795191554586,
         "classes": [
-          "cos-line-clamp-1",
-          "new-dialog-container-text"
+          "cos-line-clamp-1"
         ],
-        "docX": 77.70000076293945,
-        "docY": 81,
+        "docX": 62,
+        "docY": 87,
         "height": 20,
-        "innerHeight": 740,
-        "innerWidth": 1490,
+        "innerHeight": 703,
+        "innerWidth": 1283,
         "parentClasses": [
-          "new-dialog-container-button",
-          "new-dialog-container-button-sample"
+          "new-dialog-container-plain"
         ],
         "parentTag": "div",
-        "role": "new-chat",
         "tag": "span",
-        "text": "开启新对话",
-        "width": 70,
-        "x": 77.70000076293945,
-        "y": 81
+        "text": "新对话",
+        "width": 42,
+        "x": 62,
+        "y": 87
       }
     }
   },
